@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.ApplicationInsights;
 using SFA.DAS.Provider.PR.Web.AppStart;
+using SFA.DAS.Provider.PR.Web.Authorization;
 using SFA.DAS.Provider.Shared.UI;
 using SFA.DAS.Provider.Shared.UI.Startup;
 
@@ -26,7 +27,7 @@ builder.Services
     .AddSession(configuration)
     .AddHealthChecks(configuration)
     .AddAuthentication(configuration)
-    //.AddAuthorizationServicePolicies()
+    .AddAuthorizationServicePolicies()
     .AddProviderUiServiceRegistration(configuration);
 
 //builder.Services.Configure<IISServerOptions>(options => { options.AutomaticAuthentication = false; });
