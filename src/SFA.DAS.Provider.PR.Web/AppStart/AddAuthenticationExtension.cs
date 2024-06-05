@@ -2,6 +2,7 @@
 using SFA.DAS.DfESignIn.Auth.AppStart;
 using SFA.DAS.DfESignIn.Auth.Enums;
 using SFA.DAS.Provider.PR.Web.Authorization;
+using SFA.DAS.Provider.PR.Web.Extensions;
 
 namespace SFA.DAS.Provider.PR.Web.AppStart;
 
@@ -9,7 +10,7 @@ public static class AddAuthenticationExtension
 {
     public static IServiceCollection AddAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
-        if (configuration["StubProviderAuth"] != null && configuration["StubProviderAuth"]!.Equals("true", StringComparison.CurrentCultureIgnoreCase))
+        if (configuration.IsStubAuthEnabled())
         {
             services.AddAuthentication("Provider-stub").AddScheme<AuthenticationSchemeOptions, ProviderStubAuthHandler>("Provider-stub", options => { });
         }

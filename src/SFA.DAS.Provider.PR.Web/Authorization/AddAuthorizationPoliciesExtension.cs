@@ -15,8 +15,6 @@ public static class AddAuthorizationPoliciesExtension
         services.AddSingleton<IAuthorizationHandler, ProviderUkprnAuthorizationHandler>();
         services.AddSingleton<IAuthorizationHandler, ProviderStatusAuthorizationHandler>();
 
-        //services.AddAuthorization<AuthorizationContextProvider>();
-
         services.AddAuthorization(options =>
         {
             options.AddPolicy(PolicyNames.HasProviderAccount, policy =>
@@ -25,7 +23,7 @@ public static class AddAuthorizationPoliciesExtension
                 policy.RequireClaim(ProviderClaims.ProviderUkprn);
                 policy.RequireClaim(ProviderClaims.Service, ProviderDaa, ProviderDab, ProviderDac, ProviderDav);
                 policy.Requirements.Add(new ProviderUkprnRequirement());
-                //policy.Requirements.Add(new ProviderStatusRequirement());
+                policy.Requirements.Add(new ProviderStatusRequirement());
             });
         });
 
