@@ -4,6 +4,4 @@ using Microsoft.AspNetCore.Authorization;
 namespace SFA.DAS.Provider.PR.Web.Authorization;
 
 [ExcludeFromCodeCoverage]
-public class ProviderUkprnRequirement : IAuthorizationRequirement
-{
-}
+public class ProviderUkprnRequirement : IAuthorizationRequirement { }

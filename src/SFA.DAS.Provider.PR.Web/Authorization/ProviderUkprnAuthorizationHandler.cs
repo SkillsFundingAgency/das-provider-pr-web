@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Authorization;
+using SFA.DAS.Provider.PR.Web.Extensions;
 using SFA.DAS.Provider.PR.Web.Infrastructure;
 
 namespace SFA.DAS.Provider.PR.Web.Authorization;
@@ -25,7 +26,7 @@ public class ProviderUkprnAuthorizationHandler(IHttpContextAccessor _httpContext
 
         if (string.IsNullOrWhiteSpace(ukprnFromUrl)) return true;
 
-        var ukprnClaim = context.User.FindFirst(c => c.Type.Equals(ProviderClaims.ProviderUkprn))!.Value;
+        var ukprnClaim = context.User.GetUkprn()!;
 
         return ukprnClaim.Equals(ukprnFromUrl);
     }

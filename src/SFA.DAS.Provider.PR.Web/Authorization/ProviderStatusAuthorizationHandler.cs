@@ -24,15 +24,7 @@ public class ProviderStatusAuthorizationHandler(IOuterApiClient _outerApiClient,
                 break;
         }
 
-        if (!context.User.HasClaim(c => c.Type.Equals(ProviderClaims.ProviderUkprn)))
-        {
-            context.Fail();
-            return;
-        }
-
-        var claimValue = context.User.FindFirst(c => c.Type.Equals(ProviderClaims.ProviderUkprn))?.Value;
-
-        if (!int.TryParse(claimValue, out var ukprn))
+        if (!int.TryParse(context.User.GetUkprn(), out var ukprn))
         {
             context.Fail();
             return;

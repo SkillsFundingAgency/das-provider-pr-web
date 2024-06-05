@@ -7,13 +7,9 @@ namespace SFA.DAS.Provider.PR.Web.Controllers;
 [Authorize(Policy = nameof(PolicyNames.HasProviderAccount))]
 public class HomeController : Controller
 {
-    public IActionResult Index()
-    {
-        return View();
-    }
-
     [Route("/{ukprn}")]
-    public IActionResult ProviderHome(int ukprn)
+    [Route("")]
+    public IActionResult Index()
     {
         return View();
     }

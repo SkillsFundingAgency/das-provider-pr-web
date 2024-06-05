@@ -9,7 +9,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 var configuration = builder.Configuration.LoadConfiguration(builder.Services);
 
-// Add services to the container.
 builder.Services
     .Configure<CookiePolicyOptions>(options =>
     {
@@ -30,8 +29,6 @@ builder.Services
     .AddAuthorizationServicePolicies()
     .AddProviderUiServiceRegistration(configuration);
 
-//builder.Services.Configure<IISServerOptions>(options => { options.AutomaticAuthentication = false; });
-
 builder.Services
     .Configure<RouteOptions>(options => { options.LowercaseUrls = false; })
     .AddMvc(options =>
@@ -46,9 +43,10 @@ builder.Services
 builder.Services.AddControllersWithViews().AddControllersAsServices().AddRazorRuntimeCompilation();
 #endif
 
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
