@@ -5,7 +5,7 @@ namespace SFA.DAS.Provider.PR.Domain.Interfaces;
 
 public interface IOuterApiClient
 {
-    [Get("/ping")]
+    [Get("/health")]
     Task<HttpResponseMessage> Ping();
 
     [Get("/provideraccounts/{ukprn}")]
