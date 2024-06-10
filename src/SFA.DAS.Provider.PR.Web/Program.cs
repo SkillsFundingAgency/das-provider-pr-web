@@ -75,4 +75,4 @@ app
             "{controller=Home}/{action=Index}/{id?}");
     });
 
-app.Run();
+await app.RunAsync();
