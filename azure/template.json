@@ -23,6 +23,9 @@
         "loggingRedisKey": {
             "type": "string"
         },
+        "cdnUrl": {
+            "type": "string"
+        },
         "tags": {
             "type": "object"
         },
@@ -210,9 +213,14 @@
                                     "name": "LoggingRedisConnectionString",
                                     "value": "[parameters('loggingRedisConnectionString')]"
                                 },
+                            
                                 {
                                     "name": "LoggingRedisKey",
                                     "value": "[parameters('loggingRedisKey')]"
+                                },
+                                {
+                                    "name": "Cdn:Url",
+                                    "value": "[parameters('cdnUrl')]"
                                 },
                                 {
                                     "name": "ResourceEnvironmentName",
