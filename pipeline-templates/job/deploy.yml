@@ -49,7 +49,7 @@ jobs:
             TableName: Configuration
             ConfigurationSecrets:
               DefaultSessionRedisConnectionString: $(DefaultSessionRedisConnectionString)
-              ProviderPRApimSubscriptionKey: ($ProviderPRApimSubscriptionKey)
+              ProviderPRApimSubscriptionKey: $(ProviderPRApimSubscriptionKey)
         - template: azure-pipelines-templates/deploy/step/app-deploy.yml@das-platform-building-blocks
           parameters:
             ServiceConnection: ${{ parameters.ServiceConnection }}
