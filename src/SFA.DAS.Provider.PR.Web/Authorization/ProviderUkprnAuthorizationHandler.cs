@@ -22,6 +22,8 @@ public class ProviderUkprnAuthorizationHandler(IHttpContextAccessor _httpContext
 
     private static bool IsProviderAuthorised(HttpContext context)
     {
+        if (!(context.User.Identity?.IsAuthenticated).GetValueOrDefault()) return false;
+
         var ukprnFromUrl = context.Request.RouteValues[RouteValues.Ukprn]?.ToString();
 
         if (string.IsNullOrWhiteSpace(ukprnFromUrl)) return true;
