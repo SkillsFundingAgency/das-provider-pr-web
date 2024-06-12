@@ -5,9 +5,7 @@ namespace SFA.DAS.Provider.PR.Domain.Interfaces;
 
 public interface IOuterApiClient
 {
-    [Get("/health")]
-    Task<HttpResponseMessage> Ping();
-
-    [Get("/provideraccounts/{ukprn}")]
-    Task<GetProviderStatusResponse> GetProviderStatus([Path] int ukprn, CancellationToken cancellationToken);
+    [AllowAnyStatusCode]
+    [Get("/providerAccounts/{ukprn}")]
+    Task<Response<GetProviderStatusResponse>> GetProviderStatus([Path] int ukprn, CancellationToken cancellationToken);
 }
