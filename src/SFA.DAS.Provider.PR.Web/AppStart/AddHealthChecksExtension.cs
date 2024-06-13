@@ -8,10 +8,10 @@ public static class AddHealthChecksExtension
     public static IServiceCollection AddHealthChecks(this IServiceCollection services, IConfiguration configuration)
     {
         ApplicationSettings config = configuration.GetSection(nameof(ApplicationSettings)).Get<ApplicationSettings>()!;
-        services
+        var builder = services
             .AddHealthChecks()
-            .AddCheck<OuterApiHealthCheck>("Outer api health check")
-            .AddRedis(config.RedisConnectionString, "Redis health check");
+            .AddCheck<OuterApiHealthCheck>("Outer api health check");
+        if (!configuration.IsLocal()) builder.AddRedis(config.RedisConnectionString, "Redis health check");
         return services;
     }
 }
