@@ -14,7 +14,6 @@ jobs:
   - template: azure-pipelines-templates/build/step/gitversion.yml@das-platform-building-blocks
 
   - template: azure-pipelines-templates/build/step/app-build.yml@das-platform-building-blocks
-    ref: refs/heads/DASD-11062-SonarCloudUpdate
 
   - task: DotNetCoreCLI@2
     displayName: Publish - dotnet publish ${{ parameters.SolutionBaseName }}
