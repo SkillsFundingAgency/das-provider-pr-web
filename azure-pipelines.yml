@@ -90,6 +90,7 @@ stages:
   variables:
   - group: PreProd Management Resources
   - group: PreProd Shared Resources
+  - group: PREPROD das-provider-pr-web 
   jobs:
   - template: pipeline-templates/job/deploy.yml
     parameters:
@@ -103,6 +104,7 @@ stages:
 #   variables:
 #   - group: PROD Management Resources
 #   - group: PROD Shared Resources
+#   - group: PROD das-provider-pr-web 
 #   - group: __PRODSpecificReleaseVariables__ #PLACEHOLDER
 #   jobs:
 #   - template: pipeline-templates/job/deploy.yml
