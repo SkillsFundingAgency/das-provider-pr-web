@@ -38,5 +38,6 @@ public static class AddServiceRegistrationsExtension
     {
         services.AddOptions();
         services.Configure<ProviderSharedUIConfiguration>(configuration.GetSection(nameof(ProviderSharedUIConfiguration)));
+        services.Configure<ApplicationSettings>(configuration.GetSection(nameof(ApplicationSettings)));
     }
 }

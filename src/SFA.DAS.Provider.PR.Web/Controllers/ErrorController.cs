@@ -3,20 +3,20 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using SFA.DAS.Provider.PR.Web.Infrastructure;
 using SFA.DAS.Provider.PR.Web.Infrastructure.Configuration;
 using SFA.DAS.Provider.PR.Web.Models;
+using SFA.DAS.Provider.Shared.UI.Models;
 
 namespace SFA.DAS.Provider.PR.Web.Controllers;
 
 [Route("[controller]")]
-public class ErrorController(ILogger<ErrorController> _logger, IOptions<ApplicationSettings> _applicationSettings) : Controller
+public class ErrorController(ILogger<ErrorController> _logger, IOptions<ApplicationSettings> _applicationSettings, IOptions<ProviderSharedUIConfiguration> _sharedUiSettings) : Controller
 {
     [AllowAnonymous]
     [Route("{statusCode}")]
     public IActionResult HttpStatusCodeHandler(int statusCode)
     {
-        ErrorViewModel errorViewModel = new(Url.RouteUrl(RouteNames.Home)!, _applicationSettings.Value.DfESignInServiceHelpUrl);
+        ErrorViewModel errorViewModel = new(_sharedUiSettings.Value.DashboardUrl, _applicationSettings.Value.DfESignInServiceHelpUrl);
 
         return statusCode switch
         {
@@ -31,7 +31,7 @@ public class ErrorController(ILogger<ErrorController> _logger, IOptions<Applicat
     {
         var feature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
 
-        ErrorViewModel errorViewModel = new(Url.RouteUrl(RouteNames.Home)!, _applicationSettings.Value.DfESignInServiceHelpUrl);
+        ErrorViewModel errorViewModel = new(_sharedUiSettings.Value.DashboardUrl, _applicationSettings.Value.DfESignInServiceHelpUrl);
 
         if (User.Identity!.IsAuthenticated)
         {
