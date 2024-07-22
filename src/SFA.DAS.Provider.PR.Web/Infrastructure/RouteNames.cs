@@ -4,5 +4,5 @@ public static class RouteNames
 {
     public const string Home = nameof(Home);
     public const string ProviderSignOut = "provider-signout";
-    public const string Start = nameof(Start);
+    public const string AddEmployerStart = nameof(AddEmployerStart);
 }

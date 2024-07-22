@@ -8,10 +8,10 @@ namespace SFA.DAS.Provider.PR.Web.Controllers.AddEmployer;
 
 [Authorize(Policy = nameof(PolicyNames.HasContributorOrAbovePermission))]
 
-[Route("/{ukprn}/addEmployer/start", Name = RouteNames.Start)]
+[Route("/{ukprn}/addEmployer/start", Name = RouteNames.AddEmployerStart)]
 public class StartController : Controller
 {
-    public const string ViewPath = "~/Views/AddEmployer/Start.cshtml";
+    public const string ViewPath = "~/Views/AddEmployer/AddEmployerStart.cshtml";
 
     [HttpGet]
     public IActionResult Index()
