@@ -6,4 +6,5 @@ namespace SFA.DAS.Provider.PR.Web.Authorization;
 public static class PolicyNames
 {
     public static string HasProviderAccount => nameof(HasProviderAccount);
+    public static string HasContributorOrAbovePermission => nameof(HasContributorOrAbovePermission);
 }
