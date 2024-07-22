@@ -1,4 +1,4 @@
-﻿namespace SFA.DAS.Provider.PR.Web.Models;
+﻿namespace SFA.DAS.Provider.PR.Web.Models.AddEmployer;
 
 public class StartViewModel
 {

@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Provider.PR.Web.Controllers.AddEmployer;
-using SFA.DAS.Provider.PR.Web.Models;
+using SFA.DAS.Provider.PR.Web.Models.AddEmployer;
 
 namespace SFA.DAS.Provider.PR_Web.UnitTests.Controllers.AddEmployer;
 public class StartControllerTests
