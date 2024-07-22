@@ -1,3 +1,11 @@
-﻿namespace SFA.DAS.Provider.PR.Web.Infrastructure.Configuration;
+﻿using System.Diagnostics.CodeAnalysis;
 
-public record ApplicationSettings(string RedisConnectionString, string DataProtectionKeysDatabase);
+namespace SFA.DAS.Provider.PR.Web.Infrastructure.Configuration;
+
+[ExcludeFromCodeCoverage]
+public class ApplicationSettings
+{
+    public required string RedisConnectionString { get; set; }
+    public required string DataProtectionKeysDatabase { get; set; }
+    public required string DfESignInServiceHelpUrl { get; set; }
+}

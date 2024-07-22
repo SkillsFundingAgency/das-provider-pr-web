@@ -1,7 +1,9 @@
-﻿using SFA.DAS.Configuration.AzureTableStorage;
+﻿using System.Diagnostics.CodeAnalysis;
+using SFA.DAS.Configuration.AzureTableStorage;
 
 namespace SFA.DAS.Provider.PR.Web.AppStart;
 
+[ExcludeFromCodeCoverage]
 public static class LoadConfigurationExtension
 {
     public static IConfigurationRoot LoadConfiguration(this IConfiguration config, IServiceCollection services)
