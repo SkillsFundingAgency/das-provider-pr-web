@@ -11,7 +11,7 @@ namespace SFA.DAS.Provider.PR.Web.Controllers.AddEmployer;
 [Route("/{ukprn}/addEmployer/start", Name = RouteNames.AddEmployerStart)]
 public class StartController : Controller
 {
-    public const string ViewPath = "~/Views/AddEmployer/AddEmployerStart.cshtml";
+    public const string ViewPath = "~/Views/AddEmployer/Start.cshtml";
 
     [HttpGet]
     public IActionResult Index()
