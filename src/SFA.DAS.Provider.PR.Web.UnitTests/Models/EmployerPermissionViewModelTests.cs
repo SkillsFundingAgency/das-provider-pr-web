@@ -15,12 +15,16 @@ public class EmployerPermissionViewModelTests
         sut.Name.Should().Be(model.EmployerName);
     }
 
-    [Test, AutoData]
-    public void Operator_SetsAgreementId(ProviderRelationshipModel model)
+    [Test]
+    [InlineAutoData(true)]
+    [InlineAutoData(false)]
+    public void Operator_SetsAgreementId(bool setAgreementId, ProviderRelationshipModel model)
     {
+        model.AgreementId = setAgreementId ? Guid.NewGuid().ToString() : null;
         EmployerPermissionViewModel sut = model;
 
         sut.AgreementId.Should().Be(model.AgreementId);
+        sut.HasAgreementId.Should().Be(setAgreementId);
     }
 
     [Test, AutoData]
@@ -31,12 +35,16 @@ public class EmployerPermissionViewModelTests
         sut.AccountLegalEntityId.Should().Be(model.AccountLegalEntityId);
     }
 
-    [Test, AutoData]
-    public void Operator_SetsRequestId(ProviderRelationshipModel model)
+    [Test]
+    [InlineAutoData(true)]
+    [InlineAutoData(false)]
+    public void Operator_SetsRequestId(bool setRequestId, ProviderRelationshipModel model)
     {
+        model.RequestId = setRequestId ? Guid.NewGuid() : null;
         EmployerPermissionViewModel sut = model;
 
         sut.RequestId.Should().Be(model.RequestId);
+        sut.HasPendingRequest.Should().Be(setRequestId);
     }
 
     [Test]
