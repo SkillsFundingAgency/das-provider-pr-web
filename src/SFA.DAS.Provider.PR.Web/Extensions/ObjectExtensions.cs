@@ -20,7 +20,7 @@ public static class ObjectExtensions
 
             if (render)
             {
-                dictionary[property.Name] = value!.ToString()!;
+                dictionary[property.Name] = value!.ToString()!.Trim();
             }
         }
 
