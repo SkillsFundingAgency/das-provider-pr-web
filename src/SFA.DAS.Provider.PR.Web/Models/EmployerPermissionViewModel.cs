@@ -15,11 +15,13 @@ public class EmployerPermissionViewModel
     public Guid? RequestId { get; set; }
     public required string CohortPermission { get; set; }
     public required string RecruitmentPermision { get; set; }
+    public bool HasPendingRequest => RequestId != null;
+    public bool HasAgreementId => !string.IsNullOrEmpty(AgreementId);
 
     public static implicit operator EmployerPermissionViewModel(ProviderRelationshipModel source)
         => new()
         {
-            Name = source.EmployerName,
+            Name = source.EmployerName.ToUpper(),
             AgreementId = source.AgreementId,
             AccountLegalEntityId = source.AccountLegalEntityId,
             RequestId = source.RequestId,

@@ -1,31 +1,170 @@
-﻿@model HomeViewModel
+﻿@using SFA.DAS.Provider.PR.Web.Infrastructure
+@model HomeViewModel
 @{
     ViewData["Title"] = "View employers and manage permissions";
 }
 
 <div class="govuk-grid-row">
-    <h1 class="govuk-heading-l">View employers and manage permissions</h1>
-    <p>View and search your employers. Select the employer name to view the last action on the account and request new permissions.</p>
+    <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-!-width-three-quarters">
+            <h1 class="govuk-heading-xl govuk-!-margin-bottom-6">View employers and manage permissions</h1>
+            <p class="govuk-body govuk-!-margin-bottom-8">
+                View and search your employers. Select the employer name to
+                view the last action on the account and request new permissions.
+            </p>
+        </div>
+    </div>
+    <div class="govuk-grid-column-one-third">
+        <hr class="govuk-section-break govuk-section-break--visible app-section-break">
+        <p class="govuk-!-margin-bottom-2">
+            Invite employers to create an account or add you as a training provider.
+        </p>
+        <p class="govuk-!-margin-bottom-6">
+            <a href="#" class="govuk-link govuk-link--no-visted-state">Add an employer</a>
+        </p>
+    </div>
+</div>
 
-    <div>
-        <table class="govuk-table">
-            <caption class="govuk-table__caption govuk-table__caption--m">@Model.TotalCount employers</caption>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-third">
+        <div class="das-highlight govuk-!-margin-top-0">
+            <form method="get">
+                <div class="govuk-form-group">
+                    <fieldset class="govuk-fieldset">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">Search your employers</legend>
+                        <label asp-for="SearchTerm" class="govuk-label das-!-color-dark-grey">
+                            Search by
+                            employer name or
+                            agreement
+                            ID
+                        </label>
+                        <input class="govuk-input" asp-for="SearchTerm" type="text" maxlength="250" />
+                    </fieldset>
+                </div>
+                <div class="govuk-form-group">
+                    <fieldset class="govuk-fieldset">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                            Permission to add <br>apprentice records
+                        </legend>
+                        <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input" id="permissionAdd-yes" name="permissionAdd"
+                                       type="checkbox" value="yes">
+                                <label class="govuk-label govuk-checkboxes__label" for="permissionAdd-yes">
+                                    Yes, employer will review records
+                                </label>
+                            </div>
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input" id="permissionAdd-no" name="permissionAdd"
+                                       type="checkbox" value="no">
+                                <label class="govuk-label govuk-checkboxes__label" for="permissionAdd-no">
+                                    No
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="govuk-form-group">
+                    <fieldset class="govuk-fieldset">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                            Permission to <br>recruit apprentices
+                        </legend>
+                        <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input" id="permissionRecruit-yes"
+                                       name="permissionRecruit" type="checkbox" value="yes">
+                                <label class="govuk-label govuk-checkboxes__label" for="permissionRecruit-yes">
+                                    Yes
+                                </label>
+                            </div>
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input" id="permissionRecruit-review"
+                                       name="permissionRecruit" type="checkbox" value="review">
+                                <label class="govuk-label govuk-checkboxes__label" for="permissionRecruit-review">
+                                    Yes, employer will review adverts
+                                </label>
+                            </div>
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input" id="permissionRecruit-no"
+                                       name="permissionRecruit" type="checkbox" value="no">
+                                <label class="govuk-label govuk-checkboxes__label" for="permissionRecruit-no">
+                                    No
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="govuk-form-group">
+                    <fieldset class="govuk-fieldset">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                            Requests
+                        </legend>
+                        <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input" id="request-pending" name="request-pending"
+                                       type="checkbox" value="request-pending">
+                                <label class="govuk-label govuk-checkboxes__label" for="request-pending">
+                                    Request pending
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="govuk-button-group">
+                    <button type="submit" class="govuk-button" id="filters-submit-second">Apply filters</button>
+                    <a href="@Model.ClearFiltersLink" class="govuk-link govuk-link--no-visted-state">Clear filters</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="govuk-grid-column-two-thirds">
+        <table class="govuk-table app-table--search-results">
+            <caption class="govuk-table__caption govuk-table__caption--m app-table__caption">
+                @Model.TotalCount
+            </caption>
 
             <thead class="govuk-table__head">
                 <tr class="govuk-table__row">
-                    <th scope="col" class="govuk-table__header">Employer name</th>
-                    <th scope="col" class="govuk-table__header">Permission to add apprentice records</th>
-                    <th scope="col" class="govuk-table__header">Permission to recruit apprentices</th>
+                    <th scope="col" class="govuk-table__header govuk-!-width-one-third">Employer name</th>
+                    <th scope="col" class="govuk-table__header govuk-!-width-one-third">
+                        Permission to add apprentice
+                        records
+                    </th>
+                    <th scope="col" class="govuk-table__header govuk-!-width-one-third">
+                        Permission to recruit
+                        apprentices
+                    </th>
                 </tr>
             </thead>
 
             <tbody class="govuk-table__body">
-                @foreach(var employer in Model.Employers)
+                @* <tr class="govuk-table__row">
+                <td class="govuk-table__cell">
+                <strong class="govuk-tag govuk-tag--orange govuk-!-margin-bottom-2">Request pending</strong>
+                <a href="#" class="govuk-link app-search-result-link">Company name</a>
+                <span class="govuk-!-font-size-16 das-!-color-dark-grey">Agreement ID: 123</span>
+                </td>
+                <td class="govuk-table__cell">No</td>
+                <td class="govuk-table__cell">Yes, employer will review all adverts</td>
+                </tr>
+                <tr class="govuk-table__row">
+                <td class="govuk-table__cell">
+                <a href="#" class="govuk-link app-search-result-link">Company name</a>
+                <span class="govuk-!-font-size-16 das-!-color-dark-grey">Agreement ID: 123</span>
+                </td>
+                <td class="govuk-table__cell">Yes, employer will review records</td>
+                <td class="govuk-table__cell">No</td>
+                </tr> *@
+                @foreach (var employer in Model.Employers)
                 {
                     <tr class="govuk-table__row">
                         <td class="govuk-table__cell">
-                          @employer.Name
-                          Agreement ID: @employer.AgreementId
+                            <div asp-show="employer.HasPendingRequest">
+                                <strong class="govuk-tag govuk-tag--orange govuk-!-margin-bottom-2">Request pending</strong>
+                                <br />
+                            </div>
+                            <a href="#" class="govuk-link app-search-result-link">@employer.Name</a><br />
+                            <span asp-show="employer.HasAgreementId" class="govuk-!-font-size-16 das-!-color-dark-grey">Agreement ID: @employer.AgreementId</span>
                         </td>
                         <td class="govuk-table__cell">@employer.CohortPermission</td>
                         <td class="govuk-table__cell">@employer.RecruitmentPermision</td>
