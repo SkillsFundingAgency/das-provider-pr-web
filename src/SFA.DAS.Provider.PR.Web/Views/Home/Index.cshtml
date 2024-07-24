@@ -1,13 +1,36 @@
-﻿@model HomeViewModel
+﻿@using SFA.DAS.Provider.PR.Web.Infrastructure
+@model HomeViewModel
 @{
     ViewData["Title"] = "View employers and manage permissions";
 }
 
 <div class="govuk-grid-row">
-    <h1 class="govuk-heading-l">View employers and manage permissions</h1>
-    <p>View and search your employers. Select the employer name to view the last action on the account and request new permissions.</p>
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l">View employers and manage permissions</h1>
+        <p>View and search your employers. Select the employer name to view the last action on the account and request new permissions.</p>
+    </div>
+    <div class="govuk-grid-column-one-third">
+        <p>
+            Invite employers to create an account or add you as a training provider.
+        </p>
+        <a href="#">Add an employer</a>
+    </div>
+</div>
 
-    <div>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-third">
+        <form method="get">
+            <div>
+                <h2>Search your employers</h2>
+                <label asp-for="EmployerNameOrAgreementId">Search by employer name or agreement ID</label>
+                <input class="govuk-input" asp-for="EmployerNameOrAgreementId" type="text" />
+            </div>
+            <div>
+                <button type="submit" class="govuk-button" id="filters-submit-second">Apply filters</button>
+            </div>
+        </form>
+    </div>
+    <div class="govuk-grid-column-two-thirds">
         <table class="govuk-table">
             <caption class="govuk-table__caption govuk-table__caption--m">@Model.TotalCount employers</caption>
 
@@ -20,12 +43,12 @@
             </thead>
 
             <tbody class="govuk-table__body">
-                @foreach(var employer in Model.Employers)
+                @foreach (var employer in Model.Employers)
                 {
                     <tr class="govuk-table__row">
                         <td class="govuk-table__cell">
-                          @employer.Name
-                          Agreement ID: @employer.AgreementId
+                            @employer.Name
+                            Agreement ID: @employer.AgreementId
                         </td>
                         <td class="govuk-table__cell">@employer.CohortPermission</td>
                         <td class="govuk-table__cell">@employer.RecruitmentPermision</td>

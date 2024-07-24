@@ -2,7 +2,7 @@
 
 namespace SFA.DAS.Provider.PR.Web.Models;
 
-public class HomeViewModel
+public class HomeViewModel : HomeSubmitModel
 {
     public int TotalCount { get; }
     public IEnumerable<EmployerPermissionViewModel> Employers { get; }
@@ -12,4 +12,9 @@ public class HomeViewModel
         Employers = source.Employers.Select(e => (EmployerPermissionViewModel)e);
         TotalCount = source.TotalCount;
     }
+}
+
+public class HomeSubmitModel
+{
+    public string? EmployerNameOrAgreementId { get; set; }
 }
