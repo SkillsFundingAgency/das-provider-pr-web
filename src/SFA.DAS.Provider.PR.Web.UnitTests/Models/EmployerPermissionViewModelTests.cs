@@ -12,7 +12,7 @@ public class EmployerPermissionViewModelTests
     {
         EmployerPermissionViewModel sut = model;
 
-        sut.Name.Should().Be(model.EmployerName);
+        sut.Name.Should().Be(model.EmployerName.ToUpper());
     }
 
     [Test]

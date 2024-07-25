@@ -21,7 +21,7 @@ public class EmployerPermissionViewModel
     public static implicit operator EmployerPermissionViewModel(ProviderRelationshipModel source)
         => new()
         {
-            Name = source.EmployerName,
+            Name = source.EmployerName.ToUpper(),
             AgreementId = source.AgreementId,
             AccountLegalEntityId = source.AccountLegalEntityId,
             RequestId = source.RequestId,
