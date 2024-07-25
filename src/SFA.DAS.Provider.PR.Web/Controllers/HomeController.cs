@@ -24,7 +24,7 @@ public class HomeController(IOuterApiClient _outerApiclient) : Controller
     [HttpGet]
     public async Task<IActionResult> Index([FromRoute] int ukprn, [FromQuery] HomeSubmitModel submitModel, CancellationToken cancellationToken)
     {
-        GetProviderRelationshipsResponse response = await _outerApiclient.GetProviderRelationships(ukprn, submitModel.SerializeToDictionary(), cancellationToken);
+        GetProviderRelationshipsResponse response = await _outerApiclient.GetProviderRelationships(ukprn, submitModel.ToQueryString(), cancellationToken);
         return View(new HomeViewModel(response, Url.RouteUrl(RouteNames.Home)!));
     }
 }

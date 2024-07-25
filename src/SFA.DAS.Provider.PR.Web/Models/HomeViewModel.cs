@@ -20,4 +20,16 @@ public class HomeViewModel : HomeSubmitModel
 public class HomeSubmitModel
 {
     public string? SearchTerm { get; set; }
+    public bool HasPendingRequest { get; set; }
+
+    public Dictionary<string, string> ToQueryString()
+    {
+        Dictionary<string, string> result = new();
+
+        if (!string.IsNullOrWhiteSpace(SearchTerm)) result.Add(nameof(SearchTerm), SearchTerm.Trim());
+
+        if (HasPendingRequest) result.Add(nameof(HasPendingRequest), true.ToString());
+
+        return result;
+    }
 }
