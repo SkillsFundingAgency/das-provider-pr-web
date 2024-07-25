@@ -101,9 +101,8 @@
                         </legend>
                         <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
                             <div class="govuk-checkboxes__item">
-                                <input class="govuk-checkboxes__input" id="request-pending" name="request-pending"
-                                       type="checkbox" value="request-pending">
-                                <label class="govuk-label govuk-checkboxes__label" for="request-pending">
+                                <input class="govuk-checkboxes__input" asp-for="HasPendingRequest" type="checkbox" value="true">
+                                <label class="govuk-label govuk-checkboxes__label" asp-for="HasPendingRequest">
                                     Request pending
                                 </label>
                             </div>
@@ -138,23 +137,6 @@
             </thead>
 
             <tbody class="govuk-table__body">
-                @* <tr class="govuk-table__row">
-                <td class="govuk-table__cell">
-                <strong class="govuk-tag govuk-tag--orange govuk-!-margin-bottom-2">Request pending</strong>
-                <a href="#" class="govuk-link app-search-result-link">Company name</a>
-                <span class="govuk-!-font-size-16 das-!-color-dark-grey">Agreement ID: 123</span>
-                </td>
-                <td class="govuk-table__cell">No</td>
-                <td class="govuk-table__cell">Yes, employer will review all adverts</td>
-                </tr>
-                <tr class="govuk-table__row">
-                <td class="govuk-table__cell">
-                <a href="#" class="govuk-link app-search-result-link">Company name</a>
-                <span class="govuk-!-font-size-16 das-!-color-dark-grey">Agreement ID: 123</span>
-                </td>
-                <td class="govuk-table__cell">Yes, employer will review records</td>
-                <td class="govuk-table__cell">No</td>
-                </tr> *@
                 @foreach (var employer in Model.Employers)
                 {
                     <tr class="govuk-table__row">
