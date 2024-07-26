@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging.ApplicationInsights;
 using SFA.DAS.Provider.PR.Web.AppStart;
 using SFA.DAS.Provider.PR.Web.Authorization;
@@ -32,6 +33,7 @@ builder.Services
     .AddProviderUiServiceRegistration(configuration);
 
 builder.Services
+    .Configure<MvcViewOptions>(viewOptions => viewOptions.HtmlHelperOptions.CheckBoxHiddenInputRenderMode = CheckBoxHiddenInputRenderMode.None)
     .Configure<RouteOptions>(options => { options.LowercaseUrls = false; })
     .AddMvc(options =>
     {

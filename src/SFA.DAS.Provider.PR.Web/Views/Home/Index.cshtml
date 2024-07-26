@@ -48,15 +48,13 @@
                         </legend>
                         <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
                             <div class="govuk-checkboxes__item">
-                                <input class="govuk-checkboxes__input" id="permissionAdd-yes" name="permissionAdd"
-                                       type="checkbox" value="yes">
+                                <input class="govuk-checkboxes__input" asp-for="HasAddApprenticePermission" type="checkbox">
                                 <label class="govuk-label govuk-checkboxes__label" for="permissionAdd-yes">
                                     Yes, employer will review records
                                 </label>
                             </div>
                             <div class="govuk-checkboxes__item">
-                                <input class="govuk-checkboxes__input" id="permissionAdd-no" name="permissionAdd"
-                                       type="checkbox" value="no">
+                                <input class="govuk-checkboxes__input" asp-for="HasNotAddApprenticePermission" type="checkbox">
                                 <label class="govuk-label govuk-checkboxes__label" for="permissionAdd-no">
                                     No
                                 </label>
@@ -101,8 +99,8 @@
                         </legend>
                         <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
                             <div class="govuk-checkboxes__item">
-                                <input class="govuk-checkboxes__input" asp-for="HasPendingRequest" type="checkbox" value="true">
-                                <label class="govuk-label govuk-checkboxes__label" asp-for="HasPendingRequest">
+                                <input class="govuk-checkboxes__input" asp-for="PendingRequest" type="checkbox" value="true">
+                                <label class="govuk-label govuk-checkboxes__label" asp-for="PendingRequest">
                                     Request pending
                                 </label>
                             </div>
