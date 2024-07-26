@@ -19,8 +19,12 @@ public class HomeViewModel : HomeSubmitModel
 
 public class HomeSubmitModel
 {
+    public const string HasCreateCohortPermissionKey = "HasCreateCohortPermission";
+
     public string? SearchTerm { get; set; }
-    public bool HasPendingRequest { get; set; }
+    public bool PendingRequest { get; set; }
+    public bool HasAddApprenticePermission { get; set; }
+    public bool HasNotAddApprenticePermission { get; set; }
 
     public Dictionary<string, string> ToQueryString()
     {
@@ -28,7 +32,9 @@ public class HomeSubmitModel
 
         if (!string.IsNullOrWhiteSpace(SearchTerm)) result.Add(nameof(SearchTerm), SearchTerm.Trim());
 
-        if (HasPendingRequest) result.Add(nameof(HasPendingRequest), true.ToString());
+        if (PendingRequest) result.Add(nameof(PendingRequest), true.ToString());
+
+        if (HasNotAddApprenticePermission != HasAddApprenticePermission) result.Add(HasCreateCohortPermissionKey, HasAddApprenticePermission.ToString());
 
         return result;
     }
