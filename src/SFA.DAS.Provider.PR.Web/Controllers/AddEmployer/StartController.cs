@@ -14,8 +14,8 @@ public class StartController : Controller
     public const string ViewPath = "~/Views/AddEmployer/Start.cshtml";
 
     [HttpGet]
-    public IActionResult Index()
+    public IActionResult Index([FromRoute] int ukprn)
     {
-        return View(ViewPath, new StartViewModel("#", "#"));
+        return View(ViewPath, new StartViewModel("#", Url.RouteUrl(RouteNames.Home, new { ukprn })!));
     }
 }
