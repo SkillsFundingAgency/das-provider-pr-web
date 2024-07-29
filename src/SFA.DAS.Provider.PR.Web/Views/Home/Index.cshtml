@@ -49,13 +49,13 @@
                         <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
                             <div class="govuk-checkboxes__item">
                                 <input class="govuk-checkboxes__input" asp-for="HasAddApprenticePermission" type="checkbox">
-                                <label class="govuk-label govuk-checkboxes__label" for="permissionAdd-yes">
+                                <label class="govuk-label govuk-checkboxes__label" asp-for="HasAddApprenticePermission">
                                     Yes, employer will review records
                                 </label>
                             </div>
                             <div class="govuk-checkboxes__item">
-                                <input class="govuk-checkboxes__input" asp-for="HasNotAddApprenticePermission" type="checkbox">
-                                <label class="govuk-label govuk-checkboxes__label" for="permissionAdd-no">
+                                <input class="govuk-checkboxes__input" asp-for="HasNoAddApprenticePermission" type="checkbox">
+                                <label class="govuk-label govuk-checkboxes__label" asp-for="HasNoAddApprenticePermission">
                                     No
                                 </label>
                             </div>
@@ -69,23 +69,20 @@
                         </legend>
                         <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
                             <div class="govuk-checkboxes__item">
-                                <input class="govuk-checkboxes__input" id="permissionRecruit-yes"
-                                       name="permissionRecruit" type="checkbox" value="yes">
-                                <label class="govuk-label govuk-checkboxes__label" for="permissionRecruit-yes">
+                                <input class="govuk-checkboxes__input" asp-for="HasRecruitmentPermission"  type="checkbox">
+                                <label class="govuk-label govuk-checkboxes__label" asp-for="HasRecruitmentPermission">
                                     Yes
                                 </label>
                             </div>
                             <div class="govuk-checkboxes__item">
-                                <input class="govuk-checkboxes__input" id="permissionRecruit-review"
-                                       name="permissionRecruit" type="checkbox" value="review">
-                                <label class="govuk-label govuk-checkboxes__label" for="permissionRecruit-review">
+                                <input class="govuk-checkboxes__input" asp-for="HasRecruitmentWithReviewPermission" type="checkbox">
+                                <label class="govuk-label govuk-checkboxes__label" asp-for="HasRecruitmentWithReviewPermission">
                                     Yes, employer will review adverts
                                 </label>
                             </div>
                             <div class="govuk-checkboxes__item">
-                                <input class="govuk-checkboxes__input" id="permissionRecruit-no"
-                                       name="permissionRecruit" type="checkbox" value="no">
-                                <label class="govuk-label govuk-checkboxes__label" for="permissionRecruit-no">
+                                <input class="govuk-checkboxes__input" asp-for="HasNoRecruitmentPermission" type="checkbox">
+                                <label class="govuk-label govuk-checkboxes__label" asp-for="HasNoRecruitmentPermission">
                                     No
                                 </label>
                             </div>
@@ -99,8 +96,8 @@
                         </legend>
                         <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
                             <div class="govuk-checkboxes__item">
-                                <input class="govuk-checkboxes__input" asp-for="PendingRequest" type="checkbox" value="true">
-                                <label class="govuk-label govuk-checkboxes__label" asp-for="PendingRequest">
+                                <input class="govuk-checkboxes__input" asp-for="HasPendingRequest" type="checkbox" value="true">
+                                <label class="govuk-label govuk-checkboxes__label" asp-for="HasPendingRequest">
                                     Request pending
                                 </label>
                             </div>

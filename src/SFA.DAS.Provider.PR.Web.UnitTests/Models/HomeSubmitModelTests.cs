@@ -29,21 +29,21 @@ public class HomeSubmitModelTests
     [Test]
     public void ToQueryString_HasPendingRequestIsTrue_AddsToDictionary()
     {
-        HomeSubmitModel sut = new() { PendingRequest = true };
+        HomeSubmitModel sut = new() { HasPendingRequest = true };
 
         var actual = sut.ToQueryString();
 
-        actual.Should().ContainKey(nameof(HomeSubmitModel.PendingRequest)).WhoseValue.Should().Be(true.ToString());
+        actual.Should().ContainKey(nameof(HomeSubmitModel.HasPendingRequest)).WhoseValue.Should().Be(true.ToString());
     }
 
     [Test]
     public void ToQueryString_HasPendingRequestIsFalse_DoesNotAddToDictionary()
     {
-        HomeSubmitModel sut = new() { PendingRequest = false };
+        HomeSubmitModel sut = new() { HasPendingRequest = false };
 
         var actual = sut.ToQueryString();
 
-        actual.Should().NotContainKey(nameof(HomeSubmitModel.PendingRequest));
+        actual.Should().NotContainKey(nameof(HomeSubmitModel.HasPendingRequest));
     }
 
     [TestCase(true, false, true)]
@@ -52,7 +52,7 @@ public class HomeSubmitModelTests
     [TestCase(true, true, false)]
     public void ToQueryString_ConditionallyAddsHasCreateCohortPermission(bool yesSelected, bool noSelected, bool isAdded)
     {
-        HomeSubmitModel sut = new() { HasAddApprenticePermission = yesSelected, HasNotAddApprenticePermission = noSelected };
+        HomeSubmitModel sut = new() { HasAddApprenticePermission = yesSelected, HasNoAddApprenticePermission = noSelected };
 
         var actual = sut.ToQueryString();
 
@@ -63,6 +63,31 @@ public class HomeSubmitModelTests
         else
         {
             actual.Should().NotContainKey(HomeSubmitModel.HasCreateCohortPermissionKey);
+        }
+    }
+
+    [TestCase(true, false, false, true)]
+    [TestCase(false, true, false, true)]
+    [TestCase(false, false, true, true)]
+    [TestCase(true, true, true, true)]
+    [TestCase(false, false, false, false)]
+    public void ToQueryString_ConditionallyAddsHasCreateCohortPermission(bool yesSelected, bool yesWithReviewSelected, bool noSelected, bool isAdded)
+    {
+        HomeSubmitModel sut = new() { HasRecruitmentPermission = yesSelected, HasRecruitmentWithReviewPermission = yesWithReviewSelected, HasNoRecruitmentPermission = noSelected };
+
+        var actual = sut.ToQueryString();
+
+        if (isAdded)
+        {
+            actual.Should().ContainKey(nameof(HomeSubmitModel.HasRecruitmentPermission)).WhoseValue.Should().Be(yesSelected.ToString());
+            actual.Should().ContainKey(nameof(HomeSubmitModel.HasRecruitmentWithReviewPermission)).WhoseValue.Should().Be(yesWithReviewSelected.ToString());
+            actual.Should().ContainKey(nameof(HomeSubmitModel.HasNoRecruitmentPermission)).WhoseValue.Should().Be(noSelected.ToString());
+        }
+        else
+        {
+            actual.Should().NotContainKey(nameof(HomeSubmitModel.HasRecruitmentPermission));
+            actual.Should().NotContainKey(nameof(HomeSubmitModel.HasRecruitmentWithReviewPermission));
+            actual.Should().NotContainKey(nameof(HomeSubmitModel.HasNoRecruitmentPermission));
         }
     }
 }
