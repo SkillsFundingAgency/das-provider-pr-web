@@ -8,4 +8,7 @@ public interface IOuterApiClient
     [AllowAnyStatusCode]
     [Get("/providerAccounts/{ukprn}")]
     Task<Response<GetProviderStatusResponse>> GetProviderStatus([Path] int ukprn, CancellationToken cancellationToken);
+
+    [Get("relationships/{ukprn}")]
+    Task<GetProviderRelationshipsResponse> GetProviderRelationships([Path] long ukprn, [QueryMap] IDictionary<string, string> queryString, CancellationToken cancellationToken);
 }

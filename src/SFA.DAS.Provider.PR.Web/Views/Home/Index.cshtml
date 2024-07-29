@@ -1,13 +1,37 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model HomeViewModel
+@{
+    ViewData["Title"] = "View employers and manage permissions";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="govuk-grid-row">
+    <h1 class="govuk-heading-l">View employers and manage permissions</h1>
+    <p>View and search your employers. Select the employer name to view the last action on the account and request new permissions.</p>
 
-    @if (ViewContext.RouteData.Values.ContainsKey("ukprn"))
-    {
-    <h3>You have successfully authorized to use @ViewContext.RouteData.Values["ukprn"].</h3>
-    }
+    <div>
+        <table class="govuk-table">
+            <caption class="govuk-table__caption govuk-table__caption--m">@Model.TotalCount employers</caption>
+
+            <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header">Employer name</th>
+                    <th scope="col" class="govuk-table__header">Permission to add apprentice records</th>
+                    <th scope="col" class="govuk-table__header">Permission to recruit apprentices</th>
+                </tr>
+            </thead>
+
+            <tbody class="govuk-table__body">
+                @foreach(var employer in Model.Employers)
+                {
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell">
+                          @employer.Name
+                          Agreement ID: @employer.AgreementId
+                        </td>
+                        <td class="govuk-table__cell">@employer.CohortPermission</td>
+                        <td class="govuk-table__cell">@employer.RecruitmentPermision</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
