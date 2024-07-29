@@ -1,2 +1,23 @@
-﻿body {
+﻿.govuk-checkboxes__label::before {
+  background-color: #fff;
+}
+
+.app-table__caption {
+  border-bottom: 2px solid #b1b4b6;
+  padding-bottom: 20px;
+  margin-bottom: 0;
+}
+
+.app-table--search-results .govuk-table__cell {
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+.app-search-result-link {
+  font-weight: 700;
+}
+
+.app-section-break {
+  border-bottom-width: 2px;
+  margin-bottom: 15px;
 }

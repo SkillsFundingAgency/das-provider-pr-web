@@ -12,6 +12,7 @@ namespace SFA.DAS.Provider.PR.Web.Controllers;
 [Authorize(Policy = nameof(PolicyNames.HasProviderAccount))]
 public class HomeController(IOuterApiClient _outerApiclient) : Controller
 {
+    [HttpGet]
     public IActionResult Index()
     {
         var ukprn = User.GetUkprn();
@@ -20,10 +21,10 @@ public class HomeController(IOuterApiClient _outerApiclient) : Controller
     }
 
     [Route("/{ukprn:int}", Name = RouteNames.Home)]
-    public async Task<IActionResult> Index(int ukprn, CancellationToken cancellationToken)
+    [HttpGet]
+    public async Task<IActionResult> Index([FromRoute] int ukprn, [FromQuery] HomeSubmitModel submitModel, CancellationToken cancellationToken)
     {
-        GetProviderRelationshipsResponse response = await _outerApiclient.GetProviderRelationships(ukprn, new Dictionary<string, string>(), cancellationToken);
-        return View(new HomeViewModel(response));
+        GetProviderRelationshipsResponse response = await _outerApiclient.GetProviderRelationships(ukprn, submitModel.SerializeToDictionary(), cancellationToken);
+        return View(new HomeViewModel(response, Url.RouteUrl(RouteNames.Home)!));
     }
-
 }
