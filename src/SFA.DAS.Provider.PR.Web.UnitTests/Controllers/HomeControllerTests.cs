@@ -28,13 +28,13 @@ public class HomeControllerTests
     }
 
     [Test, AutoData]
-    public async Task IndexWithUkprn_ReturnsView(int ukprn, GetProviderRelationshipsResponse response, string url, CancellationToken cancellationToken)
+    public async Task IndexWithUkprn_ReturnsView(int ukprn, GetProviderRelationshipsResponse response, string clearFilterUrl, string addEmployerUrl, CancellationToken cancellationToken)
     {
         Mock<IOuterApiClient> outerApiClientMock = new();
         outerApiClientMock.Setup(c => c.GetProviderRelationships(ukprn, It.IsAny<Dictionary<string, string>>(), cancellationToken)).ReturnsAsync(response);
 
         HomeController sut = new(outerApiClientMock.Object);
-        sut.AddDefaultContext().AddUrlHelperMock().AddUrlForRoute(RouteNames.Home, url);
+        sut.AddDefaultContext().AddUrlHelperMock().AddUrlForRoute(RouteNames.Home, clearFilterUrl).AddUrlForRoute(RouteNames.AddEmployerStart, addEmployerUrl);
 
         var actual = await sut.Index(ukprn, new(), cancellationToken);
 

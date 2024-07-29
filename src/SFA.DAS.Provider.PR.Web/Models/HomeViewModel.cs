@@ -8,12 +8,14 @@ public class HomeViewModel : HomeSubmitModel
     public string TotalCount { get; }
     public IEnumerable<EmployerPermissionViewModel> Employers { get; }
     public string ClearFiltersLink { get; }
+    public string AddEmployerLink { get; }
 
-    public HomeViewModel(GetProviderRelationshipsResponse source, string clearFiltersLink)
+    public HomeViewModel(GetProviderRelationshipsResponse source, string clearFiltersLink, string addEmployerLink)
     {
         Employers = source.Employers.Select(e => (EmployerPermissionViewModel)e);
         TotalCount = "employer".ToQuantity(source.TotalCount);
         ClearFiltersLink = clearFiltersLink;
+        AddEmployerLink = addEmployerLink;
     }
 }
 
