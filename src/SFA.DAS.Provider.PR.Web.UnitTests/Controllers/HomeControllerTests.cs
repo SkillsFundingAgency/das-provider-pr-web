@@ -28,9 +28,10 @@ public class HomeControllerTests
     }
 
     [Test, AutoData]
-    public async Task IndexWithUkprn_ReturnsView(int ukprn, GetProviderRelationshipsResponse response, string clearFilterUrl, string addEmployerUrl, CancellationToken cancellationToken)
+    public async Task IndexWithUkprn_HasRelationships_ReturnsHomeView(int ukprn, GetProviderRelationshipsResponse response, string clearFilterUrl, string addEmployerUrl, CancellationToken cancellationToken)
     {
         Mock<IOuterApiClient> outerApiClientMock = new();
+        response.HasAnyRelationships = true;
         outerApiClientMock.Setup(c => c.GetProviderRelationships(ukprn, It.IsAny<Dictionary<string, string>>(), cancellationToken)).ReturnsAsync(response);
 
         HomeController sut = new(outerApiClientMock.Object);
@@ -39,6 +40,25 @@ public class HomeControllerTests
         var actual = await sut.Index(ukprn, new(), cancellationToken);
 
         actual.Should().BeOfType<ViewResult>();
+        actual.As<ViewResult>().ViewName.Should().BeNull();
         actual.As<ViewResult>().Model.Should().BeOfType<HomeViewModel>();
+    }
+
+    [Test, AutoData]
+    public async Task IndexWithUkrpn_HasNoRelationships_RetrunsNoRelationshipsView(int ukprn, GetProviderRelationshipsResponse response, string addEmployerUrl, CancellationToken cancellationToken)
+    {
+        Mock<IOuterApiClient> outerApiClientMock = new();
+        response.HasAnyRelationships = false;
+        outerApiClientMock.Setup(c => c.GetProviderRelationships(ukprn, It.IsAny<Dictionary<string, string>>(), cancellationToken)).ReturnsAsync(response);
+
+        HomeController sut = new(outerApiClientMock.Object);
+        sut.AddDefaultContext().AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, addEmployerUrl);
+
+        var actual = await sut.Index(ukprn, new(), cancellationToken);
+
+        actual.Should().BeOfType<ViewResult>();
+        actual.As<ViewResult>().ViewName.Should().Be(HomeController.NoRelationshipsHomePage);
+        actual.As<ViewResult>().Model.Should().BeOfType<NoRelationshipsHomeViewModel>();
+        actual.As<ViewResult>().Model.As<NoRelationshipsHomeViewModel>().AddEmployerLink.Should().Be(addEmployerUrl);
     }
 }
