@@ -12,6 +12,8 @@ namespace SFA.DAS.Provider.PR.Web.Controllers;
 [Authorize(Policy = nameof(PolicyNames.HasProviderAccount))]
 public class HomeController(IOuterApiClient _outerApiclient) : Controller
 {
+    public const string NoRelationshipsHomePage = "NoRelationshipsHome";
+
     [HttpGet]
     public IActionResult Index()
     {
@@ -24,7 +26,13 @@ public class HomeController(IOuterApiClient _outerApiclient) : Controller
     [HttpGet]
     public async Task<IActionResult> Index([FromRoute] int ukprn, [FromQuery] HomeSubmitModel submitModel, CancellationToken cancellationToken)
     {
-        GetProviderRelationshipsResponse response = await _outerApiclient.GetProviderRelationships(ukprn, submitModel.SerializeToDictionary(), cancellationToken);
-        return View(new HomeViewModel(response, Url.RouteUrl(RouteNames.Home)!));
+        GetProviderRelationshipsResponse response = await _outerApiclient.GetProviderRelationships(ukprn, submitModel.ToQueryString(), cancellationToken);
+
+        if (response.HasAnyRelationships)
+        {
+            return View(new HomeViewModel(response, Url.RouteUrl(RouteNames.Home)!, Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn })!));
+        }
+
+        return View(NoRelationshipsHomePage, new NoRelationshipsHomeViewModel(Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn })!));
     }
 }

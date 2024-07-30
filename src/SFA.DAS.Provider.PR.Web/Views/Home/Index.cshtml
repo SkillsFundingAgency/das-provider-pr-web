@@ -20,7 +20,7 @@
             Invite employers to create an account or add you as a training provider.
         </p>
         <p class="govuk-!-margin-bottom-6">
-            <a href="#" class="govuk-link govuk-link--no-visted-state">Add an employer</a>
+            <a href="@Model.AddEmployerLink" class="govuk-link govuk-link--no-visted-state">Add an employer</a>
         </p>
     </div>
 </div>
@@ -48,16 +48,14 @@
                         </legend>
                         <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
                             <div class="govuk-checkboxes__item">
-                                <input class="govuk-checkboxes__input" id="permissionAdd-yes" name="permissionAdd"
-                                       type="checkbox" value="yes">
-                                <label class="govuk-label govuk-checkboxes__label" for="permissionAdd-yes">
+                                <input class="govuk-checkboxes__input" asp-for="HasAddApprenticePermission" type="checkbox">
+                                <label class="govuk-label govuk-checkboxes__label" asp-for="HasAddApprenticePermission">
                                     Yes, employer will review records
                                 </label>
                             </div>
                             <div class="govuk-checkboxes__item">
-                                <input class="govuk-checkboxes__input" id="permissionAdd-no" name="permissionAdd"
-                                       type="checkbox" value="no">
-                                <label class="govuk-label govuk-checkboxes__label" for="permissionAdd-no">
+                                <input class="govuk-checkboxes__input" asp-for="HasNoAddApprenticePermission" type="checkbox">
+                                <label class="govuk-label govuk-checkboxes__label" asp-for="HasNoAddApprenticePermission">
                                     No
                                 </label>
                             </div>
@@ -71,23 +69,20 @@
                         </legend>
                         <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
                             <div class="govuk-checkboxes__item">
-                                <input class="govuk-checkboxes__input" id="permissionRecruit-yes"
-                                       name="permissionRecruit" type="checkbox" value="yes">
-                                <label class="govuk-label govuk-checkboxes__label" for="permissionRecruit-yes">
+                                <input class="govuk-checkboxes__input" asp-for="HasRecruitmentPermission"  type="checkbox">
+                                <label class="govuk-label govuk-checkboxes__label" asp-for="HasRecruitmentPermission">
                                     Yes
                                 </label>
                             </div>
                             <div class="govuk-checkboxes__item">
-                                <input class="govuk-checkboxes__input" id="permissionRecruit-review"
-                                       name="permissionRecruit" type="checkbox" value="review">
-                                <label class="govuk-label govuk-checkboxes__label" for="permissionRecruit-review">
+                                <input class="govuk-checkboxes__input" asp-for="HasRecruitmentWithReviewPermission" type="checkbox">
+                                <label class="govuk-label govuk-checkboxes__label" asp-for="HasRecruitmentWithReviewPermission">
                                     Yes, employer will review adverts
                                 </label>
                             </div>
                             <div class="govuk-checkboxes__item">
-                                <input class="govuk-checkboxes__input" id="permissionRecruit-no"
-                                       name="permissionRecruit" type="checkbox" value="no">
-                                <label class="govuk-label govuk-checkboxes__label" for="permissionRecruit-no">
+                                <input class="govuk-checkboxes__input" asp-for="HasNoRecruitmentPermission" type="checkbox">
+                                <label class="govuk-label govuk-checkboxes__label" asp-for="HasNoRecruitmentPermission">
                                     No
                                 </label>
                             </div>
@@ -101,9 +96,8 @@
                         </legend>
                         <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
                             <div class="govuk-checkboxes__item">
-                                <input class="govuk-checkboxes__input" id="request-pending" name="request-pending"
-                                       type="checkbox" value="request-pending">
-                                <label class="govuk-label govuk-checkboxes__label" for="request-pending">
+                                <input class="govuk-checkboxes__input" asp-for="HasPendingRequest" type="checkbox" value="true">
+                                <label class="govuk-label govuk-checkboxes__label" asp-for="HasPendingRequest">
                                     Request pending
                                 </label>
                             </div>
@@ -138,23 +132,6 @@
             </thead>
 
             <tbody class="govuk-table__body">
-                @* <tr class="govuk-table__row">
-                <td class="govuk-table__cell">
-                <strong class="govuk-tag govuk-tag--orange govuk-!-margin-bottom-2">Request pending</strong>
-                <a href="#" class="govuk-link app-search-result-link">Company name</a>
-                <span class="govuk-!-font-size-16 das-!-color-dark-grey">Agreement ID: 123</span>
-                </td>
-                <td class="govuk-table__cell">No</td>
-                <td class="govuk-table__cell">Yes, employer will review all adverts</td>
-                </tr>
-                <tr class="govuk-table__row">
-                <td class="govuk-table__cell">
-                <a href="#" class="govuk-link app-search-result-link">Company name</a>
-                <span class="govuk-!-font-size-16 das-!-color-dark-grey">Agreement ID: 123</span>
-                </td>
-                <td class="govuk-table__cell">Yes, employer will review records</td>
-                <td class="govuk-table__cell">No</td>
-                </tr> *@
                 @foreach (var employer in Model.Employers)
                 {
                     <tr class="govuk-table__row">
