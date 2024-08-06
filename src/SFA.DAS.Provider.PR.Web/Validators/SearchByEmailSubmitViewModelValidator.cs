@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using SFA.DAS.Provider.PR.Application.Constants;
 using SFA.DAS.Provider.PR.Application.Services;
 using SFA.DAS.Provider.PR.Web.Models.AddEmployer;
 
@@ -17,7 +16,7 @@ public class SearchByEmailSubmitViewModelValidator : AbstractValidator<SearchByE
             .Cascade(CascadeMode.Stop)
             .NotEmpty()
             .WithMessage(NoEmailErrorMessage)
-            .Matches(RegularExpressions.EmailRegex)
+            .EmailAddress()
             .WithMessage(InvalidEmailErrorMessage)
             .Must(IsDomainValid)
             .WithMessage(InvalidDomainErrorMessage);

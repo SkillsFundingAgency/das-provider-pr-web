@@ -2,16 +2,12 @@
 
 public class SearchByEmailViewModel : SearchByEmailSubmitViewModel
 {
-    public string CancelLink { get; }
-    public string BackLink { get; }
-    public long Ukprn { get; set; }
+    public SearchByEmailViewModel() { }
 
-    public SearchByEmailViewModel(string cancelLink, string backLink, int ukprn)
-    {
-        CancelLink = cancelLink;
-        BackLink = backLink;
-        Ukprn = ukprn;
-    }
+    public required string CancelLink { get; init; }
+    public required string BackLink { get; init; }
+    public required long Ukprn { get; init; }
+
 }
 
 public class SearchByEmailSubmitViewModel

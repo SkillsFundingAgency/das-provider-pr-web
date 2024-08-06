@@ -23,16 +23,11 @@ public static class EmailCheckingService
         {
             var hostEntry = Dns.GetHostEntry(domain);
 
-            if (hostEntry.AddressList.Length > 0)
-            {
-                return true;
-            }
+            return hostEntry.AddressList.Length > 0;
         }
         catch
         {
             return false;
         }
-
-        return false;
     }
 }

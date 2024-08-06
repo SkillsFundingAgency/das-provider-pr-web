@@ -47,15 +47,12 @@ public class SearchByEmailControllerPostTests
 
         var result = await sut.Index(ukprn, searchByEmailSubmitViewModel, cancellationToken);
 
-        ViewResult? viewResult = result.As<ViewResult>();
-        SearchByEmailViewModel? viewModel = viewResult.Model as SearchByEmailViewModel;
+        RedirectToRouteResult? redirectToRouteResult = result.As<RedirectToRouteResult>();
+        redirectToRouteResult.RouteName.Should().Be(RouteNames.AddEmployerSearchByEmail);
+        redirectToRouteResult.RouteValues!.First().Value.Should().Be(ukprn);
 
         outerApiClientMock.Verify(o => o.GetRelationshipByEmail(email, ukprn, cancellationToken), Times.Once);
         sessionServiceMock.Verify(s => s.Set(It.Is<AddEmployerSessionModel>(x => x.Email == email)), Times.Once);
-        viewModel!.Ukprn.Should().Be(ukprn);
-        viewModel.BackLink.Should().Be(BackLink);
-        viewModel.CancelLink.Should().Be(CancelLink);
-        viewModel.Email.Should().Be(email);
     }
 
     [Test, MoqAutoData]
@@ -156,13 +153,11 @@ public class SearchByEmailControllerPostTests
 
         var result = await sut.Index(ukprn, searchByEmailSubmitViewModel, cancellationToken);
 
-        ViewResult? viewResult = result.As<ViewResult>();
-        SearchByEmailViewModel? viewModel = viewResult.Model as SearchByEmailViewModel;
+        RedirectToRouteResult? redirectToRouteResult = result.As<RedirectToRouteResult>();
+        redirectToRouteResult.RouteName.Should().Be(RouteNames.AddEmployerSearchByEmail);
+        redirectToRouteResult.RouteValues!.First().Value.Should().Be(ukprn);
 
+        outerApiClientMock.Verify(o => o.GetRelationshipByEmail(email, ukprn, cancellationToken), Times.Once);
         sessionServiceMock.Verify(s => s.Set(It.Is<AddEmployerSessionModel>(x => x.Email == email)), Times.Once);
-        viewModel!.Ukprn.Should().Be(ukprn);
-        viewModel.BackLink.Should().Be(BackLink);
-        viewModel.CancelLink.Should().Be(CancelLink);
-        viewModel.Email.Should().Be(email);
     }
 }

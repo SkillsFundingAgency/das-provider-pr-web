@@ -23,8 +23,12 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
     [HttpGet]
     public IActionResult Index([FromRoute] int ukprn)
     {
-
         var viewModel = GetViewModel(ukprn);
+        var sessionModel = _sessionService.Get<AddEmployerSessionModel>();
+        if (!string.IsNullOrEmpty(sessionModel?.Email))
+        {
+            viewModel.Email = sessionModel.Email;
+        }
         return View(ViewPath, viewModel);
     }
 
@@ -33,26 +37,32 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
     {
         var result = _validator.Validate(submitViewModel);
         var viewModel = GetViewModel(ukprn);
-        viewModel.Email = submitViewModel.Email;
+
 
         if (!result.IsValid)
         {
+            viewModel.Email = submitViewModel.Email;
             result.AddToModelState(ModelState);
             return View(ViewPath, viewModel);
         }
 
+        _sessionService.Set(new AddEmployerSessionModel(submitViewModel.Email!));
+
         var relationshipByEmail = await _outerApiClient.GetRelationshipByEmail(submitViewModel.Email!, ukprn, cancellationToken);
+
+        if (!relationshipByEmail.HasUserAccount)
+        {
+            return RedirectToRoute(RouteNames.AddEmployerSearchByEmail, new { ukprn });
+        }
 
         var hasMultipleAccounts = HasMultipleAccounts(relationshipByEmail);
 
-        if (hasMultipleAccounts != null && hasMultipleAccounts.Value)
+        if (hasMultipleAccounts)
         {
             return RedirectToRoute(RouteNames.AddEmployerMultipleAccounts, new { ukprn });
         }
 
-        _sessionService.Set(new AddEmployerSessionModel(submitViewModel.Email!));
-
-        return View(ViewPath, viewModel);
+        return RedirectToRoute(RouteNames.AddEmployerSearchByEmail, new { ukprn });
     }
 
     [HttpGet]
@@ -70,25 +80,12 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
     {
         var cancelLink = Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn });
         var backLink = Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn });
-        return new SearchByEmailViewModel(cancelLink!, backLink!, ukprn);
+        return new SearchByEmailViewModel { CancelLink = cancelLink!, BackLink = backLink!, Ukprn = ukprn };
     }
 
-    private static bool? HasMultipleAccounts(GetRelationshipByEmailResponse response)
+    private static bool HasMultipleAccounts(GetRelationshipByEmailResponse response)
     {
-
-        if (!response.HasUserAccount)
-        {
-            return null;
-        }
-
-        if (response.HasOneEmployerAccount != null
-            && response.HasOneEmployerAccount.Value
-            && response.HasOneLegalEntity != null
-            && response.HasOneLegalEntity.Value)
-        {
-            return false;
-        }
-
-        return true;
+        return !(response.HasOneEmployerAccount.GetValueOrDefault()
+                && response.HasOneLegalEntity.GetValueOrDefault());
     }
 }
