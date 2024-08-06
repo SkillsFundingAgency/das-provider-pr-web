@@ -7,6 +7,8 @@ public static class ClaimsPrincipalExtensions
 {
     public static string? GetUkprn(this ClaimsPrincipal user) => user.FindFirst(c => c.Type.Equals(ProviderClaims.Ukprn))?.Value;
 
+    public static string? GetUserId(this ClaimsPrincipal user) => user.FindFirstValue(ProviderClaims.Upn) ?? user.FindFirstValue(ProviderClaims.Sub);
+
     public static bool HasPermission(this ClaimsPrincipal user, ServiceClaim minimumRequiredClaim)
     {
         var serviceClaims = user

@@ -1,4 +1,5 @@
 ﻿using RestEase;
+using SFA.DAS.Provider.PR.Domain.OuterApi.Requests.Commands;
 using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
 
 namespace SFA.DAS.Provider.PR.Domain.Interfaces;
@@ -15,4 +16,6 @@ public interface IOuterApiClient
     [Get("relationships/employeraccount/email/{email}")]
     Task<GetRelationshipByEmailResponse> GetRelationshipByEmail([Path] string email, [Query] long ukprn, CancellationToken cancellationToken);
 
+    [Post("/requests/addaccount")]
+    Task<AddAccountRequestCommandResponse> AddRequest([Body] AddAccountRequestCommand command, CancellationToken cancellationToken);
 }

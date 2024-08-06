@@ -1,0 +1,45 @@
+﻿
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using SFA.DAS.Provider.PR.Web.Infrastructure
+@model SFA.DAS.Provider.PR.Web.Models.AddEmployer.AddEmployerAndPermissionsSentViewModel
+@{
+    ViewData["Title"] = "Add employer and request permissions sent";
+}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-panel govuk-panel--confirmation">
+            <h1 class="govuk-panel__title">
+                Request sent to employer
+            </h1>
+        </div>
+        <br/><br/>
+        </div>
+        <div class="govuk-grid-column-two-thirds">
+            <h2 class="govuk-heading-m">
+                What happens next
+            </h2>
+        </div>
+        <div class="govuk-grid-column-two-thirds">
+            <p class="govuk-body">
+                We’ve sent an email to @Model.LegalName.ToUpper() asking them to add you as a training provider with the permissions you requested. The request will expire in 14 days.
+            </p>
+            <p class="govuk-body">
+            If @Model.Email is not authorised to make changes to the account, we’ll also email the person at  @Model.LegalName.ToUpper() authorised to do this.
+        </p>
+            <br/><br/>
+        </div>
+        
+        <div class="govuk-grid-column-two-thirds">
+            <h2 class="govuk-heading-m">
+                View employers and permissions
+            </h2>
+        </div>
+        <div class="govuk-grid-column-two-thirds">
+            <p class="govuk-body">
+                You can view pending requests, search your employers and check and update permissions from your <a class="govuk-link" href="@Model.ViewEmployersLink">View employers and manage permissions page</a>.
+        </p>
+            <p class="govuk-body">
+                If the employer does not respond in 14 days or declines your request, they’ll be removed from the View employers and manage permissions page.
+            </p>
+        </div>
+</div>

@@ -32,13 +32,15 @@ public static class ControllerExtensions
         var ukprnClaim = new Claim(ProviderClaims.Ukprn, TestConstants.DefaultUkprn.ToString());
         var emailClaim = new Claim(ClaimTypes.Email, fixture.Create<string>());
         var nameClaim = new Claim(ClaimTypes.NameIdentifier, fixture.Create<string>());
+        var upnClaim = new Claim(ClaimTypes.Upn, fixture.Create<string>());
 
         var httpContext = new DefaultHttpContext();
         var claimsPrinciple = new ClaimsPrincipal(new[] {new ClaimsIdentity(new[]
         {
             ukprnClaim,
             emailClaim,
-            nameClaim
+            nameClaim,
+            upnClaim
         })});
         httpContext.User = claimsPrinciple;
 

@@ -12,6 +12,7 @@ public class ProviderStubAuthHandler : AuthenticationHandler<AuthenticationSchem
 {
     private const string Ukprn = "10000001";
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private const string Upn = "51f113da-a504-4ce0-b593-ee6857b2153f";
 
     public ProviderStubAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options, ILoggerFactory logger, UrlEncoder encoder, IHttpContextAccessor httpContextAccessor) : base(options, logger, encoder)
     {
@@ -25,7 +26,8 @@ public class ProviderStubAuthHandler : AuthenticationHandler<AuthenticationSchem
             new Claim(ClaimsIdentity.DefaultNameClaimType, Ukprn),
             new Claim(ProviderClaims.DisplayName, "Provider User"),
             new Claim(ProviderClaims.Service, "DAA"),
-            new Claim(ProviderClaims.Ukprn, Ukprn)
+            new Claim(ProviderClaims.Ukprn, Ukprn),
+            new Claim(ProviderClaims.Upn,Upn)
         };
         var identity = new ClaimsIdentity(claims, "Provider-stub");
         var principal = new ClaimsPrincipal(identity);
