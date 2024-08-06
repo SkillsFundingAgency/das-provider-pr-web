@@ -20,6 +20,7 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
 {
     public const string ViewPath = "~/Views/AddEmployer/SearchByEmail.cshtml";
     public const string MultipleAccountsShutterPathViewPath = "~/Views/AddEmployer/MultipleAccountsShutterPage.cshtml";
+    public const string OneAccountNoRelationshipViewPath = "~/Views/AddEmployer/OneAccountNoRelationship.cshtml";
 
     [HttpGet]
     public IActionResult Index([FromRoute] int ukprn)
@@ -30,6 +31,7 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
         {
             viewModel.Email = sessionModel.Email;
         }
+
         return View(ViewPath, viewModel);
     }
 
@@ -65,6 +67,11 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
             return RedirectToRoute(RouteNames.AddEmployerMultipleAccounts, new { ukprn });
         }
 
+        if (relationshipByEmail.HasRelationship != null && !relationshipByEmail.HasRelationship.Value)
+        {
+            return RedirectToRoute(RouteNames.OneAccountNoRelationship, new { ukprn });
+        }
+
         return RedirectToRoute(RouteNames.AddEmployerSearchByEmail, new { ukprn });
     }
 
@@ -77,6 +84,28 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
             );
 
         return View(MultipleAccountsShutterPathViewPath, shutterViewModel);
+    }
+
+    [HttpGet]
+    [Route("accountFound", Name = RouteNames.OneAccountNoRelationship)]
+    public IActionResult OneAccountNoRelationshipFound([FromRoute] int ukprn)
+    {
+        var sessionModel = _sessionService.Get<AddEmployerSessionModel>();
+        if (string.IsNullOrEmpty(sessionModel?.Email))
+        {
+            return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
+        }
+
+        var viewModel = new OneAccountNoRelationshipViewModel
+        {
+            CancelLink = Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn })!,
+            BackLink = Url.RouteUrl(RouteNames.AddEmployerSearchByEmail, new { ukprn })!,
+            ContinueLink = Url.RouteUrl(RouteNames.OneAccountNoRelationship, new { ukprn })!,
+            Ukprn = ukprn,
+            Email = sessionModel.Email
+        };
+
+        return View(OneAccountNoRelationshipViewPath, viewModel);
     }
 
     private SearchByEmailViewModel GetViewModel(int ukprn)
