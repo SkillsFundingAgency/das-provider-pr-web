@@ -10,5 +10,6 @@ public static class RouteNames
     public const string AddEmployerStart = nameof(AddEmployerStart);
     public const string AddEmployerSearchByEmail = nameof(AddEmployerSearchByEmail);
     public const string AddEmployerMultipleAccounts = nameof(AddEmployerMultipleAccounts);
+    public const string OneAccountNoRelationship = nameof(OneAccountNoRelationship);
 
 }

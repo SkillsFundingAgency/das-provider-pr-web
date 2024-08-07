@@ -16,7 +16,6 @@ public class SearchByEmailControllerGetTests
 {
     private static readonly string BackLink = Guid.NewGuid().ToString();
     private static readonly string CancelLink = BackLink;
-    private static readonly string AddLink = Guid.NewGuid().ToString();
 
     [Test, MoqAutoData]
     public void Get_BuildsExpectedViewModel(int ukprn)
@@ -55,19 +54,5 @@ public class SearchByEmailControllerGetTests
         viewModel.BackLink.Should().Be(BackLink);
         viewModel.CancelLink.Should().Be(CancelLink);
         viewModel.Email.Should().Be(email);
-    }
-
-    [Test, MoqAutoData]
-    public void MultipleAccountsShutterPage_BuildsExpectedViewModel(int ukprn)
-    {
-        SearchByEmailController sut = new(Mock.Of<IOuterApiClient>(), Mock.Of<ISessionService>(), Mock.Of<IValidator<SearchByEmailSubmitViewModel>>());
-
-        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, AddLink);
-
-        var result = sut.MultipleAccountsShutterPage(ukprn);
-
-        ViewResult? viewResult = result.As<ViewResult>();
-        MultipleAccountsShutterPageViewModel? viewModel = viewResult.Model as MultipleAccountsShutterPageViewModel;
-        viewModel!.AddLink.Should().Be(AddLink);
     }
 }
