@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -5,6 +6,7 @@ using Microsoft.Extensions.Logging.ApplicationInsights;
 using SFA.DAS.Provider.PR.Web.AppStart;
 using SFA.DAS.Provider.PR.Web.Authorization;
 using SFA.DAS.Provider.PR.Web.Infrastructure;
+using SFA.DAS.Provider.PR.Web.Validators;
 using SFA.DAS.Provider.Shared.UI;
 using SFA.DAS.Provider.Shared.UI.Startup;
 
@@ -29,6 +31,7 @@ builder.Services
     .AddSession(configuration)
     .AddHealthChecks(configuration)
     .AddAuthentication(configuration)
+    .AddValidatorsFromAssembly(typeof(SearchByEmailSubmitViewModelValidator).Assembly)
     .AddAuthorizationServicePolicies()
     .AddProviderUiServiceRegistration(configuration);
 
