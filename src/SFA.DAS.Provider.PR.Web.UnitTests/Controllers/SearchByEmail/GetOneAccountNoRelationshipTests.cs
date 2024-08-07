@@ -23,13 +23,13 @@ public class GetOneAccountNoRelationshipTests
     {
         var email = "test@test.com";
         var sessionServiceMock = new Mock<ISessionService>();
-        sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel(email));
+        sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel { Email = email });
         SearchByEmailController sut = new(Mock.Of<IOuterApiClient>(), sessionServiceMock.Object, Mock.Of<IValidator<SearchByEmailSubmitViewModel>>());
 
         sut.AddUrlHelperMock()
             .AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink)
             .AddUrlForRoute(RouteNames.AddEmployerSearchByEmail, BackLink)
-            .AddUrlForRoute(RouteNames.OneAccountNoRelationship, ContinueLink);
+            .AddUrlForRoute(RouteNames.AddPermissionsAndEmployer, ContinueLink);
 
         var result = sut.OneAccountNoRelationshipFound(ukprn);
 
@@ -58,7 +58,7 @@ public class GetOneAccountNoRelationshipTests
     public void SessionModelEmptyEmailAddress_RedirectToAddEmployerStart(int ukprn)
     {
         var sessionServiceMock = new Mock<ISessionService>();
-        sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel(string.Empty));
+        sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel { Email = string.Empty });
 
         SearchByEmailController sut = new(Mock.Of<IOuterApiClient>(), sessionServiceMock.Object, Mock.Of<IValidator<SearchByEmailSubmitViewModel>>());
 

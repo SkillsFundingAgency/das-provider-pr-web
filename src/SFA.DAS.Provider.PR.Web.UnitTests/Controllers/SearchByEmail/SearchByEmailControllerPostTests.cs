@@ -87,6 +87,14 @@ public class SearchByEmailControllerPostTests
         RedirectToRouteResult? redirectToRouteResult = result.As<RedirectToRouteResult>();
         redirectToRouteResult.RouteName.Should().Be(RouteNames.OneAccountNoRelationship);
         redirectToRouteResult.RouteValues!.First().Value.Should().Be(ukprn);
+        sessionServiceMock.Verify(s => s.Set(It.Is<AddEmployerSessionModel>(x => x.Email == email)), Times.Exactly(2));
+        sessionServiceMock.Verify(s => s.Set(It.Is<AddEmployerSessionModel>(
+            x => x.Email == email
+                 && x.AccountId == getRelationshipByEmailResponse.AccountId
+                 && x.AccountLegalEntityId == getRelationshipByEmailResponse.AccountLegalEntityId
+            && x.AccountLegalEntityName == getRelationshipByEmailResponse.AccountLegalEntityName
+            )), Times.AtLeastOnce);
+
     }
 
     [Test, MoqAutoData]
