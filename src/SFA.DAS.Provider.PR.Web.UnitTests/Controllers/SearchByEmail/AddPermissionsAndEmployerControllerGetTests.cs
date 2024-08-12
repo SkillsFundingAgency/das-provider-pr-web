@@ -2,6 +2,7 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using SFA.DAS.Provider.PR.Domain.Interfaces;
 using SFA.DAS.Provider.PR.Web.Constants;
 using SFA.DAS.Provider.PR.Web.Controllers.AddEmployer;
 using SFA.DAS.Provider.PR.Web.Infrastructure;
@@ -22,7 +23,7 @@ public class AddPermissionsAndEmployerControllerGetTests
         var email = "test@test.com";
         var sessionServiceMock = new Mock<ISessionService>();
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel { Email = email, AccountLegalEntityId = accountLegalEntityId, AccountLegalEntityName = accountLegalName, AccountId = accountId });
-        AddPermissionsAndEmployerController sut = new(sessionServiceMock.Object, Mock.Of<IValidator<AddPermissionsAndEmployerSubmitViewModel>>());
+        AddPermissionsAndEmployerController sut = new(Mock.Of<IOuterApiClient>(), sessionServiceMock.Object, Mock.Of<IValidator<AddPermissionsAndEmployerSubmitViewModel>>());
 
         sut.AddUrlHelperMock()
             .AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink);
@@ -50,7 +51,7 @@ public class AddPermissionsAndEmployerControllerGetTests
     {
         var sessionServiceMock = new Mock<ISessionService>();
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns((AddEmployerSessionModel)null!);
-        AddPermissionsAndEmployerController sut = new(sessionServiceMock.Object, Mock.Of<IValidator<AddPermissionsAndEmployerSubmitViewModel>>());
+        AddPermissionsAndEmployerController sut = new(Mock.Of<IOuterApiClient>(), sessionServiceMock.Object, Mock.Of<IValidator<AddPermissionsAndEmployerSubmitViewModel>>());
 
         sut.AddUrlHelperMock()
             .AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink);
@@ -69,10 +70,9 @@ public class AddPermissionsAndEmployerControllerGetTests
     public void Get_SessionModelInvalid_RedirectsToAddEmployerStart(string? email, long? accountLegalEntityId, int ukprn)
     {
         var sessionServiceMock = new Mock<ISessionService>();
-        sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel { Email = email!, AccountLegalEntityId = accountLegalEntityId, AccountLegalEntityName = "name" });
 
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns((AddEmployerSessionModel)null!);
-        AddPermissionsAndEmployerController sut = new(sessionServiceMock.Object, Mock.Of<IValidator<AddPermissionsAndEmployerSubmitViewModel>>());
+        AddPermissionsAndEmployerController sut = new(Mock.Of<IOuterApiClient>(), sessionServiceMock.Object, Mock.Of<IValidator<AddPermissionsAndEmployerSubmitViewModel>>());
 
         sut.AddUrlHelperMock()
             .AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink);
@@ -104,7 +104,7 @@ public class AddPermissionsAndEmployerControllerGetTests
                 PermissionToRecruit = permissionToRecruit
             });
 
-        AddPermissionsAndEmployerController sut = new(sessionServiceMock.Object, Mock.Of<IValidator<AddPermissionsAndEmployerSubmitViewModel>>());
+        AddPermissionsAndEmployerController sut = new(Mock.Of<IOuterApiClient>(), sessionServiceMock.Object, Mock.Of<IValidator<AddPermissionsAndEmployerSubmitViewModel>>());
 
         sut.AddUrlHelperMock()
             .AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink);
