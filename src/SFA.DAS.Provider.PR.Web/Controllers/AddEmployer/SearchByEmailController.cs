@@ -9,6 +9,7 @@ using SFA.DAS.Provider.PR.Web.Infrastructure;
 using SFA.DAS.Provider.PR.Web.Infrastructure.Services;
 using SFA.DAS.Provider.PR.Web.Models.AddEmployer;
 using SFA.DAS.Provider.PR.Web.Models.Session;
+using System.Web;
 
 namespace SFA.DAS.Provider.PR.Web.Controllers.AddEmployer;
 
@@ -47,6 +48,8 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
         }
 
         _sessionService.Set(new AddEmployerSessionModel(submitViewModel.Email!));
+
+        var email = HttpUtility.UrlEncode(submitViewModel.Email);
 
         var relationshipByEmail = await _outerApiClient.GetRelationshipByEmail(submitViewModel.Email!, ukprn, cancellationToken);
 
