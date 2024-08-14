@@ -56,7 +56,7 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
 
         var email = HttpUtility.UrlEncode(submitViewModel.Email);
 
-        var relationshipByEmail = await _outerApiClient.GetRelationshipByEmail(submitViewModel.Email!, ukprn, cancellationToken);
+        var relationshipByEmail = await _outerApiClient.GetRelationshipByEmail(email!, ukprn, cancellationToken);
 
         if (!relationshipByEmail.HasUserAccount)
         {
