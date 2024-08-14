@@ -11,4 +11,8 @@ public interface IOuterApiClient
 
     [Get("relationships/{ukprn}")]
     Task<GetProviderRelationshipsResponse> GetProviderRelationships([Path] long ukprn, [QueryMap] IDictionary<string, string> queryString, CancellationToken cancellationToken);
+
+    [Get("relationships/employeraccount/email/{email}")]
+    Task<GetRelationshipByEmailResponse> GetRelationshipByEmail([Path] string email, [Query] long ukprn, CancellationToken cancellationToken);
+
 }

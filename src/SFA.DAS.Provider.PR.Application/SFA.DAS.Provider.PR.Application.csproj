@@ -10,8 +10,4 @@
     <ProjectReference Include="..\SFA.DAS.Provider.PR.Domain\SFA.DAS.Provider.PR.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Services\" />
-  </ItemGroup>
-
 </Project>
