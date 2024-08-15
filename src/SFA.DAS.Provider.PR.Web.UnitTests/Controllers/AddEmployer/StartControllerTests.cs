@@ -17,7 +17,11 @@ public class StartControllerTests
     {
         var sessionServiceMock = new Mock<ISessionService>();
         StartController sut = new StartController(sessionServiceMock.Object);
-        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.Home, homeLink).AddUrlForRoute(RouteNames.AddEmployerSearchByEmail, addSearchByEmailLink);
+        sut
+            .AddUrlHelperMock()
+            .AddUrlForRoute(RouteNames.Employers, homeLink)
+            .AddUrlForRoute(RouteNames.AddEmployerSearchByEmail, addSearchByEmailLink);
+
         IActionResult result = sut.Index(ukprn);
 
         ViewResult? viewResult = result.As<ViewResult>();

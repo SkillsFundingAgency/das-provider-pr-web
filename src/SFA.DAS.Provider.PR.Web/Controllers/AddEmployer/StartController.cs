@@ -20,6 +20,6 @@ public class StartController(ISessionService _sessionService) : Controller
     {
         _sessionService.Delete<AddEmployerSessionModel>();
         var continueLink = Url.RouteUrl(RouteNames.AddEmployerSearchByEmail, new { ukprn });
-        return View(ViewPath, new StartViewModel(continueLink!, Url.RouteUrl(RouteNames.Home, new { ukprn })!));
+        return View(ViewPath, new StartViewModel(continueLink!, Url.RouteUrl(RouteNames.Employers, new { ukprn })!));
     }
 }

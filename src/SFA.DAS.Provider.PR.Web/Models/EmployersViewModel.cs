@@ -3,14 +3,14 @@ using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
 
 namespace SFA.DAS.Provider.PR.Web.Models;
 
-public class HomeViewModel : HomeSubmitModel
+public class EmployersViewModel : EmployersSubmitModel
 {
     public string TotalCount { get; }
     public IEnumerable<EmployerPermissionViewModel> Employers { get; }
     public string ClearFiltersLink { get; }
     public string AddEmployerLink { get; }
 
-    public HomeViewModel(GetProviderRelationshipsResponse source, string clearFiltersLink, string addEmployerLink)
+    public EmployersViewModel(GetProviderRelationshipsResponse source, string clearFiltersLink, string addEmployerLink)
     {
         Employers = source.Employers.Select(e => (EmployerPermissionViewModel)e);
         TotalCount = "employer".ToQuantity(source.TotalCount);
@@ -19,7 +19,7 @@ public class HomeViewModel : HomeSubmitModel
     }
 }
 
-public class HomeSubmitModel
+public class EmployersSubmitModel
 {
     public const string HasCreateCohortPermissionKey = "HasCreateCohortPermission";
 
