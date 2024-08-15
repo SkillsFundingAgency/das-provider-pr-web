@@ -12,7 +12,6 @@ using SFA.DAS.Provider.PR.Web.Models.AddEmployer;
 using SFA.DAS.Provider.PR.Web.Models.Session;
 using SFA.DAS.Provider.PR_Web.UnitTests.TestHelpers;
 using SFA.DAS.Testing.AutoFixture;
-using System.Web;
 
 namespace SFA.DAS.Provider.PR_Web.UnitTests.Controllers.SearchByEmail;
 public class SearchByEmailControllerPostTests
@@ -22,7 +21,7 @@ public class SearchByEmailControllerPostTests
     private static readonly string RedirectToMultipleAccountsShutterPage = Guid.NewGuid().ToString();
 
     private static readonly string Email = "test@account.com";
-    private readonly string _emailEncoded = HttpUtility.UrlEncode(Email);
+    private readonly string _emailCallingRelationships = Email;
 
     [Test, MoqAutoData]
     public async Task Post_SingleAccountsHasRelationship_ReturnsExpectedViewModelAndPath(
@@ -41,7 +40,7 @@ public class SearchByEmailControllerPostTests
         getRelationshipByEmailResponse.HasOneLegalEntity = true;
         getRelationshipByEmailResponse.HasRelationship = true;
 
-        outerApiClientMock.Setup(x => x.GetRelationshipByEmail(_emailEncoded, ukprn, cancellationToken)).ReturnsAsync(getRelationshipByEmailResponse);
+        outerApiClientMock.Setup(x => x.GetRelationshipByEmail(_emailCallingRelationships, ukprn, cancellationToken)).ReturnsAsync(getRelationshipByEmailResponse);
 
         validatorMock.Setup(v => v.Validate(It.IsAny<SearchByEmailSubmitViewModel>())).Returns(new ValidationResult());
 
@@ -55,7 +54,7 @@ public class SearchByEmailControllerPostTests
         redirectToRouteResult.RouteName.Should().Be(RouteNames.AddEmployerSearchByEmail);
         redirectToRouteResult.RouteValues!.First().Value.Should().Be(ukprn);
 
-        outerApiClientMock.Verify(o => o.GetRelationshipByEmail(_emailEncoded, ukprn, cancellationToken), Times.Once);
+        outerApiClientMock.Verify(o => o.GetRelationshipByEmail(_emailCallingRelationships, ukprn, cancellationToken), Times.Once);
         sessionServiceMock.Verify(s => s.Set(It.Is<AddEmployerSessionModel>(x => x.Email == Email)), Times.Once);
     }
 
@@ -77,7 +76,7 @@ public class SearchByEmailControllerPostTests
         getRelationshipByEmailResponse.HasOneLegalEntity = true;
         getRelationshipByEmailResponse.HasRelationship = false;
 
-        outerApiClientMock.Setup(x => x.GetRelationshipByEmail(_emailEncoded, ukprn, cancellationToken)).ReturnsAsync(getRelationshipByEmailResponse);
+        outerApiClientMock.Setup(x => x.GetRelationshipByEmail(_emailCallingRelationships, ukprn, cancellationToken)).ReturnsAsync(getRelationshipByEmailResponse);
 
         validatorMock.Setup(v => v.Validate(It.IsAny<SearchByEmailSubmitViewModel>())).Returns(new ValidationResult());
 
@@ -115,7 +114,7 @@ public class SearchByEmailControllerPostTests
         getRelationshipByEmailResponse.HasOneEmployerAccount = true;
         getRelationshipByEmailResponse.HasOneLegalEntity = true;
 
-        outerApiClientMock.Setup(x => x.GetRelationshipByEmail(_emailEncoded, ukprn, cancellationToken)).ReturnsAsync(getRelationshipByEmailResponse);
+        outerApiClientMock.Setup(x => x.GetRelationshipByEmail(_emailCallingRelationships, ukprn, cancellationToken)).ReturnsAsync(getRelationshipByEmailResponse);
 
         validatorMock.Setup(m => m.Validate(It.IsAny<SearchByEmailSubmitViewModel>())).Returns(new ValidationResult(new List<ValidationFailure>()
         {
@@ -158,7 +157,7 @@ public class SearchByEmailControllerPostTests
         getRelationshipByEmailResponse.HasOneEmployerAccount = hasOneEmployerAccount;
         getRelationshipByEmailResponse.HasOneLegalEntity = hasOneLegalEntity;
 
-        outerApiClientMock.Setup(x => x.GetRelationshipByEmail(_emailEncoded, ukprn, cancellationToken)).ReturnsAsync(getRelationshipByEmailResponse);
+        outerApiClientMock.Setup(x => x.GetRelationshipByEmail(_emailCallingRelationships, ukprn, cancellationToken)).ReturnsAsync(getRelationshipByEmailResponse);
         validatorMock.Setup(v => v.Validate(It.IsAny<SearchByEmailSubmitViewModel>())).Returns(new ValidationResult());
 
         SearchByEmailController sut = new(outerApiClientMock.Object, Mock.Of<ISessionService>(), validatorMock.Object);
@@ -186,7 +185,7 @@ public class SearchByEmailControllerPostTests
         searchByEmailSubmitViewModel.Email = Email;
         getRelationshipByEmailResponse.HasUserAccount = false;
 
-        outerApiClientMock.Setup(x => x.GetRelationshipByEmail(_emailEncoded, ukprn, cancellationToken)).ReturnsAsync(getRelationshipByEmailResponse);
+        outerApiClientMock.Setup(x => x.GetRelationshipByEmail(_emailCallingRelationships, ukprn, cancellationToken)).ReturnsAsync(getRelationshipByEmailResponse);
         validatorMock.Setup(v => v.Validate(It.IsAny<SearchByEmailSubmitViewModel>())).Returns(new ValidationResult());
 
         SearchByEmailController sut = new(outerApiClientMock.Object, sessionServiceMock.Object, validatorMock.Object);
@@ -199,7 +198,7 @@ public class SearchByEmailControllerPostTests
         redirectToRouteResult.RouteName.Should().Be(RouteNames.AddEmployerSearchByEmail);
         redirectToRouteResult.RouteValues!.First().Value.Should().Be(ukprn);
 
-        outerApiClientMock.Verify(o => o.GetRelationshipByEmail(_emailEncoded, ukprn, cancellationToken), Times.Once);
+        outerApiClientMock.Verify(o => o.GetRelationshipByEmail(_emailCallingRelationships, ukprn, cancellationToken), Times.Once);
         sessionServiceMock.Verify(s => s.Set(It.Is<AddEmployerSessionModel>(x => x.Email == Email)), Times.Once);
     }
 }
