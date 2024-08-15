@@ -149,5 +149,6 @@
                 }
             </tbody>
         </table>
+        @{await Html.RenderPartialAsync("_Pagination", Model.Pagination);}
     </div>
 </div>

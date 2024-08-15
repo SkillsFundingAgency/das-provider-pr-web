@@ -14,7 +14,7 @@ namespace SFA.DAS.Provider.PR_Web.UnitTests.Models;
 public class EmployersViewModelTests
 {
     [Test, AutoData]
-    public void Ctor_IntialisesObject(GetProviderRelationshipsResponse source, string clearFilterLink, string addEmployerLink, int ukprn)
+    public void Ctor_IntialisesObject(GetProviderRelationshipsResponse source, string clearFilterLink, string addEmployerLink, int ukprn, int pageSize, int pageNumber)
     {
         Mock<IUrlHelper> urlHelperMock = new();
         urlHelperMock
@@ -22,7 +22,7 @@ public class EmployersViewModelTests
             .AddUrlForRoute(RouteNames.AddEmployerStart, addEmployerLink);
         IEnumerable<EmployerPermissionViewModel> expected = source.Employers.Select(e => (EmployerPermissionViewModel)e);
 
-        EmployersViewModel sut = new(source, urlHelperMock.Object, ukprn);
+        EmployersViewModel sut = new(source, urlHelperMock.Object, ukprn, pageNumber, pageSize);
 
         using (new AssertionScope())
         {
@@ -30,6 +30,7 @@ public class EmployersViewModelTests
             sut.Employers.Should().BeEquivalentTo(expected);
             sut.ClearFiltersLink.Should().Be(clearFilterLink);
             sut.AddEmployerLink.Should().Be(addEmployerLink);
+            sut.PageSize.Should().Be(pageSize);
         }
     }
 }

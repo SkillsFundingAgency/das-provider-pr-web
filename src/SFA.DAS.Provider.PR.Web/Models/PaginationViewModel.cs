@@ -78,4 +78,7 @@ public class PaginationViewModel
     }
 }
 
-public record PageLink(string Title, string? Url);
+public record PageLink(string Title, string? Url)
+{
+    public bool HasLink => !string.IsNullOrEmpty(Url);
+}
