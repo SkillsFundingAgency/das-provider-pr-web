@@ -22,7 +22,7 @@ public class EmployersControllerTests
         outerApiClientMock.Setup(c => c.GetProviderRelationships(ukprn, It.IsAny<Dictionary<string, string>>(), cancellationToken)).ReturnsAsync(response);
 
         EmployersController sut = new(outerApiClientMock.Object);
-        sut.AddDefaultContext().AddUrlHelperMock().AddUrlForRoute(RouteNames.Employers, clearFilterUrl).AddUrlForRoute(RouteNames.AddEmployerStart, addEmployerUrl);
+        sut.AddDefaultContext().AddUrlHelperMock();
 
         var actual = await sut.Index(ukprn, new(), cancellationToken);
 

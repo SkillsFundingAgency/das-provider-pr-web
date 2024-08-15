@@ -21,7 +21,7 @@ public class EmployersController(IOuterApiClient _outerApiclient) : Controller
 
         if (response.HasAnyRelationships)
         {
-            return View(new EmployersViewModel(response, Url.RouteUrl(RouteNames.Employers)!, Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn })!));
+            return View(new EmployersViewModel(response, Url, ukprn));
         }
 
         return View(NoRelationshipsHomePage, new NoRelationshipsHomeViewModel(Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn })!));

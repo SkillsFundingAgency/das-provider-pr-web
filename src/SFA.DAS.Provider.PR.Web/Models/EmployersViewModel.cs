@@ -1,5 +1,7 @@
 ﻿using Humanizer;
+using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
+using SFA.DAS.Provider.PR.Web.Infrastructure;
 
 namespace SFA.DAS.Provider.PR.Web.Models;
 
@@ -10,12 +12,12 @@ public class EmployersViewModel : EmployersSubmitModel
     public string ClearFiltersLink { get; }
     public string AddEmployerLink { get; }
 
-    public EmployersViewModel(GetProviderRelationshipsResponse source, string clearFiltersLink, string addEmployerLink)
+    public EmployersViewModel(GetProviderRelationshipsResponse source, IUrlHelper urlHelper, int ukprn)
     {
         Employers = source.Employers.Select(e => (EmployerPermissionViewModel)e);
         TotalCount = "employer".ToQuantity(source.TotalCount);
-        ClearFiltersLink = clearFiltersLink;
-        AddEmployerLink = addEmployerLink;
+        ClearFiltersLink = urlHelper.RouteUrl(RouteNames.Employers, new { ukprn })!;
+        AddEmployerLink = urlHelper.RouteUrl(RouteNames.AddEmployerStart, new { ukprn })!;
     }
 }
 
