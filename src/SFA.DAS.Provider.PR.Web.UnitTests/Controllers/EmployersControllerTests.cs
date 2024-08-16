@@ -41,13 +41,16 @@ public class EmployersControllerTests
     }
 
     [Test, AutoData]
-    public async Task IndexWithUkrpn_HasNoRelationships_RetrunsNoRelationshipsView(int ukprn, GetProviderRelationshipsResponse response, string addEmployerUrl, CancellationToken cancellationToken)
+    public async Task IndexWithUkrpn_HasNoRelationships_RetrunsNoRelationshipsView(int ukprn, GetProviderRelationshipsResponse response, string addEmployerUrl, ApplicationSettings applicationSettings, CancellationToken cancellationToken)
     {
         Mock<IOuterApiClient> outerApiClientMock = new();
         response.HasAnyRelationships = false;
         outerApiClientMock.Setup(c => c.GetProviderRelationships(ukprn, It.IsAny<Dictionary<string, string>>(), cancellationToken)).ReturnsAsync(response);
 
-        EmployersController sut = new(outerApiClientMock.Object, Mock.Of<IOptions<ApplicationSettings>>());
+        Mock<IOptions<ApplicationSettings>> applicationSettingsMock = new();
+        applicationSettingsMock.Setup(a => a.Value).Returns(applicationSettings);
+
+        EmployersController sut = new(outerApiClientMock.Object, applicationSettingsMock.Object);
         sut.AddDefaultContext().AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, addEmployerUrl);
 
         var actual = await sut.Index(ukprn, new(), cancellationToken);

@@ -1,28 +1,12 @@
-﻿using Humanizer;
-using Microsoft.AspNetCore.Mvc;
-using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
-using SFA.DAS.Provider.PR.Web.Infrastructure;
-
-namespace SFA.DAS.Provider.PR.Web.Models;
+﻿namespace SFA.DAS.Provider.PR.Web.Models;
 
 public class EmployersViewModel : EmployersSubmitModel
 {
-    public string TotalCount { get; }
-    public IEnumerable<EmployerPermissionViewModel> Employers { get; }
-    public string ClearFiltersLink { get; }
-    public string AddEmployerLink { get; }
-    public PaginationViewModel Pagination { get; set; }
-
-    public EmployersViewModel(GetProviderRelationshipsResponse source, IUrlHelper urlHelper, int ukprn, int pageSize, Dictionary<string, string> queryParams)
-    {
-        Employers = source.Employers.Select(e => (EmployerPermissionViewModel)e);
-        TotalCount = "employer".ToQuantity(source.TotalCount);
-        ClearFiltersLink = urlHelper.RouteUrl(RouteNames.Employers, new { ukprn })!;
-        AddEmployerLink = urlHelper.RouteUrl(RouteNames.AddEmployerStart, new { ukprn })!;
-        queryParams[nameof(ukprn)] = ukprn.ToString();
-        Pagination = new(source.TotalCount, pageSize, urlHelper, RouteNames.Employers, queryParams);
-        PageSize = pageSize;
-    }
+    public string TotalCount { get; init; } = null!;
+    public IEnumerable<EmployerPermissionViewModel> Employers { get; init; } = null!;
+    public string ClearFiltersLink { get; init; } = null!;
+    public string AddEmployerLink { get; init; } = null!;
+    public PaginationViewModel Pagination { get; init; } = null!;
 }
 
 public class EmployersSubmitModel
@@ -37,7 +21,6 @@ public class EmployersSubmitModel
     public bool HasRecruitmentWithReviewPermission { get; set; }
     public bool HasNoRecruitmentPermission { get; set; }
     public int PageNumber { get; set; } = 1;
-    public int PageSize { get; protected set; }
 
     public Dictionary<string, string> ToQueryString()
     {

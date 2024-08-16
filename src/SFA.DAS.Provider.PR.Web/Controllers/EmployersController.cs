@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Humanizer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using SFA.DAS.Provider.PR.Domain.Interfaces;
@@ -21,12 +22,23 @@ public class EmployersController(IOuterApiClient _outerApiclient, IOptions<Appli
     public async Task<IActionResult> Index([FromRoute] int ukprn, [FromQuery] EmployersSubmitModel submitModel, CancellationToken cancellationToken)
     {
         var queryParams = submitModel.ToQueryString();
-        queryParams.Add("PageSize", _applicationSettingsOption.Value.EmployersPageSize.ToString());
+        var pageSize = _applicationSettingsOption.Value.EmployersPageSize;
+        queryParams.Add("PageSize", pageSize.ToString());
         GetProviderRelationshipsResponse response = await _outerApiclient.GetProviderRelationships(ukprn, queryParams, cancellationToken);
 
         if (response.HasAnyRelationships)
         {
-            return View(new EmployersViewModel(response, Url, ukprn, _applicationSettingsOption.Value.EmployersPageSize, submitModel.ToQueryString()));
+            queryParams[nameof(ukprn)] = ukprn.ToString();
+            EmployersViewModel model = new()
+            {
+                Pagination = new(response.TotalCount, pageSize, Url, RouteNames.Employers, queryParams),
+                ClearFiltersLink = Url.RouteUrl(RouteNames.Employers, new { ukprn })!,
+                AddEmployerLink = Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn })!,
+                Employers = response.Employers.Select(e => (EmployerPermissionViewModel)e),
+                TotalCount = "employer".ToQuantity(response.TotalCount)
+            };
+
+            return base.View(model);
         }
 
         return View(NoRelationshipsHomePage, new NoRelationshipsHomeViewModel(Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn })!));
