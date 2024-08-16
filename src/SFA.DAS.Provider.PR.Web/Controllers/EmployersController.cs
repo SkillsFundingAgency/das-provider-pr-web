@@ -20,11 +20,13 @@ public class EmployersController(IOuterApiClient _outerApiclient, IOptions<Appli
     [HttpGet]
     public async Task<IActionResult> Index([FromRoute] int ukprn, [FromQuery] EmployersSubmitModel submitModel, CancellationToken cancellationToken)
     {
-        GetProviderRelationshipsResponse response = await _outerApiclient.GetProviderRelationships(ukprn, submitModel.ToQueryString(), cancellationToken);
+        var queryParams = submitModel.ToQueryString();
+        queryParams.Add("PageSize", _applicationSettingsOption.Value.EmployersPageSize.ToString());
+        GetProviderRelationshipsResponse response = await _outerApiclient.GetProviderRelationships(ukprn, queryParams, cancellationToken);
 
         if (response.HasAnyRelationships)
         {
-            return View(new EmployersViewModel(response, Url, ukprn, submitModel.PageNumber.GetValueOrDefault(), _applicationSettingsOption.Value.EmployersPageSize));
+            return View(new EmployersViewModel(response, Url, ukprn, _applicationSettingsOption.Value.EmployersPageSize, submitModel.ToQueryString()));
         }
 
         return View(NoRelationshipsHomePage, new NoRelationshipsHomeViewModel(Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn })!));

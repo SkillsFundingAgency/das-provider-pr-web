@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.Provider.PR.Web.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace SFA.DAS.Provider.PR.Web.Models;
 
 public class PaginationViewModel
 {
@@ -6,9 +8,16 @@ public class PaginationViewModel
     public const string NextPageTitle = "Next »";
 
     public List<PageLink> Pages { get; } = [];
+    private readonly IUrlHelper _urlHepler;
+    private readonly Dictionary<string, string> _queryParams;
+    private readonly string _routeName;
 
-    public PaginationViewModel(int currentPage, int totalCount, int pageSize)
+    public PaginationViewModel(int totalCount, int pageSize, IUrlHelper urlHelper, string routeName, Dictionary<string, string> queryParams)
     {
+        _urlHepler = urlHelper;
+        _routeName = routeName;
+        _queryParams = queryParams;
+        int.TryParse(queryParams["PageNumber"], out var currentPage);
         if (totalCount == 0) return;
         var totalPages = Convert.ToInt32(Math.Ceiling((double)totalCount / pageSize));
         if (currentPage > totalPages) return;
@@ -37,9 +46,10 @@ public class PaginationViewModel
         if (startPage > 1 && totalPages > 6) Pages.Add(new(PreviousPageTitle, GetPageLink(startPage - 1)));
     }
 
-    private static string? GetPageLink(int pageNumber)
+    private string GetPageLink(int pageNumber)
     {
-        return pageNumber.ToString();
+        _queryParams["PageNumber"] = pageNumber.ToString();
+        return _urlHepler.RouteUrl(_routeName, _queryParams)!;
     }
 
     static (int startPage, int endPage) GetPageRange(int currentPage, int totalRecords, int pageSize)

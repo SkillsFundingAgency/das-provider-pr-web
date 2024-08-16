@@ -1,6 +1,9 @@
 ﻿using AutoFixture.NUnit3;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.AspNetCore.Mvc;
+using Moq;
+using SFA.DAS.Provider.PR.Web.Infrastructure;
 using SFA.DAS.Provider.PR.Web.Models;
 
 namespace SFA.DAS.Provider.PR_Web.UnitTests.Models;
@@ -9,11 +12,13 @@ public class PaginationViewModelTests
 {
     private const int PageSize = 10;
     [Test]
-    [InlineAutoData(1, 0, 10, "When no records")]
-    [InlineAutoData(3, 10, 10, "When page number is greater than total pages")]
-    public void ReturnsEmptyModel(int currentPage, int totalCount, int pageSize, string testMessage)
+    [InlineAutoData(1, 0, "When no records")]
+    [InlineAutoData(3, 10, "When page number is greater than total pages")]
+    public void ReturnsEmptyModel(int currentPage, int totalCount, string testMessage)
     {
-        var sut = new PaginationViewModel(currentPage, totalCount, pageSize);
+        Mock<IUrlHelper> urlHelperMock = new Mock<IUrlHelper>();
+        Dictionary<string, string> queryParams = new() { { "PageNumber", currentPage.ToString() } };
+        var sut = new PaginationViewModel(totalCount, PageSize, urlHelperMock.Object, RouteNames.Employers, queryParams);
         sut.Pages.Count.Should().Be(0, testMessage);
     }
 
@@ -25,15 +30,17 @@ public class PaginationViewModelTests
     [InlineAutoData(4, 70, true, "When two pages previous to current page is greater than 1")]
     public void AddsPreviousLink(int currentPage, int totalCount, bool expected, string testMessage)
     {
-        var actual = new PaginationViewModel(currentPage, totalCount, PageSize);
+        Mock<IUrlHelper> urlHelperMock = new Mock<IUrlHelper>();
+        Dictionary<string, string> queryParams = new() { { "PageNumber", currentPage.ToString() } };
+        var sut = new PaginationViewModel(totalCount, PageSize, urlHelperMock.Object, RouteNames.Employers, queryParams);
 
         if (expected)
         {
-            actual.Pages[0].Title.Should().Be(PaginationViewModel.PreviousPageTitle);
+            sut.Pages[0].Title.Should().Be(PaginationViewModel.PreviousPageTitle);
         }
         else
         {
-            actual.Pages.Find(p => p.Title == PaginationViewModel.PreviousPageTitle).Should().BeNull();
+            sut.Pages.Find(p => p.Title == PaginationViewModel.PreviousPageTitle).Should().BeNull();
         }
     }
 
@@ -47,15 +54,17 @@ public class PaginationViewModelTests
     [InlineAutoData(6, 100, true, "When the number of total pages is beyond display range")]
     public void AddsNextLink(int currentPage, int totalCount, bool expected, string testMessage)
     {
-        var actual = new PaginationViewModel(currentPage, totalCount, PageSize);
+        Mock<IUrlHelper> urlHelperMock = new Mock<IUrlHelper>();
+        Dictionary<string, string> queryParams = new() { { "PageNumber", currentPage.ToString() } };
+        var sut = new PaginationViewModel(totalCount, PageSize, urlHelperMock.Object, RouteNames.Employers, queryParams);
 
         if (expected)
         {
-            actual.Pages[actual.Pages.Count - 1].Title.Should().Be(PaginationViewModel.NextPageTitle);
+            sut.Pages[sut.Pages.Count - 1].Title.Should().Be(PaginationViewModel.NextPageTitle);
         }
         else
         {
-            actual.Pages.Find(p => p.Title == PaginationViewModel.NextPageTitle).Should().BeNull();
+            sut.Pages.Find(p => p.Title == PaginationViewModel.NextPageTitle).Should().BeNull();
         }
     }
 
@@ -69,13 +78,15 @@ public class PaginationViewModelTests
     [TestCase(4, 100, 8, PaginationViewModel.PreviousPageTitle, PaginationViewModel.NextPageTitle, "When there are pages before and after the range")]
     public void CalculatesCorrectStartPage(int currentPage, int totalCount, int expectedPageLinksCount, string expectedStartPage, string expectedEndPage, string testMessage)
     {
-        var model = new PaginationViewModel(currentPage, totalCount, PageSize);
+        Mock<IUrlHelper> urlHelperMock = new Mock<IUrlHelper>();
+        Dictionary<string, string> queryParams = new() { { "PageNumber", currentPage.ToString() } };
+        var sut = new PaginationViewModel(totalCount, PageSize, urlHelperMock.Object, RouteNames.Employers, queryParams);
 
         using (new AssertionScope(testMessage))
         {
-            model.Pages.Count.Should().Be(expectedPageLinksCount, $"Expected page count: {expectedPageLinksCount}");
-            model.Pages[0].Title.Should().Be(expectedStartPage, $"Expected start page: {expectedStartPage}");
-            model.Pages[model.Pages.Count - 1].Title.Should().Be(expectedEndPage, $"Expected end page: {expectedEndPage}");
+            sut.Pages.Count.Should().Be(expectedPageLinksCount, $"Expected page count: {expectedPageLinksCount}");
+            sut.Pages[0].Title.Should().Be(expectedStartPage, $"Expected start page: {expectedStartPage}");
+            sut.Pages[sut.Pages.Count - 1].Title.Should().Be(expectedEndPage, $"Expected end page: {expectedEndPage}");
         }
     }
 }

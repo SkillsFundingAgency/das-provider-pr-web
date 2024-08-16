@@ -13,13 +13,14 @@ public class EmployersViewModel : EmployersSubmitModel
     public string AddEmployerLink { get; }
     public PaginationViewModel Pagination { get; set; }
 
-    public EmployersViewModel(GetProviderRelationshipsResponse source, IUrlHelper urlHelper, int ukprn, int pageNumber, int pageSize)
+    public EmployersViewModel(GetProviderRelationshipsResponse source, IUrlHelper urlHelper, int ukprn, int pageSize, Dictionary<string, string> queryParams)
     {
         Employers = source.Employers.Select(e => (EmployerPermissionViewModel)e);
         TotalCount = "employer".ToQuantity(source.TotalCount);
         ClearFiltersLink = urlHelper.RouteUrl(RouteNames.Employers, new { ukprn })!;
         AddEmployerLink = urlHelper.RouteUrl(RouteNames.AddEmployerStart, new { ukprn })!;
-        Pagination = new(pageNumber, source.TotalCount, pageSize);
+        queryParams[nameof(ukprn)] = ukprn.ToString();
+        Pagination = new(source.TotalCount, pageSize, urlHelper, RouteNames.Employers, queryParams);
         PageSize = pageSize;
     }
 }
@@ -35,7 +36,7 @@ public class EmployersSubmitModel
     public bool HasRecruitmentPermission { get; set; }
     public bool HasRecruitmentWithReviewPermission { get; set; }
     public bool HasNoRecruitmentPermission { get; set; }
-    public int? PageNumber { get; set; }
+    public int PageNumber { get; set; } = 1;
     public int PageSize { get; protected set; }
 
     public Dictionary<string, string> ToQueryString()
@@ -54,8 +55,7 @@ public class EmployersSubmitModel
             result.Add(nameof(HasRecruitmentWithReviewPermission), HasRecruitmentWithReviewPermission.ToString());
             result.Add(nameof(HasNoRecruitmentPermission), HasNoRecruitmentPermission.ToString());
         }
-        result.Add(nameof(PageNumber), (PageNumber ?? 1).ToString());
-        result.Add(nameof(PageSize), PageSize.ToString());
+        result.Add(nameof(PageNumber), PageNumber.ToString());
         return result;
     }
 }
