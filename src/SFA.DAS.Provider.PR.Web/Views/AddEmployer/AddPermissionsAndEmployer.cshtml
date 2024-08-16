@@ -1,0 +1,34 @@
+﻿
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using SFA.DAS.Provider.PR.Web.Infrastructure
+@model SFA.DAS.Provider.PR.Web.Models.AddEmployer.AddPermissionsAndEmployerViewModel
+@{
+    ViewData["Title"] = "Add provider and request permissions";
+}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <partial name="_validationSummary" />
+        <form asp-route="@RouteNames.AddPermissionsAndEmployer" method="POST">
+            <input asp-for="Email" id="email" type="hidden" />
+            <input asp-for="LegalName" id="legalName" type="hidden" />
+            <input asp-for="CancelLink" id="cancelLink" type="hidden" />
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <h1 class="govuk-fieldset__heading">
+                            Add employer and request permissions
+                        </h1>
+                    </legend>
+                    <p class="govuk-body">
+                        Select the permissions you want from @Model.LegalName.ToUpper(). Send request will send an invitation to the employer to add you as a training provider with these permissions.
+                    </p>
+                    <partial name="_PermissionChoices"/>
+                </fieldset>
+            </div>
+            <div class="govuk-button-group">
+                <button type="submit" id="continue" class="govuk-button" data-disable-on-submit="true">Confirm</button>
+                <a class="govuk-link" href="@Model.CancelLink">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
