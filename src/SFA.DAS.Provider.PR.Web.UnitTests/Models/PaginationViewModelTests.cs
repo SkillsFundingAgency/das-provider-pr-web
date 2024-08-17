@@ -17,7 +17,7 @@ public class PaginationViewModelTests
     public void ReturnsEmptyModel(int currentPage, int totalCount, string testMessage)
     {
         Mock<IUrlHelper> urlHelperMock = new Mock<IUrlHelper>();
-        Dictionary<string, string> queryParams = new() { { "PageNumber", currentPage.ToString() } };
+        Dictionary<string, object> queryParams = new() { { nameof(EmployersSubmitModel.PageNumber), currentPage } };
         var sut = new PaginationViewModel(totalCount, PageSize, urlHelperMock.Object, RouteNames.Employers, queryParams);
         sut.Pages.Count.Should().Be(0, testMessage);
     }
@@ -31,7 +31,7 @@ public class PaginationViewModelTests
     public void AddsPreviousLink(int currentPage, int totalCount, bool expected, string testMessage)
     {
         Mock<IUrlHelper> urlHelperMock = new Mock<IUrlHelper>();
-        Dictionary<string, string> queryParams = new() { { "PageNumber", currentPage.ToString() } };
+        Dictionary<string, object> queryParams = new() { { nameof(EmployersSubmitModel.PageNumber), currentPage.ToString() } };
         var sut = new PaginationViewModel(totalCount, PageSize, urlHelperMock.Object, RouteNames.Employers, queryParams);
 
         if (expected)
@@ -55,7 +55,7 @@ public class PaginationViewModelTests
     public void AddsNextLink(int currentPage, int totalCount, bool expected, string testMessage)
     {
         Mock<IUrlHelper> urlHelperMock = new Mock<IUrlHelper>();
-        Dictionary<string, string> queryParams = new() { { "PageNumber", currentPage.ToString() } };
+        Dictionary<string, object> queryParams = new() { { nameof(EmployersSubmitModel.PageNumber), currentPage.ToString() } };
         var sut = new PaginationViewModel(totalCount, PageSize, urlHelperMock.Object, RouteNames.Employers, queryParams);
 
         if (expected)
@@ -79,7 +79,7 @@ public class PaginationViewModelTests
     public void CalculatesCorrectStartPage(int currentPage, int totalCount, int expectedPageLinksCount, string expectedStartPage, string expectedEndPage, string testMessage)
     {
         Mock<IUrlHelper> urlHelperMock = new Mock<IUrlHelper>();
-        Dictionary<string, string> queryParams = new() { { "PageNumber", currentPage.ToString() } };
+        Dictionary<string, object> queryParams = new() { { nameof(EmployersSubmitModel.PageNumber), currentPage.ToString() } };
         var sut = new PaginationViewModel(totalCount, PageSize, urlHelperMock.Object, RouteNames.Employers, queryParams);
 
         using (new AssertionScope(testMessage))

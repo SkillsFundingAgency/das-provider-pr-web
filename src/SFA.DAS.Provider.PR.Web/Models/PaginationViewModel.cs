@@ -9,15 +9,15 @@ public class PaginationViewModel
 
     public List<PageLink> Pages { get; } = [];
     private readonly IUrlHelper _urlHepler;
-    private readonly Dictionary<string, string> _queryParams;
+    private readonly Dictionary<string, object> _queryParams;
     private readonly string _routeName;
 
-    public PaginationViewModel(int totalCount, int pageSize, IUrlHelper urlHelper, string routeName, Dictionary<string, string> queryParams)
+    public PaginationViewModel(int totalCount, int pageSize, IUrlHelper urlHelper, string routeName, Dictionary<string, object> queryParams)
     {
         _urlHepler = urlHelper;
         _routeName = routeName;
         _queryParams = queryParams;
-        int.TryParse(queryParams["PageNumber"], out var currentPage);
+        int.TryParse(queryParams[nameof(EmployersSubmitModel.PageNumber)].ToString(), out var currentPage);
         if (totalCount == 0) return;
         var totalPages = Convert.ToInt32(Math.Ceiling((double)totalCount / pageSize));
         if (currentPage > totalPages) return;
@@ -48,7 +48,7 @@ public class PaginationViewModel
 
     private string GetPageLink(int pageNumber)
     {
-        _queryParams["PageNumber"] = pageNumber.ToString();
+        _queryParams[nameof(EmployersSubmitModel.PageNumber)] = pageNumber;
         return _urlHepler.RouteUrl(_routeName, _queryParams)!;
     }
 

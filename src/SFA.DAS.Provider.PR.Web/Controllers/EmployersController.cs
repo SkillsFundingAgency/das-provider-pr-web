@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using SFA.DAS.Provider.PR.Domain.Interfaces;
 using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
 using SFA.DAS.Provider.PR.Web.Authorization;
+using SFA.DAS.Provider.PR.Web.Extensions;
 using SFA.DAS.Provider.PR.Web.Infrastructure;
 using SFA.DAS.Provider.PR.Web.Infrastructure.Configuration;
 using SFA.DAS.Provider.PR.Web.Models;
@@ -31,7 +32,7 @@ public class EmployersController(IOuterApiClient _outerApiclient, IOptions<Appli
             queryParams[nameof(ukprn)] = ukprn.ToString();
             EmployersViewModel model = new()
             {
-                Pagination = new(response.TotalCount, pageSize, Url, RouteNames.Employers, queryParams),
+                Pagination = new(response.TotalCount, pageSize, Url, RouteNames.Employers, submitModel.ConvertToDictionary()),
                 ClearFiltersLink = Url.RouteUrl(RouteNames.Employers, new { ukprn })!,
                 AddEmployerLink = Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn })!,
                 Employers = response.Employers.Select(e => (EmployerPermissionViewModel)e),
