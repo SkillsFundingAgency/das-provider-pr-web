@@ -38,7 +38,7 @@ public class AddPermissionsAndEmployerControllerPostTests
         var result = sut.Index(ukprn, addPermissionsAndEmployerViewModel);
 
         RedirectToRouteResult? redirectToRouteResult = result.As<RedirectToRouteResult>();
-        redirectToRouteResult.RouteName.Should().Be(RouteNames.AddEmployerAndPermissionsSent);
+        redirectToRouteResult.RouteName.Should().Be(RouteNames.AddEmployerConfirmation);
         redirectToRouteResult.RouteValues!.First().Value.Should().Be(ukprn);
 
         sessionServiceMock.Verify(s => s.Get<AddEmployerSessionModel>(), Times.Once);

@@ -17,11 +17,11 @@ namespace SFA.DAS.Provider.PR.Web.Controllers.AddEmployer;
 
 [Authorize(Policy = nameof(PolicyNames.HasContributorOrAbovePermission))]
 
-[Route("/{ukprn}/addEmployer/addPermissions", Name = RouteNames.AddPermissionsAndEmployer)]
+[Route("/{ukprn}/addEmployer", Name = RouteNames.AddPermissionsAndEmployer)]
 public class AddPermissionsAndEmployerController(IOuterApiClient _outerApiClient, ISessionService _sessionService, IValidator<AddPermissionsAndEmployerSubmitViewModel> _validator) : Controller
 {
     public const string ViewPath = "~/Views/AddEmployer/AddPermissionsAndEmployer.cshtml";
-    public const string ViewPathSent = "~/Views/AddEmployer/AddPermissionsAndEmployerSent.cshtml";
+    public const string ViewPathSent = "~/Views/AddEmployer/AddEmployerConfirmation.cshtml";
 
     [HttpGet]
     public IActionResult Index([FromRoute] int ukprn)
@@ -61,12 +61,12 @@ public class AddPermissionsAndEmployerController(IOuterApiClient _outerApiClient
 
         _sessionService.Set(sessionModel);
 
-        return RedirectToRoute(RouteNames.AddEmployerAndPermissionsSent, new { ukprn });
+        return RedirectToRoute(RouteNames.AddEmployerConfirmation, new { ukprn });
     }
 
     [HttpGet]
-    [Route("/{ukprn}/addEmployer/addPermissions/sent", Name = RouteNames.AddEmployerAndPermissionsSent)]
-    public async Task<IActionResult> AddEmployerAndPermissionsSent([FromRoute] int ukprn, CancellationToken cancellationToken)
+    [Route("/{ukprn}/addEmployer/permissionsRequested", Name = RouteNames.AddEmployerConfirmation)]
+    public async Task<IActionResult> AddEmployerAndPermissionsRequested([FromRoute] int ukprn, CancellationToken cancellationToken)
     {
         var sessionModel = _sessionService.Get<AddEmployerSessionModel>();
 

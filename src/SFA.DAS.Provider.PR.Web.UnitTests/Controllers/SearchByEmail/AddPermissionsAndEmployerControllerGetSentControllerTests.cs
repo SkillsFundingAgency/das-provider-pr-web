@@ -41,7 +41,7 @@ public class AddPermissionsAndEmployerControllerGetSentControllerTests
         sut.AddUrlHelperMock()
             .AddUrlForRoute(RouteNames.Home, HomeLink);
 
-        var result = await sut.AddEmployerAndPermissionsSent(ukprn, cancellationToken);
+        var result = await sut.AddEmployerAndPermissionsRequested(ukprn, cancellationToken);
 
         ViewResult? viewResult = result.As<ViewResult>();
         AddEmployerAndPermissionsSentViewModel? viewModel = viewResult.Model as AddEmployerAndPermissionsSentViewModel;
@@ -84,7 +84,7 @@ public class AddPermissionsAndEmployerControllerGetSentControllerTests
         sut.AddUrlHelperMock()
             .AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink);
 
-        var result = await sut.AddEmployerAndPermissionsSent(ukprn, new CancellationToken());
+        var result = await sut.AddEmployerAndPermissionsRequested(ukprn, new CancellationToken());
 
         RedirectToRouteResult? redirectToRouteResult = result.As<RedirectToRouteResult>();
         redirectToRouteResult.RouteName.Should().Be(RouteNames.AddEmployerStart);
@@ -102,7 +102,7 @@ public class AddPermissionsAndEmployerControllerGetSentControllerTests
         sut.AddUrlHelperMock()
             .AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink);
 
-        var result = await sut.AddEmployerAndPermissionsSent(ukprn, new CancellationToken());
+        var result = await sut.AddEmployerAndPermissionsRequested(ukprn, new CancellationToken());
 
         RedirectToRouteResult? redirectToRouteResult = result.As<RedirectToRouteResult>();
         redirectToRouteResult.RouteName.Should().Be(RouteNames.AddEmployerStart);
@@ -142,7 +142,7 @@ public class AddPermissionsAndEmployerControllerGetSentControllerTests
         sut.AddUrlHelperMock()
             .AddUrlForRoute(RouteNames.Home, HomeLink);
 
-        await sut.AddEmployerAndPermissionsSent(ukprn, cancellationToken);
+        await sut.AddEmployerAndPermissionsRequested(ukprn, cancellationToken);
 
         _outerApiClientMock.Verify(o => o.AddRequest(It.Is<AddAccountRequestCommand>(
             s => s.EmployerContactEmail == email
@@ -184,7 +184,7 @@ public class AddPermissionsAndEmployerControllerGetSentControllerTests
         sut.AddUrlHelperMock()
             .AddUrlForRoute(RouteNames.Home, HomeLink);
 
-        await sut.AddEmployerAndPermissionsSent(ukprn, cancellationToken);
+        await sut.AddEmployerAndPermissionsRequested(ukprn, cancellationToken);
 
         _outerApiClientMock.Verify(o => o.AddRequest(It.Is<AddAccountRequestCommand>(
             s => s.EmployerContactEmail == email
