@@ -11,8 +11,21 @@ public class ClaimsPrincipalExtensionsTests
     public void GetUkprn_FindsClaimAndReturnsValue(string ukprn)
     {
         ClaimsPrincipal sut = SetupClaimsPrincipal(ProviderClaims.Ukprn, ukprn);
-
         sut.GetUkprn().Should().Be(ukprn);
+    }
+
+    [Test, AutoData]
+    public void GetUserId_UpnPresent_FindsUserIdAndReturnsValue(string upn)
+    {
+        ClaimsPrincipal sut = SetupClaimsPrincipal(ProviderClaims.Upn, upn);
+        sut.GetUserId().Should().Be(upn);
+    }
+
+    [Test, AutoData]
+    public void GetUserId_SubPresent_FindsUserIdAndReturnsValue(string sub)
+    {
+        ClaimsPrincipal sut = SetupClaimsPrincipal(ProviderClaims.Sub, sub);
+        sut.GetUserId().Should().Be(sub);
     }
 
     [TestCase(ServiceClaim.DAV, ServiceClaim.DAV, true)]
