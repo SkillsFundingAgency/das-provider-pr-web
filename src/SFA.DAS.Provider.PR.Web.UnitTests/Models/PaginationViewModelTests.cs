@@ -15,6 +15,7 @@ public class PaginationViewModelTests
     private const int PageSize = 10;
     [Test]
     [InlineAutoData(1, 0, "When no records")]
+    [InlineAutoData(1, 10, "When only enough records for one page")]
     [InlineAutoData(3, 10, "When page number is greater than total pages")]
     public void ReturnsEmptyModel(int currentPage, int totalCount, string testMessage)
     {
@@ -25,12 +26,11 @@ public class PaginationViewModelTests
     }
 
     [Test]
-    [InlineAutoData(1, 10, 0, "Previous link should not exist when one page only")]
-    [InlineAutoData(6, 60, 0, "Previous link should not exist when total pages are less than equal to minmum pages (6)")]
-    [InlineAutoData(3, 100, 2, "When current page is greater than 1 and total pages greater than minmum pages (6)")]
     [InlineAutoData(1, 0, 0, "Previous link should not exist when there are no records")]
+    [InlineAutoData(1, 10, 0, "Previous link should not exist when one page only")]
     [InlineAutoData(1, 70, 0, "Previous link should not exist when on first page with more pages")]
-    [InlineAutoData(2, 70, 1, "Previous link should not exist when on second page with more pages")]
+    [InlineAutoData(2, 20, 1, "Previous link should point to previous to current page when current page > 1 and total pages > 1")]
+    [InlineAutoData(7, 70, 6, "Previous link should point to previous to current page when on last page and total pages > 1")]
     public void AddsPreviousLink(int currentPage, int totalCount, int expectedPageNumberInPreviousLink, string testMessage)
     {
         Mock<IUrlHelper> urlHelperMock = new Mock<IUrlHelper>();
@@ -57,22 +57,22 @@ public class PaginationViewModelTests
     }
 
     [Test]
-    [InlineAutoData(1, 0, false, "When no records")]
-    [InlineAutoData(1, 10, false, "When one page")]
-    [InlineAutoData(7, 100, false, "When on fourth to last page")]
-    [InlineAutoData(8, 100, false, "When on third to last page")]
-    [InlineAutoData(9, 100, false, "When on second to last page")]
-    [InlineAutoData(10, 100, false, "When on last page")]
-    [InlineAutoData(6, 100, true, "When the number of total pages is beyond display range")]
-    public void AddsNextLink(int currentPage, int totalCount, bool expectedPageNumberInTheLink, string testMessage)
+    [InlineAutoData(1, 0, 0, "Next link should not exist when no records")]
+    [InlineAutoData(1, 10, 0, "Next link should not exist when one page only")]
+    [InlineAutoData(2, 20, 0, "Next link should not exist when on last page")]
+    [InlineAutoData(1, 20, 2, "Next link should point to current page + 1 when current page is less than total pages")]
+    public void AddsNextLink(int currentPage, int totalCount, int expectedPageNumberInTheNextLink, string testMessage)
     {
         Mock<IUrlHelper> urlHelperMock = new Mock<IUrlHelper>();
+        AddUrlForRoute(urlHelperMock, expectedPageNumberInTheNextLink);
         Dictionary<string, object> queryParams = new() { { nameof(EmployersSubmitModel.PageNumber), currentPage.ToString() } };
         var sut = new PaginationViewModel(totalCount, PageSize, urlHelperMock.Object, RouteNames.Employers, queryParams);
 
-        if (expectedPageNumberInTheLink)
+        if (expectedPageNumberInTheNextLink > 0)
         {
-            sut.Pages[sut.Pages.Count - 1].Title.Should().Be(PaginationViewModel.NextPageTitle);
+            var lastPage = sut.Pages.Count - 1;
+            sut.Pages[lastPage].Title.Should().Be(PaginationViewModel.NextPageTitle);
+            sut.Pages[lastPage].Url.Should().Contain($"PageNumber={expectedPageNumberInTheNextLink}");
         }
         else
         {
@@ -80,25 +80,61 @@ public class PaginationViewModelTests
         }
     }
 
-    [TestCase(1, 1, 1, "1", "1", "When there is only 1 page")]
-    [TestCase(1, 60, 6, "1", "6", "When current page is 1 and there are 6 pages")]
-    [TestCase(6, 60, 6, "1", "6", "When total pages are less than maximum page links")]
-    [TestCase(1, 70, 7, "1", PaginationViewModel.NextPageTitle, "When current page is 1 and total pages are greater than maximum page links")]
-    [TestCase(3, 70, 7, "1", PaginationViewModel.NextPageTitle, "When current page and first page are both in range and there are more pages")]
-    [TestCase(4, 70, 7, PaginationViewModel.PreviousPageTitle, "7", "When current page and first page are both in range and there are previous pages")]
-    [TestCase(7, 70, 7, PaginationViewModel.PreviousPageTitle, "7", "When current page is the last page in range and there are previous pages")]
-    [TestCase(4, 100, 8, PaginationViewModel.PreviousPageTitle, PaginationViewModel.NextPageTitle, "When there are pages before and after the range")]
-    public void CalculatesCorrectStartPage(int currentPage, int totalCount, int expectedPageLinksCount, string expectedStartPage, string expectedEndPage, string testMessage)
+    [Test]
+    public void SetsCorrectPageLinks()
+    {
+        int currentPage = 2;
+        int totalCount = 30;
+        Mock<IUrlHelper> urlHelperMock = new Mock<IUrlHelper>();
+        AddUrlForRoute(urlHelperMock, 1);
+        AddUrlForRoute(urlHelperMock, 2);
+        AddUrlForRoute(urlHelperMock, 3);
+
+        Dictionary<string, object> queryParams = new() { { nameof(EmployersSubmitModel.PageNumber), currentPage.ToString() } };
+        var sut = new PaginationViewModel(totalCount, PageSize, urlHelperMock.Object, RouteNames.Employers, queryParams);
+
+        using (new AssertionScope())
+        {
+            sut.Pages.Should().HaveCount(5);
+            sut.Pages[0].Title.Should().Be(PaginationViewModel.PreviousPageTitle);
+            sut.Pages[0].Url.Should().Contain($"PageNumber={1}");
+            sut.Pages[1].Title.Should().Be("1");
+            sut.Pages[1].Url.Should().Contain($"PageNumber={1}");
+            sut.Pages[2].Title.Should().Be("2");
+            sut.Pages[2].Url.Should().BeNull();
+            sut.Pages[3].Title.Should().Be("3");
+            sut.Pages[3].Url.Should().Contain($"PageNumber={3}");
+            sut.Pages[4].Title.Should().Be(PaginationViewModel.NextPageTitle);
+            sut.Pages[4].Url.Should().Contain($"PageNumber={3}");
+        }
+    }
+
+
+    [TestCase(1, 10, 0, 0, "When there is only 1 page")]
+    [TestCase(2, 11, 2, 1, "When there is only 1 page")]
+    [TestCase(3, 70, 6, 1, "When there is only 1 page")]
+    [TestCase(4, 70, 6, 2, "When there is only 1 page")]
+    [TestCase(9, 90, 6, 4, "When there is only 1 page")]
+    public void CreatesCorrectNumberOfPageLinks(int currentPage, int totalCount, int expectedPageLinksCount, int startPageNumber, string testMessage)
     {
         Mock<IUrlHelper> urlHelperMock = new Mock<IUrlHelper>();
         Dictionary<string, object> queryParams = new() { { nameof(EmployersSubmitModel.PageNumber), currentPage.ToString() } };
         var sut = new PaginationViewModel(totalCount, PageSize, urlHelperMock.Object, RouteNames.Employers, queryParams);
 
+        sut.Pages.RemoveAll(p => p.Title == PaginationViewModel.PreviousPageTitle || p.Title == PaginationViewModel.NextPageTitle);
+
         using (new AssertionScope(testMessage))
         {
-            sut.Pages.Count.Should().Be(expectedPageLinksCount, $"Expected page count: {expectedPageLinksCount}");
-            sut.Pages[0].Title.Should().Be(expectedStartPage, $"Expected start page: {expectedStartPage}");
-            sut.Pages[sut.Pages.Count - 1].Title.Should().Be(expectedEndPage, $"Expected end page: {expectedEndPage}");
+            sut.Pages.Should().HaveCount(expectedPageLinksCount, $"Expected page links count: {expectedPageLinksCount}");
+            if (expectedPageLinksCount > 0)
+            {
+                var pageNumber = startPageNumber;
+                for (int index = 0; index < expectedPageLinksCount; index++)
+                {
+                    sut.Pages[index].Title.Should().Be(pageNumber.ToString(), $"Expected page title at index:{index}");
+                    pageNumber++;
+                }
+            }
         }
     }
 }

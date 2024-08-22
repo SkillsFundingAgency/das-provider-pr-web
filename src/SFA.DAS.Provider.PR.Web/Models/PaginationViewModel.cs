@@ -20,21 +20,17 @@ public class PaginationViewModel
         int.TryParse(queryParams[nameof(EmployersSubmitModel.PageNumber)].ToString(), out var currentPage);
         if (totalCount == 0) return;
         var totalPages = Convert.ToInt32(Math.Ceiling((double)totalCount / pageSize));
+        if (totalPages <= 1) return;
         if (currentPage > totalPages) return;
         var (startPage, endPage) = GetPageRange(currentPage, totalCount, pageSize);
         AddPreviousLinkIfApplicable(totalPages, currentPage);
         AddPageLinks(currentPage, startPage, endPage);
-        AddNextLinkIfApplicable(totalPages, endPage);
-    }
-
-    private void AddNextLinkIfApplicable(int totalPages, int endPage)
-    {
-        if (endPage < totalPages) Pages.Add(new(NextPageTitle, GetPageLink(endPage + 1)));
+        AddNextLinkIfApplicable(totalPages, currentPage);
     }
 
     private void AddPreviousLinkIfApplicable(int totalPages, int currentPage)
     {
-        if (currentPage > 1 && totalPages > 6) Pages.Add(new(PreviousPageTitle, GetPageLink(currentPage - 1)));
+        if (currentPage > 1 && totalPages > 1) Pages.Add(new(PreviousPageTitle, GetPageLink(currentPage - 1)));
     }
 
     private void AddPageLinks(int currentPage, int startPage, int endPage)
@@ -44,6 +40,11 @@ public class PaginationViewModel
             string? pageUrl = pageNumber == currentPage ? null : GetPageLink(pageNumber);
             Pages.Add(new(pageNumber.ToString(), pageUrl));
         }
+    }
+
+    private void AddNextLinkIfApplicable(int totalPages, int endPage)
+    {
+        if (endPage < totalPages) Pages.Add(new(NextPageTitle, GetPageLink(endPage + 1)));
     }
 
     private string GetPageLink(int pageNumber)
