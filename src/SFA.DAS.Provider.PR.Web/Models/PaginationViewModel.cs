@@ -22,7 +22,7 @@ public class PaginationViewModel
         var totalPages = Convert.ToInt32(Math.Ceiling((double)totalCount / pageSize));
         if (currentPage > totalPages) return;
         var (startPage, endPage) = GetPageRange(currentPage, totalCount, pageSize);
-        AddPreviousLinkIfApplicable(totalPages, startPage);
+        AddPreviousLinkIfApplicable(totalPages, currentPage);
         AddPageLinks(currentPage, startPage, endPage);
         AddNextLinkIfApplicable(totalPages, endPage);
     }
@@ -32,6 +32,11 @@ public class PaginationViewModel
         if (endPage < totalPages) Pages.Add(new(NextPageTitle, GetPageLink(endPage + 1)));
     }
 
+    private void AddPreviousLinkIfApplicable(int totalPages, int currentPage)
+    {
+        if (currentPage > 1 && totalPages > 6) Pages.Add(new(PreviousPageTitle, GetPageLink(currentPage - 1)));
+    }
+
     private void AddPageLinks(int currentPage, int startPage, int endPage)
     {
         for (int pageNumber = startPage; pageNumber <= endPage; pageNumber++)
@@ -39,11 +44,6 @@ public class PaginationViewModel
             string? pageUrl = pageNumber == currentPage ? null : GetPageLink(pageNumber);
             Pages.Add(new(pageNumber.ToString(), pageUrl));
         }
-    }
-
-    private void AddPreviousLinkIfApplicable(int totalPages, int startPage)
-    {
-        if (startPage > 1 && totalPages > 6) Pages.Add(new(PreviousPageTitle, GetPageLink(startPage - 1)));
     }
 
     private string GetPageLink(int pageNumber)

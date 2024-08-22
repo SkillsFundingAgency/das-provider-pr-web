@@ -2,9 +2,11 @@
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Moq;
 using SFA.DAS.Provider.PR.Web.Infrastructure;
 using SFA.DAS.Provider.PR.Web.Models;
+using SFA.DAS.Provider.PR_Web.UnitTests.TestHelpers;
 
 namespace SFA.DAS.Provider.PR_Web.UnitTests.Models;
 
@@ -23,25 +25,35 @@ public class PaginationViewModelTests
     }
 
     [Test]
-    [InlineAutoData(1, 10, false, "When one page")]
-    [InlineAutoData(6, 60, false, "When total pages are less than equal to 6")]
-    [InlineAutoData(3, 100, false, "When current page is equal to 3")]
-    [InlineAutoData(1, 0, false, "When no records")]
-    [InlineAutoData(4, 70, true, "When two pages previous to current page is greater than 1")]
-    public void AddsPreviousLink(int currentPage, int totalCount, bool expected, string testMessage)
+    [InlineAutoData(1, 10, 0, "Previous link should not exist when one page only")]
+    [InlineAutoData(6, 60, 0, "Previous link should not exist when total pages are less than equal to minmum pages (6)")]
+    [InlineAutoData(3, 100, 2, "When current page is greater than 1 and total pages greater than minmum pages (6)")]
+    [InlineAutoData(1, 0, 0, "Previous link should not exist when there are no records")]
+    [InlineAutoData(1, 70, 0, "Previous link should not exist when on first page with more pages")]
+    [InlineAutoData(2, 70, 1, "Previous link should not exist when on second page with more pages")]
+    public void AddsPreviousLink(int currentPage, int totalCount, int expectedPageNumberInPreviousLink, string testMessage)
     {
         Mock<IUrlHelper> urlHelperMock = new Mock<IUrlHelper>();
+        AddUrlForRoute(urlHelperMock, expectedPageNumberInPreviousLink);
         Dictionary<string, object> queryParams = new() { { nameof(EmployersSubmitModel.PageNumber), currentPage.ToString() } };
         var sut = new PaginationViewModel(totalCount, PageSize, urlHelperMock.Object, RouteNames.Employers, queryParams);
 
-        if (expected)
+        if (expectedPageNumberInPreviousLink > 0)
         {
             sut.Pages[0].Title.Should().Be(PaginationViewModel.PreviousPageTitle);
+            sut.Pages[0].Url.Should().Contain($"PageNumber={expectedPageNumberInPreviousLink}");
         }
         else
         {
-            sut.Pages.Find(p => p.Title == PaginationViewModel.PreviousPageTitle).Should().BeNull();
+            sut.Pages.Should().NotContain(p => p.Title == PaginationViewModel.PreviousPageTitle);
         }
+    }
+
+    private static void AddUrlForRoute(Mock<IUrlHelper> urlHelperMock, int expectedPageNumber)
+    {
+        urlHelperMock
+           .Setup(m => m.RouteUrl(It.Is<UrlRouteContext>(c => c.RouteName!.Equals(RouteNames.Employers) && ((Dictionary<string, object>)c.Values!)["PageNumber"].Equals(expectedPageNumber))))
+           .Returns($"{TestConstants.DefaultUrl}?PageNumber={expectedPageNumber}");
     }
 
     [Test]
@@ -52,13 +64,13 @@ public class PaginationViewModelTests
     [InlineAutoData(9, 100, false, "When on second to last page")]
     [InlineAutoData(10, 100, false, "When on last page")]
     [InlineAutoData(6, 100, true, "When the number of total pages is beyond display range")]
-    public void AddsNextLink(int currentPage, int totalCount, bool expected, string testMessage)
+    public void AddsNextLink(int currentPage, int totalCount, bool expectedPageNumberInTheLink, string testMessage)
     {
         Mock<IUrlHelper> urlHelperMock = new Mock<IUrlHelper>();
         Dictionary<string, object> queryParams = new() { { nameof(EmployersSubmitModel.PageNumber), currentPage.ToString() } };
         var sut = new PaginationViewModel(totalCount, PageSize, urlHelperMock.Object, RouteNames.Employers, queryParams);
 
-        if (expected)
+        if (expectedPageNumberInTheLink)
         {
             sut.Pages[sut.Pages.Count - 1].Title.Should().Be(PaginationViewModel.NextPageTitle);
         }
