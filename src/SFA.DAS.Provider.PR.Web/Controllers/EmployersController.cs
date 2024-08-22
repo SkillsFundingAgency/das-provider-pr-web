@@ -13,12 +13,12 @@ using SFA.DAS.Provider.PR.Web.Models;
 namespace SFA.DAS.Provider.PR.Web.Controllers;
 
 [Authorize(Policy = nameof(PolicyNames.HasProviderAccount))]
-[Route("[controller]")]
+[Route("")]
 public class EmployersController(IOuterApiClient _outerApiclient, IOptions<ApplicationSettings> _applicationSettingsOption) : Controller
 {
     public const string NoRelationshipsHomePage = "NoEmployerRelationships";
 
-    [Route("{ukprn:int}", Name = RouteNames.Employers)]
+    [Route("{ukprn:int}/employers", Name = RouteNames.Employers)]
     [HttpGet]
     public async Task<IActionResult> Index([FromRoute] int ukprn, [FromQuery] EmployersSubmitModel submitModel, CancellationToken cancellationToken)
     {
