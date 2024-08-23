@@ -1,5 +1,5 @@
 ﻿@using SFA.DAS.Provider.PR.Web.Infrastructure
-@model HomeViewModel
+@model EmployersViewModel
 @{
     ViewData["Title"] = "View employers and manage permissions";
 }
@@ -149,5 +149,6 @@
                 }
             </tbody>
         </table>
+        @{await Html.RenderPartialAsync("_Pagination", Model.Pagination);}
     </div>
 </div>

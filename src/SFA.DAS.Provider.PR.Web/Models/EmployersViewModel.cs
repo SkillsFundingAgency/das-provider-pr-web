@@ -1,25 +1,15 @@
-﻿using Humanizer;
-using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
+﻿namespace SFA.DAS.Provider.PR.Web.Models;
 
-namespace SFA.DAS.Provider.PR.Web.Models;
-
-public class HomeViewModel : HomeSubmitModel
+public class EmployersViewModel : EmployersSubmitModel
 {
-    public string TotalCount { get; }
-    public IEnumerable<EmployerPermissionViewModel> Employers { get; }
-    public string ClearFiltersLink { get; }
-    public string AddEmployerLink { get; }
-
-    public HomeViewModel(GetProviderRelationshipsResponse source, string clearFiltersLink, string addEmployerLink)
-    {
-        Employers = source.Employers.Select(e => (EmployerPermissionViewModel)e);
-        TotalCount = "employer".ToQuantity(source.TotalCount);
-        ClearFiltersLink = clearFiltersLink;
-        AddEmployerLink = addEmployerLink;
-    }
+    public string TotalCount { get; init; } = null!;
+    public IEnumerable<EmployerPermissionViewModel> Employers { get; init; } = null!;
+    public string ClearFiltersLink { get; init; } = null!;
+    public string AddEmployerLink { get; init; } = null!;
+    public PaginationViewModel Pagination { get; init; } = null!;
 }
 
-public class HomeSubmitModel
+public class EmployersSubmitModel
 {
     public const string HasCreateCohortPermissionKey = "HasCreateCohortPermission";
 
@@ -30,6 +20,7 @@ public class HomeSubmitModel
     public bool HasRecruitmentPermission { get; set; }
     public bool HasRecruitmentWithReviewPermission { get; set; }
     public bool HasNoRecruitmentPermission { get; set; }
+    public int PageNumber { get; set; } = 1;
 
     public Dictionary<string, string> ToQueryString()
     {
@@ -47,7 +38,7 @@ public class HomeSubmitModel
             result.Add(nameof(HasRecruitmentWithReviewPermission), HasRecruitmentWithReviewPermission.ToString());
             result.Add(nameof(HasNoRecruitmentPermission), HasNoRecruitmentPermission.ToString());
         }
-
+        result.Add(nameof(PageNumber), PageNumber.ToString());
         return result;
     }
 }
