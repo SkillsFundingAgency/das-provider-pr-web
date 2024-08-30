@@ -1,0 +1,68 @@
+﻿@using SFA.DAS.Provider.PR.Web.Infrastructure
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model SFA.DAS.Provider.PR.Web.Models.AddEmployer.SearchByPayeViewModel
+@{
+    ViewData["Title"] = "Search by paye and aorn";
+}
+@section breadcrumb {
+    <a href="@Model.BackLink" class="govuk-back-link">Back</a>
+}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <partial name="_validationSummary" />
+        <h1 class="govuk-heading-l">
+            Search employer details
+        </h1>
+    </div>
+    <div class="govuk-grid-column-two-thirds">
+        <p class="govuk-body">
+            We cannot find an account linked to <strong>@Model.Email</strong>
+        </p>
+        <p class="govuk-body">
+            Search using the employer PAYE reference and Accounts Office reference, which we’ll match to HMRC records. 
+        </p>
+        <p class="govuk-body">
+            If no apprenticeship service accounts are linked to these references you can invite the employer to create an account.
+        </p>
+        <p class="govuk-body">
+            If there is an apprenticeship service account linked to these references you can ask the employer to add you as a training provider.
+        </p>
+    </div>
+ 
+    <div class="govuk-grid-column-two-thirds">
+        <form asp-route="@RouteNames.AddEmployerSearchByPaye" method="POST">
+            <input asp-for="Ukprn" id="Ukprn" type="hidden" />
+            <input asp-for="Email" id="Email" type="hidden" />
+            <div esfa-validation-marker-for="@Model.Paye" class="govuk-form-group">
+                <span asp-validation-for="Paye" class="govuk-error-message"></span>
+                <div class="govuk-body" id="paye">
+                    <label class="govuk-label govuk-label--s" for="paye">
+                        Employer PAYE Reference
+                    </label>
+                    <div id="paye-hint" class="govuk-hint">
+                        This is a 3 digit tax office number, a forward slash, and am tax officer employer reference, like 123/AB456
+                    </div>
+                    <input asp-for="Paye" class="govuk-input govuk-input--width-20"  name="paye" type="text" spellcheck="false" autocomplete="off" sfa-validationerror-class="form-control-error" maxlength="14">
+                </div>
+            </div>
+            
+            <div esfa-validation-marker-for="@Model.Aorn" class="govuk-form-group">
+                <span asp-validation-for="Aorn" class="govuk-error-message"></span>
+                <div class="govuk-body" id="aorn">
+                    <label class="govuk-label govuk-label--s" for="aorn">
+                        Accounts Office reference
+                    </label>
+                    <div id="aorn-hint" class="govuk-hint">
+                        This is 13 characters, like 123PX00123456
+                    </div>
+                    <input asp-for="Aorn" class="govuk-input govuk-input--width-20" name="aorn" type="text" spellcheck="false" autocomplete="off" sfa-validationerror-class="form-control-error" maxlength="17">
+                </div>
+            </div>
+
+            <div class="govuk-button-group">
+                <button type="submit" id="continue" class="govuk-button" data-disable-on-submit="true">Search</button>
+                <a class="govuk-link" href="@Model.CancelLink">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
