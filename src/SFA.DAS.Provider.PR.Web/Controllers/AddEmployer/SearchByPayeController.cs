@@ -22,13 +22,14 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
     [HttpGet]
     public IActionResult Index([FromRoute] int ukprn)
     {
-        var viewModel = GetViewModel(ukprn);
         var sessionModel = _sessionService.Get<AddEmployerSessionModel>();
 
         if (string.IsNullOrEmpty(sessionModel?.Email))
         {
             return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
         }
+
+        var viewModel = GetViewModel(ukprn);
 
         viewModel.Email = sessionModel!.Email;
 

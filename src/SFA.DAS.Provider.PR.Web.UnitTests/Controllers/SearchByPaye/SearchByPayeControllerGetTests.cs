@@ -54,9 +54,9 @@ public class SearchByPayeControllerGetTests
 
         var result = sut.Index(ukprn);
 
-        ViewResult? viewResult = result.As<ViewResult>();
-        SearchByPayeViewModel? viewModel = viewResult.Model as SearchByPayeViewModel;
-        ;
+        SearchByPayeViewModel? viewModel = ((ViewResult)result).Model as SearchByPayeViewModel;
+
+        viewModel.Should().NotBeNull();
         viewModel!.Paye.Should().Be(paye);
         viewModel.Aorn.Should().Be(aorn);
     }
