@@ -17,7 +17,7 @@ namespace SFA.DAS.Provider.PR.Web.Controllers.AddEmployer;
 public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionService _sessionService, IValidator<SearchByPayeSubmitViewModel> _validator) : Controller
 {
     public const string ViewPath = "~/Views/AddEmployer/SearchByPaye.cshtml";
-
+    public const string PayeAornShutterPathViewPath = "~/Views/AddEmployer/ShutterPages/PayeAornShutterPage.cshtml";
 
     [HttpGet]
     public IActionResult Index([FromRoute] int ukprn)
@@ -76,6 +76,13 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
 
         var relationshipsRequest = await _outerApiClient.GetProviderRelationshipsByUkprnPayeAorn(ukprn, sessionModel.Aorn!, encodedPaye, cancellationToken);
 
+        bool? hasInvalidPaye = relationshipsRequest?.HasInvalidPaye;
+
+        if (hasInvalidPaye is true)
+        {
+            return RedirectToRoute(RouteNames.AddEmployerPayeAornNotCorrect, new { ukprn });
+        }
+
         bool? hasOneLegalEntity = relationshipsRequest?.HasOneLegalEntity;
 
         if (hasOneLegalEntity is false)
@@ -86,6 +93,18 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
         return RedirectToRoute(RouteNames.AddEmployerSearchByPaye, new { ukprn });
     }
 
+    [HttpGet]
+    [Route("payeAornNotMatched", Name = RouteNames.AddEmployerPayeAornNotCorrect)]
+    public IActionResult PayeAornShutterPage([FromRoute] int ukprn)
+    {
+        var backLink = Url.RouteUrl(RouteNames.AddEmployerSearchByPaye, new { ukprn })!;
+        var checkEmployerLink = Url.RouteUrl(RouteNames.AddEmployerSearchByPaye, new { ukprn })!;
+        var shutterViewModel = new PayeAornNotCorrectShutterPageViewModel(
+            backLink, checkEmployerLink
+        );
+
+        return View(PayeAornShutterPathViewPath, shutterViewModel);
+    }
 
     private SearchByPayeViewModel GetViewModel(int ukprn)
     {

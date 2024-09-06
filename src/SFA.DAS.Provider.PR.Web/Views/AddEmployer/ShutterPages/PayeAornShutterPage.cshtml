@@ -1,0 +1,29 @@
+﻿@using SFA.DAS.Provider.PR.Web.Infrastructure
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model SFA.DAS.Provider.PR.Web.Models.AddEmployer.PayeAornNotCorrectShutterPageViewModel
+@{
+    ViewData["Title"] = "Paye and Aorn not correct";
+}
+@section breadcrumb {
+    <a href="@Model.BackLink" class="govuk-back-link">Back</a>
+}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l">
+            The details you entered did not match HMRC records
+        </h1>
+    </div>
+    <div class="govuk-grid-column-two-thirds">
+        <p class="govuk-body">
+            We could not match the details you entered with HMRC records.
+        </p>
+        <p class="govuk-body">
+            The employer PAYE reference or Accounts Office reference may be incorrect.
+        </p>
+        <div class="govuk-button-group">
+            <p class="govuk-body">
+                <a href="@Model.CheckEmployerLink">Check employer details</a> to make sure you’ve entered the details correctly. If you have, you’ll need to contact the employer.
+            </p>
+        </div>
+    </div>
+</div>
