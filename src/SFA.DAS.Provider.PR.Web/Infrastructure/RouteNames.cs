@@ -14,4 +14,5 @@ public static class RouteNames
     public const string OneAccountNoRelationship = nameof(OneAccountNoRelationship);
     public const string AddPermissionsAndEmployer = nameof(AddPermissionsAndEmployer);
     public const string AddEmployerConfirmation = nameof(AddEmployerConfirmation);
+    public const string AddEmployerSearchByPaye = nameof(AddEmployerSearchByPaye);
 }

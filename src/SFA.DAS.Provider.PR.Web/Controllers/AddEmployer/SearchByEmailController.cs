@@ -58,7 +58,7 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
 
         if (!relationshipByEmail.HasUserAccount)
         {
-            return RedirectToRoute(RouteNames.AddEmployerSearchByEmail, new { ukprn });
+            return RedirectToRoute(RouteNames.AddEmployerSearchByPaye, new { ukprn });
         }
 
         var hasMultipleAccounts = HasMultipleAccounts(relationshipByEmail);

@@ -172,7 +172,7 @@ public class SearchByEmailControllerPostTests
     }
 
     [Test, MoqInlineAutoData]
-    public async Task Post_HasAccountFalse_ReturnsExpectedViewModel(
+    public async Task Post_HasAccountFalse_RedirectsToSearchByPaye(
         Mock<IOuterApiClient> outerApiClientMock,
         Mock<IValidator<SearchByEmailSubmitViewModel>> validatorMock,
         Mock<ISessionService> sessionServiceMock,
@@ -195,7 +195,7 @@ public class SearchByEmailControllerPostTests
         var result = await sut.Index(ukprn, searchByEmailSubmitViewModel, cancellationToken);
 
         RedirectToRouteResult? redirectToRouteResult = result.As<RedirectToRouteResult>();
-        redirectToRouteResult.RouteName.Should().Be(RouteNames.AddEmployerSearchByEmail);
+        redirectToRouteResult.RouteName.Should().Be(RouteNames.AddEmployerSearchByPaye);
         redirectToRouteResult.RouteValues!.First().Value.Should().Be(ukprn);
 
         outerApiClientMock.Verify(o => o.GetRelationshipByEmail(_emailCallingRelationships, ukprn, cancellationToken), Times.Once);

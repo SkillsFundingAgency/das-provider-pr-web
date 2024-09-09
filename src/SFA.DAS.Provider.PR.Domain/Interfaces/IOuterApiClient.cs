@@ -18,4 +18,9 @@ public interface IOuterApiClient
 
     [Post("/requests/addaccount")]
     Task<AddAccountRequestCommandResponse> AddRequest([Body] AddAccountRequestCommand command, CancellationToken cancellationToken);
+
+    [Get("employeraccount")]
+    Task<GetRelationshipsByUkprnPayeAornResponse> GetProviderRelationshipsByUkprnPayeAorn([Query] long ukprn, [Query] string aorn, [Query] string encodedPaye, CancellationToken cancellationToken);
+
+
 }
