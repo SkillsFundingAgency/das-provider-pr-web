@@ -10,4 +10,7 @@ public class AddEmployerSessionModel : PermissionDescriptionsViewModel
     public long? AccountId { get; set; }
     public string? Paye { get; set; }
     public string? Aorn { get; set; }
+    public string? OrganisationName { get; set; }
+    public string? FirstName { get; set; }
+    public string? LastName { get; set; }
 }

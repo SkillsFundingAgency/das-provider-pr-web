@@ -98,6 +98,15 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
             return RedirectToRoute(RouteNames.AddEmployerMultipleAccounts, new { ukprn });
         }
 
+        var isInEAS = relationshipsRequest?.Account != null;
+
+        if (!isInEAS)
+        {
+            sessionModel.OrganisationName = relationshipsRequest?.Organisation?.Name;
+            _sessionService.Set(sessionModel);
+            return RedirectToRoute(RouteNames.AddEmployerContactDetails, new { ukprn });
+        }
+
         return RedirectToRoute(RouteNames.AddEmployerSearchByPaye, new { ukprn });
     }
 
