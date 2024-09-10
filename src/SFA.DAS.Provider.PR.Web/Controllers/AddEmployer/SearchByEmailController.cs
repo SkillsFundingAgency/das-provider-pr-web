@@ -19,7 +19,7 @@ namespace SFA.DAS.Provider.PR.Web.Controllers.AddEmployer;
 public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionService _sessionService, IValidator<SearchByEmailSubmitViewModel> _validator) : Controller
 {
     public const string ViewPath = "~/Views/AddEmployer/SearchByEmail.cshtml";
-    public const string MultipleAccountsShutterPathViewPath = "~/Views/AddEmployer/MultipleAccountsShutterPage.cshtml";
+    public const string MultipleAccountsShutterPathViewPath = "~/Views/AddEmployer/ShutterPages/MultipleAccountsShutterPage.cshtml";
     public const string OneAccountNoRelationshipViewPath = "~/Views/AddEmployer/OneAccountNoRelationship.cshtml";
 
     [HttpGet]
