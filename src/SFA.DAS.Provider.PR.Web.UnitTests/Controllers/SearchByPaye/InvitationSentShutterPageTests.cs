@@ -29,6 +29,7 @@ public class InvitationSentShutterPageTests
         GetRequestByUkprnPayeResponse getRequestByUkprnPayeResponse,
         CancellationToken cancellationToken)
     {
+        var createAccount = "CreateAccount";
         Mock<ISessionService> sessionServiceMock = new Mock<ISessionService>();
         Mock<IOuterApiClient> outerApiClientMock = new Mock<IOuterApiClient>();
 
@@ -40,6 +41,7 @@ public class InvitationSentShutterPageTests
         });
 
         getRequestByUkprnPayeResponse.EmployerOrganisationName = employerOrganisationName;
+        getRequestByUkprnPayeResponse.RequestType = createAccount;
 
         Response<GetRequestByUkprnPayeResponse> resultResponse = new(null, new(HttpStatusCode.OK), () => getRequestByUkprnPayeResponse);
 

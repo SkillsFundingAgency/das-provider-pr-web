@@ -3,4 +3,5 @@
 public class GetRequestByUkprnPayeResponse
 {
     public string? EmployerOrganisationName { get; set; }
+    public string? RequestType { get; set; }
 }

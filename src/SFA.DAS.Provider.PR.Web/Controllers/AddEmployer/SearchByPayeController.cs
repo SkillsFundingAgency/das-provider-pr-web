@@ -106,6 +106,7 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
     [Route("invitationSent", Name = RouteNames.AddEmployerInvitationAlreadySent)]
     public async Task<IActionResult> InvitationSentShutterPage([FromRoute] int ukprn, CancellationToken cancellationToken)
     {
+        const string createAccount = "CreateAccount";
         var sessionModel = _sessionService.Get<AddEmployerSessionModel>();
 
         if (string.IsNullOrEmpty(sessionModel?.Paye))
@@ -117,7 +118,7 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
 
         var requestResponse = await _outerApiClient.GetRequest(ukprn, sessionModel.Paye, cancellationToken);
 
-        if (requestResponse.ResponseMessage.IsSuccessStatusCode)
+        if (requestResponse.ResponseMessage.IsSuccessStatusCode && requestResponse.GetContent().RequestType == createAccount)
         {
             employerName = requestResponse.GetContent().EmployerOrganisationName!;
         }
