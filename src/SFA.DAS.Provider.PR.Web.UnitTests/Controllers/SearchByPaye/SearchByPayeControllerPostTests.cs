@@ -46,6 +46,7 @@ public class SearchByPayeControllerPostTests
 
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel { Email = email, Paye = paye, Aorn = aorn });
 
+        getRelationshipsByUkprnPayeAornResponse.HasActiveRequest = false;
         getRelationshipsByUkprnPayeAornResponse.HasOneLegalEntity = null;
 
         outerApiClientMock.Setup(x => x.GetProviderRelationshipsByUkprnPayeAorn(ukprn, aorn, encodedPaye, cancellationToken)).ReturnsAsync(getRelationshipsByUkprnPayeAornResponse);
@@ -211,16 +212,15 @@ public class SearchByPayeControllerPostTests
     }
 
     [Test, MoqAutoData]
-    public async Task Post_MultipleAccounts_RedirectsToShutterPage(
-   Mock<IOuterApiClient> outerApiClientMock,
-   Mock<IValidator<SearchByPayeSubmitViewModel>> validatorMock,
-   Mock<ISessionService> sessionServiceMock,
-   int ukprn,
-   string paye,
-   string aorn,
-   GetRelationshipsByUkprnPayeAornResponse getRelationshipsByUkprnPayeAornResponse,
-   CancellationToken cancellationToken
-   )
+    public async Task Post_HasActiveRequest_RedirectsToShutterPage(
+        Mock<IOuterApiClient> outerApiClientMock,
+        Mock<IValidator<SearchByPayeSubmitViewModel>> validatorMock,
+        Mock<ISessionService> sessionServiceMock,
+        int ukprn,
+        string paye,
+        string aorn,
+        CancellationToken cancellationToken
+    )
     {
         SearchByPayeSubmitViewModel searchByPayeSubmitViewModel = new()
         {
@@ -235,6 +235,53 @@ public class SearchByPayeControllerPostTests
 
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel { Email = email, Paye = paye, Aorn = aorn });
 
+        GetRelationshipsByUkprnPayeAornResponse getRelationshipsByUkprnPayeAornResponse =
+            new GetRelationshipsByUkprnPayeAornResponse
+            {
+                HasActiveRequest = true
+            };
+
+        outerApiClientMock.Setup(x => x.GetProviderRelationshipsByUkprnPayeAorn(ukprn, aorn, encodedPaye, cancellationToken)).ReturnsAsync(getRelationshipsByUkprnPayeAornResponse);
+
+        validatorMock.Setup(v => v.Validate(It.IsAny<SearchByPayeSubmitViewModel>())).Returns(new ValidationResult());
+
+        SearchByPayeController sut = new(outerApiClientMock.Object, sessionServiceMock.Object, validatorMock.Object);
+
+        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
+
+        var result = await sut.Index(ukprn, searchByPayeSubmitViewModel, cancellationToken);
+
+        RedirectToRouteResult? redirectToRouteResult = result.As<RedirectToRouteResult>();
+        redirectToRouteResult.RouteName.Should().Be(RouteNames.AddEmployerInvitationAlreadySent);
+        redirectToRouteResult.RouteValues!.First().Value.Should().Be(ukprn);
+    }
+
+    [Test, MoqAutoData]
+    public async Task Post_MultipleAccounts_RedirectsToShutterPage(
+       Mock<IOuterApiClient> outerApiClientMock,
+       Mock<IValidator<SearchByPayeSubmitViewModel>> validatorMock,
+       Mock<ISessionService> sessionServiceMock,
+       int ukprn,
+       string paye,
+       string aorn,
+       GetRelationshipsByUkprnPayeAornResponse getRelationshipsByUkprnPayeAornResponse,
+       CancellationToken cancellationToken
+       )
+    {
+        SearchByPayeSubmitViewModel searchByPayeSubmitViewModel = new()
+        {
+            Email = Email,
+            Aorn = aorn,
+            Paye = paye
+        };
+
+        var encodedPaye = Uri.EscapeDataString(paye);
+
+        var email = "test@test.com";
+
+        sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel { Email = email, Paye = paye, Aorn = aorn });
+
+        getRelationshipsByUkprnPayeAornResponse.HasActiveRequest = false;
         getRelationshipsByUkprnPayeAornResponse.HasOneLegalEntity = false;
 
         outerApiClientMock.Setup(x => x.GetProviderRelationshipsByUkprnPayeAorn(ukprn, aorn, encodedPaye, cancellationToken)).ReturnsAsync(getRelationshipsByUkprnPayeAornResponse);
@@ -256,18 +303,17 @@ public class SearchByPayeControllerPostTests
         sessionServiceMock.Verify(s => s.Get<AddEmployerSessionModel>(), Times.Once);
     }
 
-
     [Test, MoqAutoData]
     public async Task Post_PayeAornNotCorrect_RedirectsToPayeAornNotFoundShutterPage(
-   Mock<IOuterApiClient> outerApiClientMock,
-   Mock<IValidator<SearchByPayeSubmitViewModel>> validatorMock,
-   Mock<ISessionService> sessionServiceMock,
-   int ukprn,
-   string paye,
-   string aorn,
-   GetRelationshipsByUkprnPayeAornResponse getRelationshipsByUkprnPayeAornResponse,
-   CancellationToken cancellationToken
-   )
+       Mock<IOuterApiClient> outerApiClientMock,
+       Mock<IValidator<SearchByPayeSubmitViewModel>> validatorMock,
+       Mock<ISessionService> sessionServiceMock,
+       int ukprn,
+       string paye,
+       string aorn,
+       GetRelationshipsByUkprnPayeAornResponse getRelationshipsByUkprnPayeAornResponse,
+       CancellationToken cancellationToken
+       )
     {
         SearchByPayeSubmitViewModel searchByPayeSubmitViewModel = new()
         {
@@ -282,6 +328,7 @@ public class SearchByPayeControllerPostTests
 
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel { Email = email, Paye = paye, Aorn = aorn });
 
+        getRelationshipsByUkprnPayeAornResponse.HasActiveRequest = false;
         getRelationshipsByUkprnPayeAornResponse.HasInvalidPaye = true;
 
         outerApiClientMock.Setup(x => x.GetProviderRelationshipsByUkprnPayeAorn(ukprn, aorn, encodedPaye, cancellationToken)).ReturnsAsync(getRelationshipsByUkprnPayeAornResponse);

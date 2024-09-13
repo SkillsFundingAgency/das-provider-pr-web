@@ -16,4 +16,5 @@ public static class RouteNames
     public const string AddEmployerConfirmation = nameof(AddEmployerConfirmation);
     public const string AddEmployerSearchByPaye = nameof(AddEmployerSearchByPaye);
     public const string AddEmployerPayeAornNotCorrect = nameof(AddEmployerPayeAornNotCorrect);
+    public const string AddEmployerInvitationAlreadySent = nameof(AddEmployerInvitationAlreadySent);
 }

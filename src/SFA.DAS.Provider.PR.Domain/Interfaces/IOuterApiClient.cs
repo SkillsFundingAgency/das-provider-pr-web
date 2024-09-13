@@ -22,5 +22,8 @@ public interface IOuterApiClient
     [Get("employeraccount")]
     Task<GetRelationshipsByUkprnPayeAornResponse> GetProviderRelationshipsByUkprnPayeAorn([Query] long ukprn, [Query] string aorn, [Query] string encodedPaye, CancellationToken cancellationToken);
 
+    [AllowAnyStatusCode]
+    [Get("requests")]
+    Task<Response<GetRequestByUkprnPayeResponse>> GetRequest([Query] long ukprn, [Query] string paye, CancellationToken cancellationToken);
 
 }

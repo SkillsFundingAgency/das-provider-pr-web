@@ -18,6 +18,7 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
 {
     public const string ViewPath = "~/Views/AddEmployer/SearchByPaye.cshtml";
     public const string PayeAornShutterPathViewPath = "~/Views/AddEmployer/ShutterPages/PayeAornShutterPage.cshtml";
+    public const string InviteAlreadySentShutterPathViewPath = "~/Views/AddEmployer/ShutterPages/InviteAlreadySentShutterPage.cshtml";
 
     [HttpGet]
     public IActionResult Index([FromRoute] int ukprn)
@@ -76,6 +77,13 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
 
         var relationshipsRequest = await _outerApiClient.GetProviderRelationshipsByUkprnPayeAorn(ukprn, sessionModel.Aorn!, encodedPaye, cancellationToken);
 
+        bool? hasActiveRequest = relationshipsRequest?.HasActiveRequest;
+
+        if (hasActiveRequest is true)
+        {
+            return RedirectToRoute(RouteNames.AddEmployerInvitationAlreadySent, new { ukprn });
+        }
+
         bool? hasInvalidPaye = relationshipsRequest?.HasInvalidPaye;
 
         if (hasInvalidPaye is true)
@@ -91,6 +99,46 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
         }
 
         return RedirectToRoute(RouteNames.AddEmployerSearchByPaye, new { ukprn });
+    }
+
+
+    [HttpGet]
+    [Route("invitationSent", Name = RouteNames.AddEmployerInvitationAlreadySent)]
+    public async Task<IActionResult> InvitationSentShutterPage([FromRoute] int ukprn, CancellationToken cancellationToken)
+    {
+        const string createAccount = "CreateAccount";
+        var sessionModel = _sessionService.Get<AddEmployerSessionModel>();
+
+        if (string.IsNullOrEmpty(sessionModel?.Paye))
+        {
+            return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
+        }
+
+        string employerName;
+
+        var requestResponse = await _outerApiClient.GetRequest(ukprn, sessionModel.Paye, cancellationToken);
+
+        if (requestResponse.ResponseMessage.IsSuccessStatusCode && requestResponse.GetContent().RequestType == createAccount)
+        {
+            employerName = requestResponse.GetContent().EmployerOrganisationName!;
+        }
+        else
+        {
+            return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
+        }
+
+        var backLink = Url.RouteUrl(RouteNames.AddEmployerSearchByPaye, new { ukprn })!;
+
+        var checkEmployerLink = "";
+        var shutterViewModel = new InviteAlreadySentShutterPageViewModel(
+            employerName,
+            sessionModel.Paye,
+            sessionModel.Aorn!,
+            sessionModel.Email,
+            backLink, checkEmployerLink
+        );
+
+        return View(InviteAlreadySentShutterPathViewPath, shutterViewModel);
     }
 
     [HttpGet]
