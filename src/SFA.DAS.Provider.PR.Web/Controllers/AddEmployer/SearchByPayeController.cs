@@ -98,9 +98,9 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
             return RedirectToRoute(RouteNames.AddEmployerMultipleAccounts, new { ukprn });
         }
 
-        var isInEAS = relationshipsRequest?.Account != null;
+        var hasExistingAccount = relationshipsRequest?.Account != null;
 
-        if (!isInEAS)
+        if (!hasExistingAccount)
         {
             sessionModel.OrganisationName = relationshipsRequest?.Organisation?.Name;
             _sessionService.Set(sessionModel);

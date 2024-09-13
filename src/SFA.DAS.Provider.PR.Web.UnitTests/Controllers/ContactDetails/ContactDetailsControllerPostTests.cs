@@ -22,12 +22,12 @@ public class ContactDetailsControllerPostTests
     [Test, MoqAutoData]
     public void Post_ReturnsExpectedViewModelAndPath(
         Mock<IValidator<ContactDetailsSubmitViewModel>> validatorMock,
-     Mock<ISessionService> sessionServiceMock,
-     int ukprn,
-     string firstName,
-     string lastName,
-     CancellationToken cancellationToken
-     )
+        Mock<ISessionService> sessionServiceMock,
+        int ukprn,
+        string firstName,
+        string lastName,
+        CancellationToken cancellationToken
+        )
     {
         ContactDetailsSubmitViewModel contactDetailsSubmitViewModel = new()
         {
