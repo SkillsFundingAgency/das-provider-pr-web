@@ -15,6 +15,8 @@ namespace SFA.DAS.Provider.PR_Web.UnitTests.Controllers.CheckDetails;
 public class CheckDetailsControllerGetTests
 {
     private static readonly string CancelLink = Guid.NewGuid().ToString();
+    private static readonly string ChangeEmployerNameChangeLink = Guid.NewGuid().ToString();
+    private static readonly string ChangePermissionsLink = Guid.NewGuid().ToString();
 
     [Test, MoqAutoData]
     public void Get_BuildsExpectedViewModel(
@@ -27,7 +29,9 @@ public class CheckDetailsControllerGetTests
         addEmployerSessionModel.Email = email;
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(addEmployerSessionModel);
 
-        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink);
+        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink)
+            .AddUrlForRoute(RouteNames.AddEmployerContactDetails, ChangeEmployerNameChangeLink)
+            .AddUrlForRoute(RouteNames.ChangePermissions, ChangePermissionsLink);
 
         var result = sut.Index(ukprn);
 
@@ -38,8 +42,8 @@ public class CheckDetailsControllerGetTests
                                                                                         .Excluding(o => o.OrganisationName));
         viewModel!.OrganisationName.Should().Be(addEmployerSessionModel.OrganisationName!.ToUpper());
         viewModel.CancelLink.Should().Be(CancelLink);
-        viewModel.ChangeEmployerNameLink.Should().Be(string.Empty);
-        viewModel.ChangePermissionsLink.Should().Be(string.Empty);
+        viewModel.ChangeEmployerNameLink.Should().Be(ChangeEmployerNameChangeLink);
+        viewModel.ChangePermissionsLink.Should().Be(ChangePermissionsLink);
         viewModel.PermissionToRecruitText.Should().Be(SetPermissionsText.NoPermissionText);
         viewModel.PermissionToAddCohortsText.Should().Be(SetPermissionsText.NoPermissionText);
     }
@@ -92,7 +96,7 @@ public class CheckDetailsControllerGetTests
         int ukprn)
     {
         var email = "test@test.com";
-        AddEmployerSessionModel addEmployerSessionModel = new AddEmployerSessionModel { Email = email };
+        AddEmployerSessionModel addEmployerSessionModel = new AddEmployerSessionModel { Email = email, IsCheckDetailsVisited = true };
         addEmployerSessionModel.PermissionToAddCohorts = permissionToAddCohorts;
         addEmployerSessionModel.PermissionToRecruit = permissionsToRecruit;
 
@@ -104,6 +108,36 @@ public class CheckDetailsControllerGetTests
         sut.Index(ukprn);
 
         sessionServiceMock.Verify(x => x.Set(It.IsAny<AddEmployerSessionModel>()), Times.Exactly(numberOfSessionSets));
+    }
+
+    [Test]
+    [MoqInlineAutoData(false, 1)]
+    [MoqInlineAutoData(true, 0)]
+    public void Get_SetsSessionModelIfUpdatingPermissions(
+        bool isCheckDetailsVisited,
+        int numberOfSessionsSet,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Greedy] CheckDetailsController sut,
+        int ukprn)
+    {
+        var email = "test@test.com";
+        AddEmployerSessionModel addEmployerSessionModel = new AddEmployerSessionModel
+        {
+            Email = email,
+            IsCheckDetailsVisited = isCheckDetailsVisited,
+            PermissionToAddCohorts = SetPermissions.AddRecords.Yes,
+            PermissionToRecruit = SetPermissions.RecruitApprentices.Yes
+        };
+
+        addEmployerSessionModel.Email = email;
+
+        sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(addEmployerSessionModel);
+
+        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink);
+
+        sut.Index(ukprn);
+
+        sessionServiceMock.Verify(x => x.Set(It.IsAny<AddEmployerSessionModel>()), Times.Exactly(numberOfSessionsSet));
     }
 
     [Test]

@@ -75,6 +75,12 @@ public class ContactDetailsController(ISessionService _sessionService, IValidato
     {
         var cancelLink = Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn });
         var backLink = Url.RouteUrl(RouteNames.AddEmployerSearchByPaye, new { ukprn });
+
+        if (sessionModel.IsCheckDetailsVisited)
+        {
+            backLink = Url.RouteUrl(RouteNames.CheckEmployerDetails, new { ukprn });
+        }
+
         return new ContactDetailsViewModel { CancelLink = cancelLink!, BackLink = backLink!, Ukprn = ukprn, Aorn = sessionModel.Aorn!, Paye = sessionModel.Paye!, OrganisationName = sessionModel.OrganisationName! };
     }
 }

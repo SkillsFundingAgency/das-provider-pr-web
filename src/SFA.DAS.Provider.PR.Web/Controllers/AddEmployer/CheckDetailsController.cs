@@ -47,8 +47,8 @@ public class CheckDetailsController(ISessionService _sessionService) : Controlle
     private CheckDetailsViewModel GetViewModel(int ukprn, AddEmployerSessionModel sessionModel)
     {
         var cancelLink = Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn });
-        var changeEmployerNameLink = string.Empty;
-        var changePermissionsLink = string.Empty;
+        var changeEmployerNameLink = Url.RouteUrl(RouteNames.AddEmployerContactDetails, new { ukprn });
+        var changePermissionsLink = Url.RouteUrl(RouteNames.ChangePermissions, new { ukprn });
 
         if (sessionModel.PermissionToAddCohorts == null)
         {
@@ -59,6 +59,12 @@ public class CheckDetailsController(ISessionService _sessionService) : Controlle
         if (sessionModel.PermissionToRecruit == null)
         {
             sessionModel.PermissionToRecruit = SetPermissions.RecruitApprentices.Yes;
+            _sessionService.Set(sessionModel);
+        }
+
+        if (!sessionModel.IsCheckDetailsVisited)
+        {
+            sessionModel.IsCheckDetailsVisited = true;
             _sessionService.Set(sessionModel);
         }
 
@@ -78,8 +84,8 @@ public class CheckDetailsController(ISessionService _sessionService) : Controlle
             PermissionToAddCohortsText = permissionToAddCohortsText,
             PermissionToRecruit = sessionModel.PermissionToRecruit,
             PermissionToRecruitText = permissionToRecruitText,
-            ChangeEmployerNameLink = changeEmployerNameLink,
-            ChangePermissionsLink = changePermissionsLink,
+            ChangeEmployerNameLink = changeEmployerNameLink!,
+            ChangePermissionsLink = changePermissionsLink!,
             CancelLink = cancelLink!
         };
     }
