@@ -1,6 +1,6 @@
 ﻿namespace SFA.DAS.Provider.PR.Web.Models.AddEmployer;
 
-public class AddPermissionsAndEmployerViewModel : AddPermissionsAndEmployerSubmitViewModel
+public class AddPermissionsAndEmployerViewModel : AddPermissionsAndEmployerSubmitModel
 {
     public AddPermissionsAndEmployerViewModel() { }
 
@@ -10,6 +10,6 @@ public class AddPermissionsAndEmployerViewModel : AddPermissionsAndEmployerSubmi
     public required long Ukprn { get; set; }
 }
 
-public class AddPermissionsAndEmployerSubmitViewModel : PermissionDescriptionsViewModel
+public class AddPermissionsAndEmployerSubmitModel : PermissionDescriptionsViewModel
 {
 }

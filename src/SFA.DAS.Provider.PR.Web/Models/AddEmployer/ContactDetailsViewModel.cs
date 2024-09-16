@@ -1,6 +1,6 @@
 ﻿namespace SFA.DAS.Provider.PR.Web.Models.AddEmployer;
 
-public class ContactDetailsViewModel : ContactDetailsSubmitViewModel
+public class ContactDetailsViewModel : ContactDetailsSubmitModel
 {
     public ContactDetailsViewModel() { }
 
@@ -12,7 +12,7 @@ public class ContactDetailsViewModel : ContactDetailsSubmitViewModel
     public required string Aorn { get; set; }
 }
 
-public class ContactDetailsSubmitViewModel
+public class ContactDetailsSubmitModel
 {
     public string? FirstName { get; set; }
     public string? LastName { get; set; }

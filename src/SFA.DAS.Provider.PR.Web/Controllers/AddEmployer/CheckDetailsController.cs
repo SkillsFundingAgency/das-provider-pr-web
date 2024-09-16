@@ -21,7 +21,7 @@ public class CheckDetailsController(ISessionService _sessionService) : Controlle
     {
         var sessionModel = _sessionService.Get<AddEmployerSessionModel>();
 
-        if (string.IsNullOrEmpty(sessionModel?.Email))
+        if (!IsCompleteFlow(sessionModel))
         {
             return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
         }
@@ -36,7 +36,7 @@ public class CheckDetailsController(ISessionService _sessionService) : Controlle
     {
         var sessionModel = _sessionService.Get<AddEmployerSessionModel>();
 
-        if (string.IsNullOrEmpty(sessionModel?.Email))
+        if (!IsCompleteFlow(sessionModel))
         {
             return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
         }
@@ -104,5 +104,18 @@ public class CheckDetailsController(ISessionService _sessionService) : Controlle
             SetPermissions.RecruitApprentices.YesWithReview => SetPermissionsText.RecruitmentWithReviewPermissionText,
             _ => SetPermissionsText.NoPermissionText
         };
+    }
+
+    private static bool IsCompleteFlow(AddEmployerSessionModel? sessionModel)
+    {
+        if (string.IsNullOrEmpty(sessionModel?.Email)) return false;
+
+        if (string.IsNullOrEmpty(sessionModel.Paye) || string.IsNullOrEmpty(sessionModel.Aorn)) return false;
+
+        if (string.IsNullOrWhiteSpace(sessionModel.OrganisationName)) return false;
+
+        if (string.IsNullOrWhiteSpace(sessionModel.FirstName) || string.IsNullOrEmpty(sessionModel.LastName)) return false;
+
+        return true;
     }
 }

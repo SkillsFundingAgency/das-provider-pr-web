@@ -13,7 +13,7 @@ namespace SFA.DAS.Provider.PR.Web.Controllers.AddEmployer;
 [Authorize(Policy = nameof(PolicyNames.HasContributorOrAbovePermission))]
 
 [Route("/{ukprn}/addEmployer/contactDetails", Name = RouteNames.AddEmployerContactDetails)]
-public class ContactDetailsController(ISessionService _sessionService, IValidator<ContactDetailsSubmitViewModel> _validator) : Controller
+public class ContactDetailsController(ISessionService _sessionService, IValidator<ContactDetailsSubmitModel> _validator) : Controller
 {
     public const string ViewPath = "~/Views/AddEmployer/ContactDetails.cshtml";
 
@@ -44,7 +44,7 @@ public class ContactDetailsController(ISessionService _sessionService, IValidato
     }
 
     [HttpPost]
-    public IActionResult Index([FromRoute] int ukprn, ContactDetailsSubmitViewModel submitViewModel, CancellationToken cancellationToken)
+    public IActionResult Index([FromRoute] int ukprn, ContactDetailsSubmitModel submitModel, CancellationToken cancellationToken)
     {
         var sessionModel = _sessionService.Get<AddEmployerSessionModel>();
 
@@ -53,7 +53,7 @@ public class ContactDetailsController(ISessionService _sessionService, IValidato
             return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
         }
 
-        var result = _validator.Validate(submitViewModel);
+        var result = _validator.Validate(submitModel);
 
         if (!result.IsValid)
         {
@@ -63,8 +63,8 @@ public class ContactDetailsController(ISessionService _sessionService, IValidato
         }
 
 
-        sessionModel.FirstName = submitViewModel.FirstName;
-        sessionModel.LastName = submitViewModel.LastName;
+        sessionModel.FirstName = submitModel.FirstName;
+        sessionModel.LastName = submitModel.LastName;
         _sessionService.Set(sessionModel);
 
         return RedirectToRoute(RouteNames.CheckEmployerDetails, new { ukprn });
@@ -75,7 +75,6 @@ public class ContactDetailsController(ISessionService _sessionService, IValidato
     {
         var cancelLink = Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn });
         var backLink = Url.RouteUrl(RouteNames.AddEmployerSearchByPaye, new { ukprn });
-
         if (sessionModel.IsCheckDetailsVisited)
         {
             backLink = Url.RouteUrl(RouteNames.CheckEmployerDetails, new { ukprn });

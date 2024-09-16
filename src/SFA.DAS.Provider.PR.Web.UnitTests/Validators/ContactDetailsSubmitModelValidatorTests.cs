@@ -3,7 +3,7 @@ using SFA.DAS.Provider.PR.Web.Models.AddEmployer;
 using SFA.DAS.Provider.PR.Web.Validators;
 
 namespace SFA.DAS.Provider.PR_Web.UnitTests.Validators;
-public class ContactDetailsSubmitViewModelValidatorTests
+public class ContactDetailsSubmitModelValidatorTests
 {
     private const string ValidFirstName = "Joe";
     private const string ValidLastName = "Cool";
@@ -11,13 +11,13 @@ public class ContactDetailsSubmitViewModelValidatorTests
     [Test]
     public void ContactDetailsModel_IsValid()
     {
-        var model = new ContactDetailsSubmitViewModel()
+        var model = new ContactDetailsSubmitModel()
         {
             FirstName = ValidFirstName,
             LastName = ValidLastName
         };
 
-        var sut = new ContactDetailsSubmitViewModelValidator();
+        var sut = new ContactDetailsSubmitModelValidator();
         var result = sut.TestValidate(model);
 
         result.ShouldNotHaveAnyValidationErrors();
@@ -26,17 +26,17 @@ public class ContactDetailsSubmitViewModelValidatorTests
     [Test]
     public void NoFirstNameInModel()
     {
-        var model = new ContactDetailsSubmitViewModel()
+        var model = new ContactDetailsSubmitModel()
         {
             FirstName = string.Empty,
             LastName = ValidLastName
         };
 
-        var sut = new ContactDetailsSubmitViewModelValidator();
+        var sut = new ContactDetailsSubmitModelValidator();
         var result = sut.TestValidate(model);
 
         result.ShouldHaveValidationErrorFor(c => c.FirstName)
-            .WithErrorMessage(ContactDetailsSubmitViewModelValidator.FirstNameEmptyErrorMessage);
+            .WithErrorMessage(ContactDetailsSubmitModelValidator.FirstNameEmptyErrorMessage);
     }
 
     [TestCase("a#")]
@@ -50,33 +50,33 @@ public class ContactDetailsSubmitViewModelValidatorTests
     [TestCase("a>")]
     public void FirstNameInvalidInModel(string firstName)
     {
-        var model = new ContactDetailsSubmitViewModel()
+        var model = new ContactDetailsSubmitModel()
         {
             FirstName = firstName,
             LastName = ValidLastName
         };
 
-        var sut = new ContactDetailsSubmitViewModelValidator();
+        var sut = new ContactDetailsSubmitModelValidator();
         var result = sut.TestValidate(model);
 
         result.ShouldHaveValidationErrorFor(c => c.FirstName)
-            .WithErrorMessage(ContactDetailsSubmitViewModelValidator.FirstNameMustExcludeSpecialCharacters);
+            .WithErrorMessage(ContactDetailsSubmitModelValidator.FirstNameMustExcludeSpecialCharacters);
     }
 
     [Test]
     public void NoLastNameInModel()
     {
-        var model = new ContactDetailsSubmitViewModel()
+        var model = new ContactDetailsSubmitModel()
         {
             FirstName = ValidFirstName,
             LastName = string.Empty
         };
 
-        var sut = new ContactDetailsSubmitViewModelValidator();
+        var sut = new ContactDetailsSubmitModelValidator();
         var result = sut.TestValidate(model);
 
         result.ShouldHaveValidationErrorFor(c => c.LastName)
-            .WithErrorMessage(ContactDetailsSubmitViewModelValidator.LastNameEmptyErrorMessage);
+            .WithErrorMessage(ContactDetailsSubmitModelValidator.LastNameEmptyErrorMessage);
     }
 
     [TestCase("a#")]
@@ -90,16 +90,16 @@ public class ContactDetailsSubmitViewModelValidatorTests
     [TestCase("a>")]
     public void LastNameInvalidInModel(string lastName)
     {
-        var model = new ContactDetailsSubmitViewModel()
+        var model = new ContactDetailsSubmitModel()
         {
             FirstName = ValidFirstName,
             LastName = lastName
         };
 
-        var sut = new ContactDetailsSubmitViewModelValidator();
+        var sut = new ContactDetailsSubmitModelValidator();
         var result = sut.TestValidate(model);
 
         result.ShouldHaveValidationErrorFor(c => c.LastName)
-            .WithErrorMessage(ContactDetailsSubmitViewModelValidator.LastNameMustExcludeSpecialCharacters);
+            .WithErrorMessage(ContactDetailsSubmitModelValidator.LastNameMustExcludeSpecialCharacters);
     }
 }

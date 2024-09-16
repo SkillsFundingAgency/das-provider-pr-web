@@ -1,5 +1,5 @@
-﻿using FluentAssertions;
-using FluentValidation;
+﻿using AutoFixture.NUnit3;
+using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using SFA.DAS.Provider.PR.Domain.Interfaces;
@@ -16,20 +16,21 @@ public class SearchByEmailControllerGetTests
 {
     private static readonly string BackLink = Guid.NewGuid().ToString();
     private static readonly string CancelLink = BackLink;
+    private static readonly string CheckDetailsLink = Guid.NewGuid().ToString();
 
     [Test, MoqAutoData]
-    public void Get_BuildsExpectedViewModel(int ukprn)
+    public void Get_BuildsExpectedViewModel(
+        [Frozen] Mock<IOuterApiClient> outerApiMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Greedy] SearchByEmailController sut,
+        int ukprn)
     {
-        var sessionServiceMock = new Mock<ISessionService>();
-
-        SearchByEmailController sut = new(Mock.Of<IOuterApiClient>(), sessionServiceMock.Object, Mock.Of<IValidator<SearchByEmailSubmitViewModel>>());
-
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
 
         var result = sut.Index(ukprn);
 
         ViewResult? viewResult = result.As<ViewResult>();
-        SearchByEmailViewModel? viewModel = viewResult.Model as SearchByEmailViewModel;
+        SearchByEmailModel? viewModel = viewResult.Model as SearchByEmailModel;
         viewModel!.Ukprn.Should().Be(ukprn);
         viewModel.BackLink.Should().Be(BackLink);
         viewModel.CancelLink.Should().Be(CancelLink);
@@ -37,22 +38,44 @@ public class SearchByEmailControllerGetTests
     }
 
     [Test, MoqAutoData]
-    public void Get_AddedEmailFromSession(int ukprn)
+    public void Get_AddedEmailFromSession(
+        [Frozen] Mock<IOuterApiClient> outerApiMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Greedy] SearchByEmailController sut,
+        int ukprn)
     {
         var email = "test@test.com";
-        var sessionServiceMock = new Mock<ISessionService>();
+
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel { Email = email });
-        SearchByEmailController sut = new(Mock.Of<IOuterApiClient>(), sessionServiceMock.Object, Mock.Of<IValidator<SearchByEmailSubmitViewModel>>());
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
 
         var result = sut.Index(ukprn);
 
         ViewResult? viewResult = result.As<ViewResult>();
-        SearchByEmailViewModel? viewModel = viewResult.Model as SearchByEmailViewModel;
+        SearchByEmailModel? viewModel = viewResult.Model as SearchByEmailModel;
         viewModel!.Ukprn.Should().Be(ukprn);
         viewModel.BackLink.Should().Be(BackLink);
         viewModel.CancelLink.Should().Be(CancelLink);
         viewModel.Email.Should().Be(email);
+    }
+
+    [Test, MoqAutoData]
+    public void Get_HasVisitedCheckDetails_RedirectToCheckDetails(
+        [Frozen] Mock<IOuterApiClient> outerApiMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Greedy] SearchByEmailController sut,
+        int ukprn)
+    {
+        var email = "test@test.com";
+        sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel { Email = email, IsCheckDetailsVisited = true });
+
+        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink).AddUrlForRoute(RouteNames.CheckEmployerDetails, CheckDetailsLink);
+
+        var actual = sut.Index(ukprn);
+
+        actual.Should().BeOfType<RedirectToRouteResult>();
+        actual.As<RedirectToRouteResult>().RouteName.Should().Be(RouteNames.CheckEmployerDetails);
+        actual.As<RedirectToRouteResult>().RouteValues.Should().ContainKey("ukprn");
     }
 }

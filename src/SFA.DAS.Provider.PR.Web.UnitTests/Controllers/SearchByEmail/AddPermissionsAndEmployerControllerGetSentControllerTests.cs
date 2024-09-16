@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using AutoFixture.NUnit3;
+using FluentAssertions;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -22,10 +23,19 @@ public class AddPermissionsAndEmployerControllerGetSentControllerTests
     private static readonly string CancelLink = Guid.NewGuid().ToString();
 
     [Test, MoqAutoData]
-    public async Task Get_BuildsExpectedViewModelFromSessionModel(int ukprn, long accountId, long accountLegalEntityId, string accountLegalName, CancellationToken cancellationToken)
+    public async Task Get_BuildsExpectedViewModelFromSessionModel(
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<AddPermissionsAndEmployerSubmitModel>> validatorMock,
+        [Greedy] AddPermissionsAndEmployerController sut,
+        int ukprn,
+        long accountId,
+        long accountLegalEntityId,
+        string accountLegalName,
+        CancellationToken cancellationToken)
     {
         var email = "test@test.com";
-        var sessionServiceMock = new Mock<ISessionService>();
+
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel
         {
             Email = email,
@@ -35,7 +45,6 @@ public class AddPermissionsAndEmployerControllerGetSentControllerTests
             PermissionToAddCohorts = SetPermissions.AddRecords.Yes,
             PermissionToRecruit = SetPermissions.RecruitApprentices.No
         });
-        AddPermissionsAndEmployerController sut = new(Mock.Of<IOuterApiClient>(), sessionServiceMock.Object, Mock.Of<IValidator<AddPermissionsAndEmployerSubmitViewModel>>());
 
         sut.AddDefaultContext();
         sut.AddUrlHelperMock()
@@ -66,9 +75,16 @@ public class AddPermissionsAndEmployerControllerGetSentControllerTests
     [MoqInlineAutoData("test@test.com", 134L, null)]
     [MoqInlineAutoData("test@test.com", null, SetPermissions.AddRecords.Yes)]
     [MoqInlineAutoData(null, 1345L, SetPermissions.AddRecords.Yes)]
-    public async Task Get_SessionModelInvalid_RedirectsToAddEmployerStart(string? email, long? accountLegalEntityId, string? permissionToAddCohorts, int ukprn)
+    public async Task Get_SessionModelInvalid_RedirectsToAddEmployerStart(
+        string? email,
+        long? accountLegalEntityId,
+        string? permissionToAddCohorts,
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<AddPermissionsAndEmployerSubmitModel>> validatorMock,
+        [Greedy] AddPermissionsAndEmployerController sut,
+        int ukprn)
     {
-        var sessionServiceMock = new Mock<ISessionService>();
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(
             new AddEmployerSessionModel
             {
@@ -78,8 +94,6 @@ public class AddPermissionsAndEmployerControllerGetSentControllerTests
                 PermissionToAddCohorts = permissionToAddCohorts,
                 PermissionToRecruit = SetPermissions.RecruitApprentices.No
             });
-
-        AddPermissionsAndEmployerController sut = new(Mock.Of<IOuterApiClient>(), sessionServiceMock.Object, Mock.Of<IValidator<AddPermissionsAndEmployerSubmitViewModel>>());
 
         sut.AddUrlHelperMock()
             .AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink);
@@ -92,12 +106,14 @@ public class AddPermissionsAndEmployerControllerGetSentControllerTests
     }
 
     [Test, MoqInlineAutoData]
-    public async Task Get_SessionModelNull_RedirectsToAddEmployerStart(int ukprn)
+    public async Task Get_SessionModelNull_RedirectsToAddEmployerStart(
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<AddPermissionsAndEmployerSubmitModel>> validatorMock,
+        [Greedy] AddPermissionsAndEmployerController sut,
+        int ukprn)
     {
-        var sessionServiceMock = new Mock<ISessionService>();
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns((AddEmployerSessionModel)null!);
-
-        AddPermissionsAndEmployerController sut = new(Mock.Of<IOuterApiClient>(), sessionServiceMock.Object, Mock.Of<IValidator<AddPermissionsAndEmployerSubmitViewModel>>());
 
         sut.AddUrlHelperMock()
             .AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink);
@@ -113,10 +129,21 @@ public class AddPermissionsAndEmployerControllerGetSentControllerTests
     [MoqInlineAutoData(SetPermissions.AddRecords.Yes, SetPermissions.RecruitApprentices.No)]
     [MoqInlineAutoData(SetPermissions.AddRecords.No, SetPermissions.RecruitApprentices.Yes)]
     [MoqInlineAutoData(SetPermissions.AddRecords.No, SetPermissions.RecruitApprentices.YesWithReview)]
-    public async Task Get_PostsExpectedAddRequestForSingleOperation(string addRecordsOperation, string addRecruitmentOperation, int ukprn, long accountId, long accountLegalEntityId, string accountLegalName, CancellationToken cancellationToken)
+    public async Task Get_PostsExpectedAddRequestForSingleOperation(
+        string addRecordsOperation,
+        string addRecruitmentOperation,
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<AddPermissionsAndEmployerSubmitModel>> validatorMock,
+        [Greedy] AddPermissionsAndEmployerController sut,
+        int ukprn,
+        long accountId,
+        long accountLegalEntityId,
+        string accountLegalName,
+        CancellationToken cancellationToken)
     {
         var email = "test@test.com";
-        var sessionServiceMock = new Mock<ISessionService>();
+
         var addEmployerSessionModel = new AddEmployerSessionModel
         {
             Email = email,
@@ -131,12 +158,10 @@ public class AddPermissionsAndEmployerControllerGetSentControllerTests
 
         var expectedOperations = OperationsMappingService.MapDescriptionsToOperations(addEmployerSessionModel);
 
-        var _outerApiClientMock = new Mock<IOuterApiClient>();
         var requestId = Guid.NewGuid();
 
-        _outerApiClientMock.Setup(o => o.AddRequest(It.IsAny<AddAccountRequestCommand>(), cancellationToken)).ReturnsAsync(new AddAccountRequestCommandResponse(requestId));
+        outerApiClientMock.Setup(o => o.AddRequest(It.IsAny<AddAccountRequestCommand>(), cancellationToken)).ReturnsAsync(new AddAccountRequestCommandResponse(requestId));
 
-        AddPermissionsAndEmployerController sut = new(_outerApiClientMock.Object, sessionServiceMock.Object, Mock.Of<IValidator<AddPermissionsAndEmployerSubmitViewModel>>());
 
         sut.AddDefaultContext();
         sut.AddUrlHelperMock()
@@ -144,7 +169,7 @@ public class AddPermissionsAndEmployerControllerGetSentControllerTests
 
         await sut.AddEmployerAndPermissionsRequested(ukprn, cancellationToken);
 
-        _outerApiClientMock.Verify(o => o.AddRequest(It.Is<AddAccountRequestCommand>(
+        outerApiClientMock.Verify(o => o.AddRequest(It.Is<AddAccountRequestCommand>(
             s => s.EmployerContactEmail == email
             && s.AccountLegalEntityId == accountLegalEntityId
             && s.Ukprn == ukprn
@@ -155,10 +180,20 @@ public class AddPermissionsAndEmployerControllerGetSentControllerTests
     [Test]
     [MoqInlineAutoData(SetPermissions.AddRecords.Yes, SetPermissions.RecruitApprentices.Yes)]
     [MoqInlineAutoData(SetPermissions.AddRecords.Yes, SetPermissions.RecruitApprentices.YesWithReview)]
-    public async Task Get_PostsExpectedAddRequestForTwoOperations(string addRecordsOperation, string addRecruitmentOperation, int ukprn, long accountId, long accountLegalEntityId, string accountLegalName, CancellationToken cancellationToken)
+    public async Task Get_PostsExpectedAddRequestForTwoOperations(
+        string addRecordsOperation,
+        string addRecruitmentOperation,
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<AddPermissionsAndEmployerSubmitModel>> validatorMock,
+        [Greedy] AddPermissionsAndEmployerController sut,
+        int ukprn, long accountId,
+        long accountLegalEntityId,
+        string accountLegalName,
+        CancellationToken cancellationToken)
     {
         var email = "test@test.com";
-        var sessionServiceMock = new Mock<ISessionService>();
+
         var addEmployerSessionModel = new AddEmployerSessionModel
         {
             Email = email,
@@ -173,12 +208,9 @@ public class AddPermissionsAndEmployerControllerGetSentControllerTests
 
         var expectedOperations = OperationsMappingService.MapDescriptionsToOperations(addEmployerSessionModel);
 
-        var _outerApiClientMock = new Mock<IOuterApiClient>();
         var requestId = Guid.NewGuid();
 
-        _outerApiClientMock.Setup(o => o.AddRequest(It.IsAny<AddAccountRequestCommand>(), cancellationToken)).ReturnsAsync(new AddAccountRequestCommandResponse(requestId));
-
-        AddPermissionsAndEmployerController sut = new(_outerApiClientMock.Object, sessionServiceMock.Object, Mock.Of<IValidator<AddPermissionsAndEmployerSubmitViewModel>>());
+        outerApiClientMock.Setup(o => o.AddRequest(It.IsAny<AddAccountRequestCommand>(), cancellationToken)).ReturnsAsync(new AddAccountRequestCommandResponse(requestId));
 
         sut.AddDefaultContext();
         sut.AddUrlHelperMock()
@@ -186,14 +218,14 @@ public class AddPermissionsAndEmployerControllerGetSentControllerTests
 
         await sut.AddEmployerAndPermissionsRequested(ukprn, cancellationToken);
 
-        _outerApiClientMock.Verify(o => o.AddRequest(It.Is<AddAccountRequestCommand>(
+        outerApiClientMock.Verify(o => o.AddRequest(It.Is<AddAccountRequestCommand>(
             s => s.EmployerContactEmail == email
             && s.AccountLegalEntityId == accountLegalEntityId
             && s.Ukprn == ukprn
           && s.Operations.First() == expectedOperations.First()
         ), cancellationToken), Times.Once);
 
-        _outerApiClientMock.Verify(o => o.AddRequest(It.Is<AddAccountRequestCommand>(
+        outerApiClientMock.Verify(o => o.AddRequest(It.Is<AddAccountRequestCommand>(
             s => s.EmployerContactEmail == email
                  && s.AccountLegalEntityId == accountLegalEntityId
                  && s.Ukprn == ukprn
