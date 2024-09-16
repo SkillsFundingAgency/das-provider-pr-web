@@ -1,0 +1,91 @@
+﻿@using SFA.DAS.Provider.PR.Web.Infrastructure
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model SFA.DAS.Provider.PR.Web.Models.AddEmployer.CheckDetailsViewModel
+
+@{
+    ViewData["Title"] = "Check Details";
+}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l">
+            Check details
+        </h1>
+        <p class="govuk-body">
+            <div class="govuk-inset-text">
+                @Model.OrganisationName.ToUpper() <br /><br />
+                Employer PAYE reference: @Model.Paye <br />
+                Accounts Office reference: @Model.Aorn<br />
+                Email address: @Model.Email
+
+            </div>
+        </p>
+        <p class="govuk-body">
+            Make sure the employer's details and permissions are correct. We’ll use this information to create their account, which the employer will confirm is correct.        </p>
+    </div>
+    <div class="govuk-grid-column-two-thirds">
+        
+        <div class="govuk-summary-card">
+            <div class="govuk-summary-card__title-wrapper">
+                <h2 class="govuk-summary-card__title">Employer name</h2>
+                <a href="@Model.ChangeEmployerNameLink" class="govuk-summary-card__actions govuk-link">Change employer name</a>
+            </div>
+            <div class="govuk-summary-card__content">
+                <dl class="govuk-summary-list">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key govuk-!-width-one-half">
+                            First name
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            @Model.FirstName
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Last name
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            @Model.LastName    
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+        
+        <div class="govuk-summary-card">
+            <div class="govuk-summary-card__title-wrapper">
+                <h2 class="govuk-summary-card__title">Training provider permissions</h2>
+                <a href="@Model.ChangeEmployerNameLink" class="govuk-summary-card__actions govuk-link">Change permissions</a>
+            </div>
+            <div class="govuk-summary-card__content">
+                <dl class="govuk-summary-list">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key govuk-!-width-one-half">
+                            Add apprentice records<br/><br/>
+                            <div class="govuk-hint">This allows you to add apprentice records. If the employer does not pay the levy, you can also reserve funding for apprentices.</div>
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            @Model.PermissionToAddCohortsText
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">
+                            Recruit apprentices<br/><br/>
+                            <div class="govuk-hint">This allows you to advertise apprenticeships and review applications on the employer's behalf.</div>
+                        </dt>
+                        <dd class="govuk-summary-list__value">
+                            @Model.PerimissionToRecruitText
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+
+        <form asp-route="@RouteNames.AddEmployerSearchByPaye" method="POST">
+
+            <div class="govuk-button-group">
+                <button type="submit" id="continue" class="govuk-button" data-disable-on-submit="true">Send invitation</button>
+                <a class="govuk-link" href="@Model.CancelLink">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
