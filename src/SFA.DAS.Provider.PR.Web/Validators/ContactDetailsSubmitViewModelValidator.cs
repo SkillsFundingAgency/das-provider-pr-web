@@ -9,7 +9,7 @@ public class ContactDetailsSubmitViewModelValidator : AbstractValidator<ContactD
     public const string FirstNameEmptyErrorMessage = "You must enter a first name";
     public const string FirstNameMustExcludeSpecialCharacters = "First name must include valid characters";
     public const string LastNameEmptyErrorMessage = "You must enter a last name";
-    public const string LastNameMustExcludeSpecialCharacters = "First name must include valid characters";
+    public const string LastNameMustExcludeSpecialCharacters = "Last name must include valid characters";
 
     public ContactDetailsSubmitViewModelValidator()
     {
