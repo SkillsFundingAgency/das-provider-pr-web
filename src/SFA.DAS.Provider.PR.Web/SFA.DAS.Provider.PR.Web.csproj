@@ -25,7 +25,7 @@
     <PackageReference Include="SFA.DAS.Configuration.AzureTableStorage" Version="3.0.84" />
     <PackageReference Include="SFA.DAS.DfESignIn.Auth" Version="17.1.89" />
     <PackageReference Include="SFA.DAS.Http" Version="3.2.69" />
-    <PackageReference Include="SFA.DAS.Provider.Shared.UI" Version="2.0.30" />
+    <PackageReference Include="SFA.DAS.Provider.Shared.UI" Version="2.0.39" />
     <PackageReference Include="WebEssentials.AspNetCore.CdnTagHelpers" Version="1.0.21" />
   </ItemGroup>
 
