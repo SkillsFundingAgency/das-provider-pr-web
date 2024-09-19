@@ -1,0 +1,59 @@
+﻿@using SFA.DAS.Provider.PR.Web.Infrastructure
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model SFA.DAS.Provider.PR.Web.Models.AddEmployer.ContactDetailsViewModel
+
+@{
+    ViewData["Title"] = "Add Employer first name and last name";
+}
+@section breadcrumb {
+    <a href="@Model.BackLink" class="govuk-back-link">Back</a>
+}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <partial name="_validationSummary" />
+        <h1 class="govuk-heading-l">
+            Add an employer
+        </h1>
+        <p class="govuk-body">
+            <div class="govuk-inset-text">
+                @Model.OrganisationName.ToUpper() <br /><br />
+                Employer PAYE reference: @Model.Paye <br />
+                Accounts Office reference: @Model.Aorn
+
+            </div>
+        </p>
+        <p class="govuk-body">
+            The details you provided match this employer in HMRC's records. There’s no apprenticeship service account linked to these details. Type the first and last name of your contact at the employer to invite them to create an account. If the employer is not correct, go back to Enter employer details.
+        </p>
+    </div>
+    <div class="govuk-grid-column-two-thirds">
+        <form asp-route="@RouteNames.AddEmployerSearchByPaye" method="POST">
+            <input asp-for="Ukprn" id="Ukprn" type="hidden" />
+            <input asp-for="Aorn" id="Aorn" type="hidden" />
+            <input asp-for="Paye" id="Paye" type="hidden" />
+            <input asp-for="OrganisationName" id="OrganisationName" type="hidden" />
+            <div esfa-validation-marker-for="@Model.FirstName" class="govuk-form-group">
+                <span asp-validation-for="FirstName" class="govuk-error-message"></span>
+                <div class="govuk-body" id="FirstName">
+                    <label class="govuk-label govuk-label--s" for="firstName">
+                        First name
+                    </label>
+                    <input asp-for="FirstName" class="govuk-input govuk-!-width-three-quarters" name="firstName" type="text" spellcheck="false" autocomplete="off" sfa-validationerror-class="form-control-error" maxlength="200">
+                </div>
+            </div>
+            <div esfa-validation-marker-for="@Model.LastName" class="govuk-form-group">
+                <span asp-validation-for="LastName" class="govuk-error-message"></span>
+                <div class="govuk-body" id="LastName">
+                    <label class="govuk-label govuk-label--s" for="lastName">
+                        Last name
+                    </label>
+                    <input asp-for="LastName" class="govuk-input govuk-!-width-three-quarters" name="lastName" type="text" spellcheck="false" autocomplete="off" sfa-validationerror-class="form-control-error" maxlength="200">
+                </div>
+            </div>
+            <div class="govuk-button-group">
+                <button type="submit" id="continue" class="govuk-button" data-disable-on-submit="true">Continue</button>
+                <a class="govuk-link" href="@Model.CancelLink">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
