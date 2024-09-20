@@ -12,7 +12,7 @@
         </h1>
         <p class="govuk-body">
             <div class="govuk-inset-text">
-                @Model.OrganisationName.ToUpper() <br /><br />
+                @Model.OrganisationName <br /><br />
                 Employer PAYE reference: @Model.Paye <br />
                 Accounts Office reference: @Model.Aorn<br />
                 Email address: @Model.Email
@@ -73,7 +73,7 @@
                             <div class="govuk-hint">This allows you to advertise apprenticeships and review applications on the employer's behalf.</div>
                         </dt>
                         <dd class="govuk-summary-list__value">
-                            @Model.PerimissionToRecruitText
+                            @Model.PermissionToRecruitText
                         </dd>
                     </div>
                 </dl>

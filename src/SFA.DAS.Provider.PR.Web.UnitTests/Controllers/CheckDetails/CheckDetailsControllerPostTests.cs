@@ -1,13 +1,15 @@
-﻿using FluentAssertions;
+﻿using AutoFixture.NUnit3;
+using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using SFA.DAS.Provider.PR.Web.Controllers.AddEmployer;
 using SFA.DAS.Provider.PR.Web.Infrastructure;
 using SFA.DAS.Provider.PR.Web.Infrastructure.Services;
 using SFA.DAS.Provider.PR.Web.Models.Session;
 using SFA.DAS.Provider.PR_Web.UnitTests.TestHelpers;
 using SFA.DAS.Testing.AutoFixture;
 
-namespace SFA.DAS.Provider.PR_Web.UnitTests.Controllers.CheckDetailsController;
+namespace SFA.DAS.Provider.PR_Web.UnitTests.Controllers.CheckDetails;
 public class CheckDetailsControllerPostTests
 {
     private static readonly string CancelLink = Guid.NewGuid().ToString();
@@ -16,7 +18,8 @@ public class CheckDetailsControllerPostTests
 
     [Test, MoqAutoData]
     public void Post_ReturnsExpectedViewModelAndPath(
-        Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Greedy] CheckDetailsController sut,
         int ukprn,
         string firstName,
         string lastName,
@@ -24,9 +27,6 @@ public class CheckDetailsControllerPostTests
     )
     {
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel { Email = Email, FirstName = firstName, LastName = lastName });
-
-
-        PR.Web.Controllers.AddEmployer.CheckDetailsController sut = new(sessionServiceMock.Object);
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink);
 
@@ -41,15 +41,14 @@ public class CheckDetailsControllerPostTests
 
     [Test, MoqAutoData]
     public void Post_SessionModelNotFound_RedirectedToStart(
-        Mock<ISessionService> sessionServiceMock,
-       int ukprn,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Greedy] CheckDetailsController sut,
+        int ukprn,
         CancellationToken cancellationToken
       )
     {
 
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns((AddEmployerSessionModel)null!);
-
-        PR.Web.Controllers.AddEmployer.CheckDetailsController sut = new(sessionServiceMock.Object);
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink);
 
@@ -61,15 +60,13 @@ public class CheckDetailsControllerPostTests
 
     [Test, MoqAutoData]
     public void Post_RedirectsToStartIfEmailNotSetInSession(
-        Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Greedy] CheckDetailsController sut,
         int ukprn,
         CancellationToken cancellationToken
     )
     {
-
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel { Email = string.Empty });
-
-        PR.Web.Controllers.AddEmployer.CheckDetailsController sut = new(sessionServiceMock.Object);
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink);
 

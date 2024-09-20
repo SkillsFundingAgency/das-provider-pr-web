@@ -65,11 +65,23 @@ public class CheckDetailsController(ISessionService _sessionService) : Controlle
         var permissionToAddCohortsText = SetCohortPermissionText(sessionModel.PermissionToAddCohorts);
         var permissionToRecruitText = SetRecruitPermissionText(sessionModel.PermissionToRecruit);
 
-        return new CheckDetailsViewModel(ukprn, sessionModel.OrganisationName!, sessionModel.Paye!, sessionModel.Aorn!,
-            sessionModel.Email, sessionModel.FirstName!, sessionModel.LastName!,
-            sessionModel.PermissionToAddCohorts, permissionToAddCohortsText,
-            sessionModel.PermissionToRecruit, permissionToRecruitText,
-            changeEmployerNameLink, changePermissionsLink, cancelLink!);
+        return new CheckDetailsViewModel
+        {
+            Ukprn = ukprn,
+            OrganisationName = sessionModel.OrganisationName?.ToUpper()!,
+            Paye = sessionModel.Paye!,
+            Aorn = sessionModel.Aorn!,
+            Email = sessionModel.Email,
+            FirstName = sessionModel.FirstName!,
+            LastName = sessionModel.LastName!,
+            PermissionToAddCohorts = sessionModel.PermissionToAddCohorts,
+            PermissionToAddCohortsText = permissionToAddCohortsText,
+            PermissionToRecruit = sessionModel.PermissionToRecruit,
+            PermissionToRecruitText = permissionToRecruitText,
+            ChangeEmployerNameLink = changeEmployerNameLink,
+            ChangePermissionsLink = changePermissionsLink,
+            CancelLink = cancelLink!
+        };
     }
 
     private static string SetCohortPermissionText(string sessionModelPermissionToAddCohorts)
