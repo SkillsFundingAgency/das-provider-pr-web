@@ -45,7 +45,7 @@ public class SearchByPayeControllerPostTests
 
         var email = "test@test.com";
 
-        sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel { Email = email, Paye = paye, Aorn = aorn });
+        sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel { Email = email, Paye = paye, Aorn = aorn, IsCheckDetailsVisited = true });
 
         getRelationshipsByUkprnPayeAornResponse.HasActiveRequest = false;
         getRelationshipsByUkprnPayeAornResponse.HasOneLegalEntity = null;
@@ -65,7 +65,7 @@ public class SearchByPayeControllerPostTests
         redirectToRouteResult.RouteValues!.First().Value.Should().Be(ukprn);
 
         outerApiClientMock.Verify(o => o.GetProviderRelationshipsByUkprnPayeAorn(ukprn, aorn, encodedPaye, cancellationToken), Times.Once);
-        sessionServiceMock.Verify(s => s.Set(It.IsAny<AddEmployerSessionModel>()), Times.Once);
+        sessionServiceMock.Verify(s => s.Set(It.Is<AddEmployerSessionModel>(s => s.IsCheckDetailsVisited == false)), Times.Once);
         sessionServiceMock.Verify(s => s.Get<AddEmployerSessionModel>(), Times.Once);
     }
 

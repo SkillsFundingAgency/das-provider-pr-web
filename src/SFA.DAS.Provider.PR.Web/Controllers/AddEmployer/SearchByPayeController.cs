@@ -71,6 +71,7 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
 
         sessionModel.Paye = submitViewModel.Paye;
         sessionModel.Aorn = submitViewModel.Aorn;
+        sessionModel.IsCheckDetailsVisited = false;
         _sessionService.Set(sessionModel);
 
         var encodedPaye = Uri.EscapeDataString(sessionModel.Paye!);
