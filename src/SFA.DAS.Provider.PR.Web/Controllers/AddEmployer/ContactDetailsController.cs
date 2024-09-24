@@ -67,7 +67,7 @@ public class ContactDetailsController(ISessionService _sessionService, IValidato
         sessionModel.LastName = submitViewModel.LastName;
         _sessionService.Set(sessionModel);
 
-        return RedirectToRoute(RouteNames.AddEmployerContactDetails, new { ukprn });
+        return RedirectToRoute(RouteNames.CheckEmployerDetails, new { ukprn });
     }
 
 

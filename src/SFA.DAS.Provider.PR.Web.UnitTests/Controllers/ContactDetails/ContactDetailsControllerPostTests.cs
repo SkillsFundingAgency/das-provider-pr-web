@@ -46,7 +46,7 @@ public class ContactDetailsControllerPostTests
         var result = sut.Index(ukprn, contactDetailsSubmitViewModel, cancellationToken);
 
         RedirectToRouteResult? redirectToRouteResult = result.As<RedirectToRouteResult>();
-        redirectToRouteResult.RouteName.Should().Be(RouteNames.AddEmployerContactDetails);
+        redirectToRouteResult.RouteName.Should().Be(RouteNames.CheckEmployerDetails);
         redirectToRouteResult.RouteValues!.First().Value.Should().Be(ukprn);
         sessionServiceMock.Verify(s => s.Set(It.IsAny<AddEmployerSessionModel>()), Times.Once);
         sessionServiceMock.Verify(s => s.Get<AddEmployerSessionModel>(), Times.Once);

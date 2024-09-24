@@ -1,14 +1,10 @@
 ﻿using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
+using SFA.DAS.Provider.PR.Web.Constants;
 
 namespace SFA.DAS.Provider.PR.Web.Models;
 
 public class EmployerPermissionViewModel
 {
-    public const string NoPermissionText = "No";
-    public const string RecruitmentPermissionText = "Yes";
-    public const string CohortsPermissionText = "Yes, employer will review records";
-    public const string RecruitmentWithReviewPermissionText = "Yes, employer will review adverts";
-
     public required string Name { get; set; }
     public string? AgreementId { get; set; }
     public long? AccountLegalEntityId { get; set; }
@@ -25,16 +21,16 @@ public class EmployerPermissionViewModel
             AgreementId = source.AgreementId,
             AccountLegalEntityId = source.AccountLegalEntityId,
             RequestId = source.RequestId,
-            CohortPermission = source.HasCreateCohortPermission ? CohortsPermissionText : NoPermissionText,
+            CohortPermission = source.HasCreateCohortPermission ? SetPermissionsText.CohortsPermissionText : SetPermissionsText.NoPermissionText,
             RecruitmentPermision = GetRecruitmentPermissionText(source)
         };
 
     private static string GetRecruitmentPermissionText(ProviderRelationshipModel source)
     {
-        if (source.HasRecruitmentWithReviewPermission) return RecruitmentWithReviewPermissionText;
+        if (source.HasRecruitmentWithReviewPermission) return SetPermissionsText.RecruitmentWithReviewPermissionText;
 
-        if (source.HasRecruitmentPermission) return RecruitmentPermissionText;
+        if (source.HasRecruitmentPermission) return SetPermissionsText.RecruitmentPermissionText;
 
-        return NoPermissionText;
+        return SetPermissionsText.NoPermissionText;
     }
 }

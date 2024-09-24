@@ -1,6 +1,7 @@
 ﻿using AutoFixture.NUnit3;
 using FluentAssertions;
 using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
+using SFA.DAS.Provider.PR.Web.Constants;
 using SFA.DAS.Provider.PR.Web.Models;
 
 namespace SFA.DAS.Provider.PR_Web.UnitTests.Models;
@@ -48,8 +49,8 @@ public class EmployerPermissionViewModelTests
     }
 
     [Test]
-    [InlineAutoData(true, EmployerPermissionViewModel.CohortsPermissionText)]
-    [InlineAutoData(false, EmployerPermissionViewModel.NoPermissionText)]
+    [InlineAutoData(true, SetPermissionsText.CohortsPermissionText)]
+    [InlineAutoData(false, SetPermissionsText.NoPermissionText)]
     public void Operator_SetsCohortPermission(bool hasCohortPermission, string permissionText, ProviderRelationshipModel model)
     {
         model.HasCreateCohortPermission = hasCohortPermission;
@@ -60,9 +61,9 @@ public class EmployerPermissionViewModelTests
     }
 
     [Test]
-    [InlineAutoData(true, false, EmployerPermissionViewModel.RecruitmentPermissionText)]
-    [InlineAutoData(false, true, EmployerPermissionViewModel.RecruitmentWithReviewPermissionText)]
-    [InlineAutoData(false, false, EmployerPermissionViewModel.NoPermissionText)]
+    [InlineAutoData(true, false, SetPermissionsText.RecruitmentPermissionText)]
+    [InlineAutoData(false, true, SetPermissionsText.RecruitmentWithReviewPermissionText)]
+    [InlineAutoData(false, false, SetPermissionsText.NoPermissionText)]
     /// true, true is not a valid scenario, only one of them should be true
     public void Operator_SetsRecruitmentPermission(bool hasRecruitmentPermission, bool hasRecruitmentWithReviewPermission, string permissionText, ProviderRelationshipModel model)
     {
