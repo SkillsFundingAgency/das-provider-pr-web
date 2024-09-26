@@ -1,0 +1,51 @@
+﻿@using SFA.DAS.Provider.PR.Web.Infrastructure
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model SFA.DAS.Provider.PR.Web.Models.AddEmployer.InvitationSentViewModel
+
+@{
+    ViewData["Title"] = "Invitation sent";
+}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-panel govuk-panel--confirmation">
+            <h1 class="govuk-panel__title">
+                Request sent to employer
+            </h1>
+        </div>
+    </div>
+    <div class="govuk-grid-column-two-thirds">
+        <br/>
+        <h1 class="govuk-heading-m">
+            What happens next?
+        </h1>
+        <p class="govuk-body">
+            We’ve emailed <strong>@Model.Email</strong> inviting them to create an account.
+        </p>
+        <p class="govuk-body">
+            The request will expire in 14 days. They’ll need to:
+
+            <div class="govuk-details">
+                <ul class="govuk-list govuk-list--bullet">
+                    <li> confirm their details, including their employer PAYE reference and Accounts Office reference</li>
+                    <li> accept the agreement between their organisation and the Department for Education</li>
+                </ul>
+            </div>
+        </p>
+        <p class="govuk-body">
+
+            If they create an account from your request, you'll be added as a training provider and your permissions will be set.
+        </p>
+    </div>
+    <div class="govuk-grid-column-two-thirds">
+        <br/>
+        <h1 class="govuk-heading-m">
+            View employers and manage permissions
+        </h1>
+        <p class="govuk-body">
+            You can view pending requests, search your employers and check and update permissions from your  <a class="govuk-link" href="@Model.ViewEmployersAndManagePermissionsLink">View employers and manage permissions page</a>. 
+        </p>
+        <p class="govuk-body">
+            If the employer does not respond in 14 days or declines your request, they’ll be removed from your View employers and manage permissions page.
+        </p>
+    </div>
+</div>
