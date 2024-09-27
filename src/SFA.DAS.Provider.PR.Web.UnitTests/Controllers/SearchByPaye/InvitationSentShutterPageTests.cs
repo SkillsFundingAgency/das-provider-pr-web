@@ -19,6 +19,7 @@ namespace SFA.DAS.Provider.PR_Web.UnitTests.Controllers.SearchByPaye;
 public class InvitationSentShutterPageTests
 {
     private static readonly string AddEmployerSearchByPayeLink = Guid.NewGuid().ToString();
+    private static readonly string EmployerDetailsLink = Guid.NewGuid().ToString();
     private const string Email = "test@test.com";
 
     [Test, MoqAutoData]
@@ -31,6 +32,7 @@ public class InvitationSentShutterPageTests
         string aorn,
         string paye,
         string employerOrganisationName,
+        int accountLegalEntityId,
         GetRequestByUkprnPayeResponse getRequestByUkprnPayeResponse,
         CancellationToken cancellationToken)
     {
@@ -41,7 +43,8 @@ public class InvitationSentShutterPageTests
         {
             Email = Email,
             Paye = paye,
-            Aorn = aorn
+            Aorn = aorn,
+            AccountLegalEntityId = accountLegalEntityId
         });
 
         getRequestByUkprnPayeResponse.EmployerOrganisationName = employerOrganisationName;
@@ -51,7 +54,7 @@ public class InvitationSentShutterPageTests
 
         outerApiClientMock.Setup(o => o.GetRequest(ukprn, paye, cancellationToken)).ReturnsAsync(resultResponse);
 
-        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerSearchByPaye, AddEmployerSearchByPayeLink);
+        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerSearchByPaye, AddEmployerSearchByPayeLink).AddUrlForRoute(RouteNames.EmployerDetails, EmployerDetailsLink);
 
         var result = await sut.InvitationSentShutterPage(ukprn, cancellationToken);
 
@@ -59,7 +62,7 @@ public class InvitationSentShutterPageTests
         InviteAlreadySentShutterPageViewModel? viewModel = viewResult.Model as InviteAlreadySentShutterPageViewModel;
 
         var expectedViewModel = new InviteAlreadySentShutterPageViewModel(employerOrganisationName, paye, aorn, Email,
-            AddEmployerSearchByPayeLink, "");
+            AddEmployerSearchByPayeLink, EmployerDetailsLink);
 
         viewModel.Should().BeEquivalentTo(expectedViewModel);
     }

@@ -1,4 +1,5 @@
 ﻿using RestEase.HttpClientFactory;
+using SFA.DAS.Encoding;
 using SFA.DAS.Http.Configuration;
 using SFA.DAS.Provider.PR.Domain.Interfaces;
 using SFA.DAS.Provider.PR.Web.Infrastructure.Configuration;
@@ -15,6 +16,7 @@ public static class AddServiceRegistrationsExtension
         var outerApiConfiguration = configuration.GetSection(nameof(ProviderPROuterApiConfiguration)).Get<ProviderPROuterApiConfiguration>();
         AddOuterApi(services, outerApiConfiguration!);
         services.AddTransient<ISessionService, SessionService>();
+        services.AddSingleton<IEncodingService, EncodingService>();
 
         return services;
     }

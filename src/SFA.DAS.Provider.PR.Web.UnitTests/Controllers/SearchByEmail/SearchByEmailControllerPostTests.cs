@@ -51,11 +51,11 @@ public class SearchByEmailControllerPostTests
         var result = await sut.Index(ukprn, searchByEmailSubmitModel, cancellationToken);
 
         RedirectToRouteResult? redirectToRouteResult = result.As<RedirectToRouteResult>();
-        redirectToRouteResult.RouteName.Should().Be(RouteNames.AddEmployerSearchByEmail);
+        redirectToRouteResult.RouteName.Should().Be(RouteNames.EmailLinkedToAccountWithRelationship);
         redirectToRouteResult.RouteValues!.First().Value.Should().Be(ukprn);
 
         outerApiClientMock.Verify(o => o.GetRelationshipByEmail(_emailCallingRelationships, ukprn, cancellationToken), Times.Once);
-        sessionServiceMock.Verify(s => s.Set(It.Is<AddEmployerSessionModel>(x => x.Email == Email)), Times.Once);
+        sessionServiceMock.Verify(s => s.Set(It.Is<AddEmployerSessionModel>(x => x.Email == Email)), Times.Exactly(2));
     }
 
     [Test, MoqAutoData]
