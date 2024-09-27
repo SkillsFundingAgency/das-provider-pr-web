@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Provider.PR.Domain.Interfaces;
 using SFA.DAS.Provider.PR.Web.Authorization;
+using SFA.DAS.Provider.PR.Web.Constants;
 using SFA.DAS.Provider.PR.Web.Infrastructure;
 using SFA.DAS.Provider.PR.Web.Infrastructure.Services;
 using SFA.DAS.Provider.PR.Web.Models.AddEmployer;
@@ -19,6 +20,7 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
     public const string ViewPath = "~/Views/AddEmployer/SearchByPaye.cshtml";
     public const string PayeAornShutterPathViewPath = "~/Views/AddEmployer/ShutterPages/PayeAornShutterPage.cshtml";
     public const string InviteAlreadySentShutterPathViewPath = "~/Views/AddEmployer/ShutterPages/InviteAlreadySentShutterPage.cshtml";
+    public const string PayeAornMatchedEmailNotLinkedShutterPathViewPath = "~/Views/AddEmployer/ShutterPages/PayeAornMatchedEmailNotLinkedShutterPage.cshtml";
 
     [HttpGet]
     public IActionResult Index([FromRoute] int ukprn)
@@ -113,6 +115,16 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
             return RedirectToRoute(RouteNames.AddEmployerContactDetails, new { ukprn });
         }
 
+        if (hasOneLegalEntity is true)
+        {
+            sessionModel.AccountLegalEntityId = relationshipsRequest!.AccountLegalEntityId;
+            sessionModel.AccountLegalEntityName = relationshipsRequest.AccountLegalEntityName;
+            sessionModel.AccountId = relationshipsRequest.Account!.AccountId;
+            sessionModel.OrganisationName = relationshipsRequest.Organisation?.Name;
+            _sessionService.Set(sessionModel);
+            return RedirectToRoute(RouteNames.PayeAornMatchedEmailNotLinkedLink, new { ukprn });
+        }
+
         return RedirectToRoute(RouteNames.AddEmployerSearchByPaye, new { ukprn });
     }
 
@@ -150,7 +162,8 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
             sessionModel.Paye,
             sessionModel.Aorn!,
             sessionModel.Email,
-            backLink, checkEmployerLink
+            backLink,
+            checkEmployerLink
         );
 
         return View(InviteAlreadySentShutterPathViewPath, shutterViewModel);
@@ -168,6 +181,54 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
 
         return View(PayeAornShutterPathViewPath, shutterViewModel);
     }
+
+    [HttpGet]
+    [Route("payeAornMatchedEmailNotLinked", Name = RouteNames.PayeAornMatchedEmailNotLinkedLink)]
+    public IActionResult PayeAornMatchedEmailNotLinkedShutterPage([FromRoute] int ukprn)
+    {
+        var sessionModel = _sessionService.Get<AddEmployerSessionModel>();
+        if (string.IsNullOrEmpty(sessionModel?.Paye))
+        {
+            return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
+        }
+
+        var cancelLink = Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn })!;
+        var shutterViewModel = new PayeAornMatchedEmailNotLinkedViewModel(
+            sessionModel.OrganisationName!,
+            sessionModel.Paye!,
+            sessionModel.Aorn!,
+            sessionModel.Email,
+            cancelLink
+        );
+
+        return View(PayeAornMatchedEmailNotLinkedShutterPathViewPath, shutterViewModel);
+    }
+
+    [HttpPost]
+    [Route("payeAornMatchedEmailNotLinked", Name = RouteNames.PayeAornMatchedEmailNotLinkedLink)]
+    public IActionResult PostPayeAornMatchedEmailNotLinkedShutterPage([FromRoute] int ukprn)
+    {
+        var sessionModel = _sessionService.Get<AddEmployerSessionModel>();
+        if (string.IsNullOrEmpty(sessionModel?.Paye))
+        {
+            return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
+        }
+
+        if (sessionModel.PermissionToAddCohorts == null)
+        {
+            sessionModel.PermissionToAddCohorts = SetPermissions.AddRecords.Yes;
+            _sessionService.Set(sessionModel);
+        }
+
+        if (sessionModel.PermissionToRecruit == null)
+        {
+            sessionModel.PermissionToRecruit = SetPermissions.RecruitApprentices.Yes;
+            _sessionService.Set(sessionModel);
+        }
+
+        return RedirectToRoute(RouteNames.AddPermissionsAndEmployer, new { ukprn });
+    }
+
 
     private SearchByPayeModel GetViewModel(int ukprn)
     {
