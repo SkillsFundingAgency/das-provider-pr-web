@@ -27,7 +27,9 @@ public class InvitationSentController(ISessionService _sessionService) : Control
 
         _sessionService.Delete<AddEmployerSessionModel>();
 
-        var viewEmployersAndManagePermissionsLink = Url.RouteUrl(RouteNames.Employers, new { ukprn })!;
+        var hasPendingRequest = true;
+        var viewEmployersAndManagePermissionsLink = Url.RouteUrl(RouteNames.Employers, new { ukprn, hasPendingRequest })!;
+
         var viewModel = new InvitationSentViewModel(ukprn, sessionModel.Email, viewEmployersAndManagePermissionsLink);
 
         return View(ViewPath, viewModel);
