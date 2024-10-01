@@ -7,6 +7,7 @@ public class EmployersViewModel : EmployersSubmitModel
     public string ClearFiltersLink { get; init; } = null!;
     public string AddEmployerLink { get; init; } = null!;
     public PaginationViewModel Pagination { get; init; } = null!;
+    public int Ukprn { get; set; }
 }
 
 public class EmployersSubmitModel

@@ -1,0 +1,98 @@
+﻿@using SFA.DAS.Provider.PR.Web.Infrastructure
+@model EmployerDetailsViewModel
+@{
+    ViewData["Title"] = "Employer Account Details";
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-!-width">
+            <h1 class="govuk-heading-l govuk-!-margin-bottom-6">Employer account details</h1>
+            <h2 class="govuk-heading-m govuk-!-margin-bottom-1">@Model.AccountLegalEntityName</h2>
+            <p class="govuk-body govuk-!-margin-bottom-8"><strong>Agreement ID: </strong>@Model.AccountLegalEntityPublicHashedId</p>
+        </div>
+    </div>
+</div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-!-width">
+            <table class="govuk-table govuk-!-margin-bottom-8">
+                <caption class="govuk-table__caption govuk-table__caption--m">Last action on account</caption>
+                <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header"></th>
+                    <th scope="col" class="govuk-table__header">Date</th>
+                </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                <tr class="govuk-table__row">
+                    <th scope="row" class="govuk-table__header">@Model.LastActionText</th>
+                    <td class="govuk-table__cell">@Model.LastActionDate</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-!-width">
+            <h2 class="govuk-heading-m">Permissions for @Model.ProviderName</h2>
+        </div>
+    </div>
+</div>
+
+        @if (@Model.PendingPermissionRequest)
+        {
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-two-thirds">
+                    <div class="govuk-!-width">
+                        <div class="govuk-inset-text">
+                            You're not added as a training provider for this employer yet so you have no permissions.
+                            We'll update your current permissions if the employer accepts your request.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <div class="govuk-!-width">
+            <table class="govuk-table ">
+                <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header"></th>
+                    <th scope="col" class="govuk-table__header">Current permissions</th>
+                    <th scope="col" class="govuk-table__header">Requested permissions</th>
+                </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                <tr class="govuk-table__row">
+                    <th scope="row" class="govuk-table__header">Permission to add apprentice records</th>
+                    <td class="govuk-table__cell">@Model.CurrentPermissions[0]</td>
+                        <td class="govuk-table__cell">@Model.RequestedPermissions[0]</td>
+                </tr>
+                <tr class="govuk-table__row">
+                    <th scope="row" class="govuk-table__header">Permission to recruit apprentices</th>
+                        <td class="govuk-table__cell">@Model.CurrentPermissions[1]</td>
+                    <td class="govuk-table__cell">@Model.RequestedPermissions[1]</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-!-width">
+            <p class="govuk-body">
+                To view all your employers, permissions and pending requests go to <a href="@Model.EmployersLink">View employers and manage permissions</a>
+            </p>
+        </div>
+    </div>
+</div>
+

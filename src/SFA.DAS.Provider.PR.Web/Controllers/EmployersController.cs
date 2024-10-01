@@ -36,7 +36,8 @@ public class EmployersController(IOuterApiClient _outerApiclient, IOptions<Appli
                 ClearFiltersLink = Url.RouteUrl(RouteNames.Employers, new { ukprn })!,
                 AddEmployerLink = Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn })!,
                 Employers = response.Employers.Select(e => (EmployerPermissionViewModel)e),
-                TotalCount = "employer".ToQuantity(response.TotalCount)
+                TotalCount = "employer".ToQuantity(response.TotalCount),
+                Ukprn = ukprn
             };
 
             return base.View(model);
