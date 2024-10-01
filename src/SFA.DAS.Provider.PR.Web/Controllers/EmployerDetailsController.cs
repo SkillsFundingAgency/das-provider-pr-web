@@ -9,6 +9,7 @@ using SFA.DAS.Provider.PR.Web.Models;
 namespace SFA.DAS.Provider.PR.Web.Controllers;
 
 [Authorize(Policy = nameof(PolicyNames.HasProviderAccount))]
+[Route("")]
 public class EmployerDetailsController(IOuterApiClient _outerApiclient) : Controller
 {
     [Route("{ukprn:int}/employers/{accountlegalentityId:long}", Name = RouteNames.EmployerDetails)]
@@ -24,7 +25,5 @@ public class EmployerDetailsController(IOuterApiClient _outerApiclient) : Contro
         model.EmployersLink = Url.RouteUrl(RouteNames.Employers, new { ukprn })!;
 
         return View(model);
-
-        //TODO The bottom row of the tables shouldn't be enclosed below
     }
 }

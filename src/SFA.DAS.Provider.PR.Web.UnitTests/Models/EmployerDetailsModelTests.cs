@@ -20,7 +20,7 @@ public class EmployerDetailsModelTests
             Assert.That(actual.AccountLegalEntityName, Is.EqualTo(response.AccountLegalEntityName));
             Assert.That(actual.Ukprn, Is.EqualTo(response.Ukprn));
             Assert.That(actual.LastAction, Is.EqualTo(response.LastAction));
-            Assert.That(actual.LastActionDate, Is.EqualTo(response.LastActionTime.Value.Date.ToShortDateString()));
+            Assert.That(actual.LastActionDate, Is.EqualTo(response.LastActionTime?.Date.ToShortDateString()));
             Assert.That(actual.ProviderName, Is.EqualTo(response.ProviderName));
             Assert.That(actual.Operations, Is.EqualTo(response.Operations));
             Assert.That(actual.LastRequestOperations, Is.EqualTo(Array.Empty<Operation>()));

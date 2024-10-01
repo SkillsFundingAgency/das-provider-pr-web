@@ -24,7 +24,7 @@ public class EmployerDetailsViewModel
 
     public PermissionAction? LastAction { get; set; }
 
-    public string LastActionDate { get; set; }
+    public string LastActionDate { get; set; } = null!;
 
     public string ProviderName { get; set; } = null!;
 
@@ -36,13 +36,13 @@ public class EmployerDetailsViewModel
 
     public string[] CurrentPermissions => SetPermissionsText(Operations);
 
-    public string[] RequestedPermissions => SetPermissionsText(LastRequestOperations);
+    public string[] RequestedPermissions => SetPermissionsText(LastRequestOperations ?? Array.Empty<Operation>());
 
-    public string EmployersLink { get; set; } = null;
+    public string EmployersLink { get; set; } = null!;
 
     public bool HasPermissionsRequest { get; set; }
 
-    public string LastActionText { get; set; }
+    public string LastActionText { get; set; } = null!;
 
 
     public static implicit operator EmployerDetailsViewModel(GetProviderRelationshipResponse response)
@@ -54,7 +54,6 @@ public class EmployerDetailsViewModel
             AccountLegalEntityName = response.AccountLegalEntityName,
             Ukprn = response.Ukprn,
             LastAction = response.LastAction,
-            LastActionDate = response.LastActionTime.Value.Date.ToShortDateString(),
             ProviderName = response.ProviderName,
             Operations = response.Operations,
             LastRequestOperations = SetLastResponseOperations(response),
@@ -63,6 +62,8 @@ public class EmployerDetailsViewModel
         };
         if (response.LastRequestOperations != null && response.LastRequestOperations.Length != 0)
             model.LastRequestOperations = response.LastRequestOperations;
+        if (response.LastActionTime != null)
+            model.LastActionDate = response.LastActionTime.Value.Date.ToShortDateString();
 
         return model;
     }
@@ -95,7 +96,7 @@ public class EmployerDetailsViewModel
         return NotPendingNotImplementedText;
     }
 
-    private string[] SetPermissionsText(Operation[] operations)
+    private static string[] SetPermissionsText(Operation[] operations)
     {
         string[] permissionsText = new string[2];
 
