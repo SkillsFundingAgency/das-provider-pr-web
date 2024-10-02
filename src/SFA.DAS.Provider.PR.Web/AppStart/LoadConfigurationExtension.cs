@@ -17,6 +17,7 @@ public static class LoadConfigurationExtension
             options.ConfigurationKeys = config["ConfigNames"]!.Split(",");
             options.StorageConnectionString = config["ConfigurationStorageConnectionString"];
             options.EnvironmentName = config["EnvironmentName"];
+            options.ConfigurationKeysRawJsonResult = new[] { ConfigurationKeys.EncodingConfig };
             options.PreFixConfigurationKeys = false;
         });
 
