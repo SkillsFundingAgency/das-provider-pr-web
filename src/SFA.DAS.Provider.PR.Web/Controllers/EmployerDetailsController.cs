@@ -18,7 +18,6 @@ public class EmployerDetailsController(IOuterApiClient _outerApiclient, IEncodin
     public async Task<IActionResult> Index([FromRoute] int ukprn, [FromRoute] string agreementid,
         CancellationToken cancellationToken)
     {
-        var crap = encodingService.Encode(1001, EncodingType.PublicAccountLegalEntityId);
         var accountLegalEntityId = encodingService.Decode(agreementid, EncodingType.PublicAccountLegalEntityId);
 
         GetProviderRelationshipResponse response =
