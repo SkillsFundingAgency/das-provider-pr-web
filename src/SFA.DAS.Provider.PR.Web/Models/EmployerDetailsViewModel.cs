@@ -47,28 +47,29 @@ public class EmployerDetailsViewModel
 
     public static implicit operator EmployerDetailsViewModel(GetProviderRelationshipResponse response)
     {
-        var model = new EmployerDetailsViewModel
+        return new EmployerDetailsViewModel
         {
             AccountLegalEntityId = response.AccountLegalEntityId,
             AccountLegalEntityPublicHashedId = response.AccountLegalEntityPublicHashedId,
             AccountLegalEntityName = response.AccountLegalEntityName,
             Ukprn = response.Ukprn,
             LastAction = response.LastAction,
+            LastActionDate = SetLastActionDate(response),
             ProviderName = response.ProviderName,
             Operations = response.Operations,
-            LastRequestOperations = SetLastResponseOperations(response),
+            LastRequestOperations = SetLastRequestOperations(response),
             HasPermissionsRequest = SetHasPermissionsRequest(response),
             LastActionText = SetLastActionText(response)
         };
-        if (response.LastRequestOperations != null && response.LastRequestOperations.Length != 0)
-            model.LastRequestOperations = response.LastRequestOperations;
-        if (response.LastActionTime != null)
-            model.LastActionDate = response.LastActionTime.Value.Date.ToShortDateString();
-
-        return model;
     }
 
-    private static Operation[] SetLastResponseOperations(GetProviderRelationshipResponse response)
+    private static string SetLastActionDate(GetProviderRelationshipResponse response)
+    {
+        if (response.LastActionTime != null)
+            return response.LastActionTime.Value.Date.ToShortDateString();
+        return "";
+    }
+    private static Operation[] SetLastRequestOperations(GetProviderRelationshipResponse response)
     {
         if (response.LastRequestOperations != null && response.LastRequestOperations.Length != 0)
             return response.LastRequestOperations;

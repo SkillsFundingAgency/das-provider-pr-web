@@ -13,6 +13,7 @@ public class EmployerPermissionViewModel
     public required string RecruitmentPermision { get; set; }
     public bool HasPendingRequest => RequestId != null;
     public bool HasAgreementId => !string.IsNullOrEmpty(AgreementId);
+    public string EmployerDetailsUrl { get; set; } = null!;
 
     public static implicit operator EmployerPermissionViewModel(ProviderRelationshipModel source)
         => new()

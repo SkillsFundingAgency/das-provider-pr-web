@@ -35,14 +35,26 @@ public class EmployersController(IOuterApiClient _outerApiclient, IOptions<Appli
                 Pagination = new(response.TotalCount, pageSize, Url, RouteNames.Employers, submitModel.ConvertToDictionary()),
                 ClearFiltersLink = Url.RouteUrl(RouteNames.Employers, new { ukprn })!,
                 AddEmployerLink = Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn })!,
-                Employers = response.Employers.Select(e => (EmployerPermissionViewModel)e),
-                TotalCount = "employer".ToQuantity(response.TotalCount),
-                Ukprn = ukprn
+                Employers = BuildEmployers(response.Employers.ToList(), ukprn),
+                TotalCount = "employer".ToQuantity(response.TotalCount)
             };
 
             return base.View(model);
         }
 
         return View(NoRelationshipsHomePage, new NoRelationshipsHomeViewModel(Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn })!));
+    }
+
+    private List<EmployerPermissionViewModel> BuildEmployers(List<ProviderRelationshipModel> employers, int ukprn)
+    {
+        var employerList = new List<EmployerPermissionViewModel>();
+        foreach (var employer in employers)
+        {
+            var newEmployer = (EmployerPermissionViewModel)employer;
+            newEmployer.EmployerDetailsUrl =
+                Url.RouteUrl(RouteNames.EmployerDetails, new { ukprn, employer.AgreementId });
+            employerList.Add(newEmployer);
+        }
+        return employerList;
     }
 }

@@ -13,17 +13,17 @@ namespace SFA.DAS.Provider.PR_Web.UnitTests.Controllers;
 public class EmployerDetailsControllerTests
 {
     [Test, AutoData]
-    public async Task IndexWithUkprnAndAccountlegalentityid_ReturnsDefaultView(int ukprn, long accountLegalEntityId, GetProviderRelationshipResponse response)
+    public async Task IndexWithUkprnAndAccountlegalentityid_ReturnsDefaultView(int ukprn, string agreementId, GetProviderRelationshipResponse response)
     {
         Mock<IOuterApiClient> outerApiClientMock = new();
-        outerApiClientMock.Setup(x => x.GetProviderRelationship(ukprn, accountLegalEntityId, CancellationToken.None))
+        outerApiClientMock.Setup(x => x.GetProviderRelationship(ukprn, It.IsAny<long>(), CancellationToken.None))
             .ReturnsAsync(response);
 
         EmployerDetailsController sut = new(outerApiClientMock.Object);
 
         sut.AddDefaultContext().AddUrlHelperMock();
 
-        var actual = await sut.Index(ukprn, accountLegalEntityId, CancellationToken.None);
+        var actual = await sut.Index(ukprn, agreementId, CancellationToken.None);
 
         using (new AssertionScope())
         {

@@ -12,15 +12,15 @@ namespace SFA.DAS.Provider.PR.Web.Controllers;
 [Route("")]
 public class EmployerDetailsController(IOuterApiClient _outerApiclient) : Controller
 {
-    [Route("{ukprn:int}/employers/{accountlegalentityId:long}", Name = RouteNames.EmployerDetails)]
+    [Route("{ukprn:int}/employers/{agreementid:string}", Name = RouteNames.EmployerDetails)]
     [HttpGet]
-    public async Task<IActionResult> Index([FromRoute] int ukprn, [FromRoute] long accountLegalEntityId,
+    public async Task<IActionResult> Index([FromRoute] int ukprn, [FromQuery] EmployerPermissionViewModel employer,
         CancellationToken cancellationToken)
     {
         GetProviderRelationshipResponse response =
-            await _outerApiclient.GetProviderRelationship(ukprn, accountLegalEntityId, cancellationToken);
+            await _outerApiclient.GetProviderRelationship(ukprn, (long)employer.AccountLegalEntityId!, cancellationToken);
 
-        EmployerDetailsViewModel model = (EmployerDetailsViewModel)response;
+        EmployerDetailsViewModel model = response;
 
         model.EmployersLink = Url.RouteUrl(RouteNames.Employers, new { ukprn })!;
 

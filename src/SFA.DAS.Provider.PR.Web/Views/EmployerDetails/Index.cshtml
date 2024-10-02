@@ -44,19 +44,18 @@
     </div>
 </div>
 
-        @if (@Model.PendingPermissionRequest)
-        {
-            <div class="govuk-grid-row">
-                <div class="govuk-grid-column-two-thirds">
-                    <div class="govuk-!-width">
-                        <div class="govuk-inset-text">
-                            You're not added as a training provider for this employer yet so you have no permissions.
-                            We'll update your current permissions if the employer accepts your request.
-                        </div>
-                    </div>
+{<div asp-show="@Model.PendingPermissionRequest">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <div class="govuk-!-width">
+                <div class="govuk-inset-text">
+                    You're not added as a training provider for this employer yet so you have no permissions.
+                    We'll update your current permissions if the employer accepts your request.
                 </div>
             </div>
-        }
+        </div>
+    </div>
+</div>
         
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">

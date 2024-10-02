@@ -66,36 +66,17 @@ public class EmployerDetailsModelTests
         Assert.That(actual.LastActionText, Is.EqualTo(expected));
     }
 
-    [Test, AutoData]
-    public void OperationsContainsCreateCohort_CurrentPermissionsIncludeCreateCohortText(
+    [Test]
+    [InlineAutoData(new Operation[] { Operation.CreateCohort }, EmployerDetailsViewModel.CohortsPermissionText)]
+    [InlineAutoData(new Operation[] { Operation.Recruitment }, EmployerDetailsViewModel.RecruitmentPermissionText)]
+    [InlineAutoData(new Operation[] { Operation.RecruitmentRequiresReview }, EmployerDetailsViewModel.RecruitmentRequiresReviewPermissionText)]
+    public void CurrentPermissionsSetCorrectly(Operation[] operations, string expected,
         GetProviderRelationshipResponse response)
     {
-        response.Operations = new Operation[] { Operation.CreateCohort };
+        response.Operations = operations;
 
         var actual = (EmployerDetailsViewModel)response;
 
-        Assert.That(actual.CurrentPermissions.Contains(EmployerDetailsViewModel.CohortsPermissionText));
-    }
-
-    [Test, AutoData]
-    public void OperationsContainsRecruitment_CurrentPermissionsIncludeRecruitmentText(
-        GetProviderRelationshipResponse response)
-    {
-        response.Operations = new Operation[] { Operation.Recruitment };
-
-        var actual = (EmployerDetailsViewModel)response;
-
-        Assert.That(actual.CurrentPermissions.Contains(EmployerDetailsViewModel.RecruitmentPermissionText));
-    }
-
-    [Test, AutoData]
-    public void OperationsContainsRecruitmentRequiresReview_CurrentPermissionsIncludeRecruitmentRequiresReviewText(
-        GetProviderRelationshipResponse response)
-    {
-        response.Operations = new Operation[] { Operation.RecruitmentRequiresReview };
-
-        var actual = (EmployerDetailsViewModel)response;
-
-        Assert.That(actual.CurrentPermissions.Contains(EmployerDetailsViewModel.RecruitmentRequiresReviewPermissionText));
+        Assert.That(actual.CurrentPermissions.Contains(expected));
     }
 }

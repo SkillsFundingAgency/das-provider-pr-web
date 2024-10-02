@@ -27,22 +27,3 @@ public class GetProviderRelationshipResponse
 
     public Operation[]? LastRequestOperations { get; set; } = [];
 }
-
-public enum PermissionAction : short
-{
-    ApprovalsRelationship,
-    RecruitRelationship,
-    PermissionCreated,
-    PermissionUpdated,
-    PermissionDeleted
-}
-
-public enum RequestStatus : short
-{
-    New,
-    Sent,
-    Accepted,
-    Declined,
-    Expired,
-    Deleted
-}
