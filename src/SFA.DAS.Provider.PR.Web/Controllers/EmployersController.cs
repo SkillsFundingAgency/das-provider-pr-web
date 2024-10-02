@@ -52,7 +52,7 @@ public class EmployersController(IOuterApiClient _outerApiclient, IOptions<Appli
         {
             var newEmployer = (EmployerPermissionViewModel)employer;
             newEmployer.EmployerDetailsUrl =
-                Url.RouteUrl(RouteNames.EmployerDetails, new { ukprn, employer.AgreementId })!;
+                Url.RouteUrl(RouteNames.EmployerDetails, new { ukprn, accountLegalEntityId = employer.AgreementId })!;
             employerList.Add(newEmployer);
         }
         return employerList;

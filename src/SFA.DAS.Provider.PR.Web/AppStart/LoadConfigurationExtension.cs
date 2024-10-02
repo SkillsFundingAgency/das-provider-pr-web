@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using SFA.DAS.Configuration.AzureTableStorage;
+using SFA.DAS.Encoding;
 
 namespace SFA.DAS.Provider.PR.Web.AppStart;
 
@@ -22,6 +24,11 @@ public static class LoadConfigurationExtension
         });
 
         var configuration = configBuilder.Build();
+
+        var encodingsConfiguration = configuration.GetSection(ConfigurationKeys.EncodingConfig).Value;
+
+        var encodingConfig = JsonSerializer.Deserialize<EncodingConfig>(encodingsConfiguration!);
+        services.AddSingleton(encodingConfig!);
 
         return configuration;
     }

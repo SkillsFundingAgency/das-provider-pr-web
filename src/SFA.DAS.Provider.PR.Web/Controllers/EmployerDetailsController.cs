@@ -13,15 +13,15 @@ namespace SFA.DAS.Provider.PR.Web.Controllers;
 [Route("")]
 public class EmployerDetailsController(IOuterApiClient _outerApiclient, IEncodingService encodingService) : Controller
 {
-    [Route("{ukprn:int}/employers/{agreementid}", Name = RouteNames.EmployerDetails)]
+    [Route("{ukprn:int}/employers/{accountlegalentityid}", Name = RouteNames.EmployerDetails)]
     [HttpGet]
-    public async Task<IActionResult> Index([FromRoute] int ukprn, [FromRoute] string agreementid,
+    public async Task<IActionResult> Index([FromRoute] int ukprn, [FromRoute] string accountlegalentityid,
         CancellationToken cancellationToken)
     {
-        var accountLegalEntityId = encodingService.Decode(agreementid, EncodingType.PublicAccountLegalEntityId);
+        var accountLegalEntityIdDecoded = encodingService.Decode(accountlegalentityid, EncodingType.PublicAccountLegalEntityId);
 
         GetProviderRelationshipResponse response =
-            await _outerApiclient.GetProviderRelationship(ukprn, accountLegalEntityId, cancellationToken);
+            await _outerApiclient.GetProviderRelationship(ukprn, accountLegalEntityIdDecoded, cancellationToken);
 
         EmployerDetailsViewModel model = response;
 
