@@ -19,6 +19,7 @@ namespace SFA.DAS.Provider.PR_Web.UnitTests.Controllers.SearchByPaye;
 public class PayeAornMatchedEmailNotLinkedShutterPageGetTests
 {
     private static readonly string StartLink = Guid.NewGuid().ToString();
+    private static readonly string ContinueLink = Guid.NewGuid().ToString();
     private const string Email = "test@test.com";
 
     [Test, MoqAutoData]
@@ -52,7 +53,7 @@ public class PayeAornMatchedEmailNotLinkedShutterPageGetTests
 
         outerApiClientMock.Setup(o => o.GetRequest(ukprn, paye, cancellationToken)).ReturnsAsync(resultResponse);
 
-        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, StartLink);
+        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, StartLink).AddUrlForRoute(RouteNames.AddPermissionsAndEmployer, ContinueLink);
 
         var result = sut.PayeAornMatchedEmailNotLinkedShutterPage(ukprn);
 
@@ -65,7 +66,8 @@ public class PayeAornMatchedEmailNotLinkedShutterPageGetTests
             PayeReference = paye,
             Aorn = aorn,
             Email = Email,
-            CancelLink = StartLink
+            CancelLink = StartLink,
+            ContinueLink = ContinueLink
         };
 
         viewModel.Should().BeEquivalentTo(expectedViewModel);

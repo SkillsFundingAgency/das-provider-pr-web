@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Provider.PR.Domain.Interfaces;
 using SFA.DAS.Provider.PR.Web.Authorization;
-using SFA.DAS.Provider.PR.Web.Constants;
 using SFA.DAS.Provider.PR.Web.Infrastructure;
 using SFA.DAS.Provider.PR.Web.Infrastructure.Services;
 using SFA.DAS.Provider.PR.Web.Models.AddEmployer;
@@ -190,43 +189,19 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
         }
 
         var cancelLink = Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn })!;
+        var continueLink = Url.RouteUrl(RouteNames.AddPermissionsAndEmployer, new { ukprn })!;
         var shutterViewModel = new PayeAornMatchedEmailNotLinkedViewModel
         {
             EmployerName = sessionModel.OrganisationName!,
             PayeReference = sessionModel.Paye!,
             Aorn = sessionModel.Aorn!,
             Email = sessionModel.Email,
-            CancelLink = cancelLink
+            CancelLink = cancelLink,
+            ContinueLink = continueLink
         };
 
         return View(PayeAornMatchedEmailNotLinkedShutterPathViewPath, shutterViewModel);
     }
-
-    [HttpPost]
-    [Route("payeAornMatchedEmailNotLinked", Name = RouteNames.PayeAornMatchedEmailNotLinkedLink)]
-    public IActionResult PostPayeAornMatchedEmailNotLinkedShutterPage([FromRoute] int ukprn)
-    {
-        var sessionModel = _sessionService.Get<AddEmployerSessionModel>();
-        if (string.IsNullOrEmpty(sessionModel?.Paye))
-        {
-            return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
-        }
-
-        if (sessionModel.PermissionToAddCohorts == null)
-        {
-            sessionModel.PermissionToAddCohorts = SetPermissions.AddRecords.Yes;
-            _sessionService.Set(sessionModel);
-        }
-
-        if (sessionModel.PermissionToRecruit == null)
-        {
-            sessionModel.PermissionToRecruit = SetPermissions.RecruitApprentices.Yes;
-            _sessionService.Set(sessionModel);
-        }
-
-        return RedirectToRoute(RouteNames.AddPermissionsAndEmployer, new { ukprn });
-    }
-
 
     private SearchByPayeModel GetViewModel(int ukprn)
     {

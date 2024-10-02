@@ -7,4 +7,5 @@ public class PayeAornMatchedEmailNotLinkedViewModel
     public required string Aorn { get; set; }
     public required string Email { get; set; }
     public required string CancelLink { get; set; }
+    public required string ContinueLink { get; set; }
 };
