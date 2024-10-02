@@ -59,8 +59,14 @@ public class PayeAornMatchedEmailNotLinkedShutterPageGetTests
         ViewResult? viewResult = result.As<ViewResult>();
         PayeAornMatchedEmailNotLinkedViewModel? viewModel = viewResult.Model as PayeAornMatchedEmailNotLinkedViewModel;
 
-        var expectedViewModel = new PayeAornMatchedEmailNotLinkedViewModel(employerOrganisationName, paye, aorn, Email,
-            StartLink);
+        var expectedViewModel = new PayeAornMatchedEmailNotLinkedViewModel
+        {
+            EmployerName = employerOrganisationName,
+            PayeReference = paye,
+            Aorn = aorn,
+            Email = Email,
+            CancelLink = StartLink
+        };
 
         viewModel.Should().BeEquivalentTo(expectedViewModel);
     }

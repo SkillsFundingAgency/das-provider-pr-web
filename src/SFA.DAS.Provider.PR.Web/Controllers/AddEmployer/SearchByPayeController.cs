@@ -85,47 +85,44 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
 
         var relationshipsRequest = await _outerApiClient.GetProviderRelationshipsByUkprnPayeAorn(ukprn, sessionModel.Aorn!, encodedPaye, cancellationToken);
 
-        bool? hasActiveRequest = relationshipsRequest?.HasActiveRequest;
+        bool? hasActiveRequest = relationshipsRequest.HasActiveRequest;
 
         if (hasActiveRequest is true)
         {
             return RedirectToRoute(RouteNames.AddEmployerInvitationAlreadySent, new { ukprn });
         }
 
-        bool? hasInvalidPaye = relationshipsRequest?.HasInvalidPaye;
+        bool? hasInvalidPaye = relationshipsRequest.HasInvalidPaye;
 
         if (hasInvalidPaye is true)
         {
             return RedirectToRoute(RouteNames.AddEmployerPayeAornNotCorrect, new { ukprn });
         }
 
-        bool? hasOneLegalEntity = relationshipsRequest?.HasOneLegalEntity;
+        var accountDoesNotExist = relationshipsRequest.Account == null;
+
+        if (accountDoesNotExist)
+        {
+            sessionModel.OrganisationName = relationshipsRequest.Organisation?.Name;
+            _sessionService.Set(sessionModel);
+            return RedirectToRoute(RouteNames.AddEmployerContactDetails, new { ukprn });
+        }
+
+        /// If you get here, there is definitely one or more legal entities, as 'accountDoesNotExist' is false
+        bool hasOneLegalEntity = relationshipsRequest.HasOneLegalEntity!.Value;
 
         if (hasOneLegalEntity is false)
         {
             return RedirectToRoute(RouteNames.AddEmployerMultipleAccounts, new { ukprn });
         }
 
-        var hasExistingAccount = relationshipsRequest?.Account != null;
+        sessionModel.AccountLegalEntityId = relationshipsRequest.AccountLegalEntityId;
+        sessionModel.AccountLegalEntityName = relationshipsRequest.AccountLegalEntityName;
+        sessionModel.AccountId = relationshipsRequest.Account!.AccountId;
+        sessionModel.OrganisationName = relationshipsRequest.Organisation?.Name;
+        _sessionService.Set(sessionModel);
+        return RedirectToRoute(RouteNames.PayeAornMatchedEmailNotLinkedLink, new { ukprn });
 
-        if (!hasExistingAccount)
-        {
-            sessionModel.OrganisationName = relationshipsRequest?.Organisation?.Name;
-            _sessionService.Set(sessionModel);
-            return RedirectToRoute(RouteNames.AddEmployerContactDetails, new { ukprn });
-        }
-
-        if (hasOneLegalEntity is true)
-        {
-            sessionModel.AccountLegalEntityId = relationshipsRequest!.AccountLegalEntityId;
-            sessionModel.AccountLegalEntityName = relationshipsRequest.AccountLegalEntityName;
-            sessionModel.AccountId = relationshipsRequest.Account!.AccountId;
-            sessionModel.OrganisationName = relationshipsRequest.Organisation?.Name;
-            _sessionService.Set(sessionModel);
-            return RedirectToRoute(RouteNames.PayeAornMatchedEmailNotLinkedLink, new { ukprn });
-        }
-
-        return RedirectToRoute(RouteNames.AddEmployerSearchByPaye, new { ukprn });
     }
 
 
@@ -193,13 +190,14 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
         }
 
         var cancelLink = Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn })!;
-        var shutterViewModel = new PayeAornMatchedEmailNotLinkedViewModel(
-            sessionModel.OrganisationName!,
-            sessionModel.Paye!,
-            sessionModel.Aorn!,
-            sessionModel.Email,
-            cancelLink
-        );
+        var shutterViewModel = new PayeAornMatchedEmailNotLinkedViewModel
+        {
+            EmployerName = sessionModel.OrganisationName!,
+            PayeReference = sessionModel.Paye!,
+            Aorn = sessionModel.Aorn!,
+            Email = sessionModel.Email,
+            CancelLink = cancelLink
+        };
 
         return View(PayeAornMatchedEmailNotLinkedShutterPathViewPath, shutterViewModel);
     }
