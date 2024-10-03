@@ -12,6 +12,7 @@ public class EmployerDetailsViewModel
     public const string AccountCreatedPermissionsSetText = "Apprenticeship service account created";
     public const string PendingPermissionRequestUpdatedText = "Permissions request sent";
     public const string PermissionUpdateAcceptedText = "Permissions set";
+    public const string PermissionUpdateDeclinedText = "Permissions request declined";
 
 
     public long AccountLegalEntityId { get; set; }
@@ -107,6 +108,9 @@ public class EmployerDetailsViewModel
                     break;
                 case RequestStatus.Accepted:
                     lastActionText = PermissionUpdateAcceptedText;
+                    break;
+                case RequestStatus.Declined:
+                    lastActionText = PermissionUpdateDeclinedText;
                     break;
             }
         }
