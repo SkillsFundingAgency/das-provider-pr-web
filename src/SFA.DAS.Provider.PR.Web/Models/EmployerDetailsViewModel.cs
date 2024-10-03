@@ -14,7 +14,8 @@ public class EmployerDetailsViewModel
     public const string PermissionUpdateAcceptedText = "Permissions set";
     public const string PermissionUpdateDeclinedText = "Permissions request declined";
     public const string PermissionUpdateExpiredText = "Permissions request expired";
-    public const string ExistingRelationshipText = "Added you as training provider for new apprentice vacancy";
+    public const string ExistingRecruitRelationshipText = "Added you as training provider for new apprentice vacancy";
+    public const string ExistingApprovalsRelationshipText = "Added you as training provider for new apprentice";
 
 
     public long AccountLegalEntityId { get; set; }
@@ -125,10 +126,10 @@ public class EmployerDetailsViewModel
             switch (response.LastAction)
             {
                 case PermissionAction.RecruitRelationship:
-                    lastActionText = ExistingRelationshipText;
+                    lastActionText = ExistingRecruitRelationshipText;
                     break;
                 case PermissionAction.ApprovalsRelationship:
-                    lastActionText = ExistingRelationshipText;
+                    lastActionText = ExistingApprovalsRelationshipText;
                     break;
             }
         }
