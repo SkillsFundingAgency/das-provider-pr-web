@@ -10,6 +10,7 @@ public class EmployerDetailsViewModel
 
     public const string PendingAddTrainingProviderAndPermissionsRequestText = "Add training provider and permissions request sent";
     public const string AccountCreatedPermissionsSetText = "Apprenticeship service account created";
+    public const string PendingPermissionRequestUpdatedText = "Permissions request sent";
     //The following are WIP, to be replaced in later stories as more variations of the employer details page are created
     public const string PendingNotImplementedText = "PENDING REQUEST - NOT YET IMPLEMENTED";
     public const string NotPendingNotImplementedText = "NO PENDING REQUEST - NOT YET IMPLEMENTED";
@@ -98,6 +99,8 @@ public class EmployerDetailsViewModel
                 {
                     case PermissionAction.PermissionCreated:
                         return PendingAddTrainingProviderAndPermissionsRequestText;
+                    case PermissionAction.PermissionUpdated:
+                        return PendingPermissionRequestUpdatedText;
                     default:
                         return PendingNotImplementedText;
                 }

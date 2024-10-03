@@ -56,6 +56,7 @@ public class EmployerDetailsModelTests
 
     [Test]
     [InlineAutoData(RequestStatus.Sent, PermissionAction.PermissionCreated, PermissionRequestType, EmployerDetailsViewModel.PendingAddTrainingProviderAndPermissionsRequestText)]
+    [InlineAutoData(RequestStatus.Sent, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsViewModel.PendingPermissionRequestUpdatedText)]
     [InlineAutoData(RequestStatus.Sent, PermissionAction.ApprovalsRelationship, PermissionRequestType, EmployerDetailsViewModel.PendingNotImplementedText)]
     [InlineAutoData(RequestStatus.New, PermissionAction.PermissionCreated, PermissionRequestType, EmployerDetailsViewModel.NotPendingNotImplementedText)]
     [InlineAutoData(RequestStatus.Accepted, PermissionAction.PermissionCreated, CreateAccountRequestType, EmployerDetailsViewModel.AccountCreatedPermissionsSetText)]
