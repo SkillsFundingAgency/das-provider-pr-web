@@ -7,6 +7,7 @@ public class EmployerDetailsModelTests
 {
     public const string CreateAccountRequestType = "CreateAccount";
     public const string PermissionRequestType = "Permission";
+    public const string AddAccountRequestType = "AddAccount";
 
     [Test, AutoData]
     public void ModelIsCreatedCorrectly_FromApiResponseObject(GetProviderRelationshipResponse response)
@@ -61,6 +62,7 @@ public class EmployerDetailsModelTests
     [InlineAutoData(RequestStatus.Declined, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsViewModel.PermissionUpdateDeclinedText)]
     [InlineAutoData(RequestStatus.Expired, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsViewModel.PermissionUpdateExpiredText)]
     [InlineAutoData(RequestStatus.Accepted, PermissionAction.PermissionCreated, CreateAccountRequestType, EmployerDetailsViewModel.AccountCreatedPermissionsSetText)]
+    [InlineAutoData(RequestStatus.Accepted, PermissionAction.RecruitRelationship, AddAccountRequestType, EmployerDetailsViewModel.ExistingRecruitRelationshipText)]
     public void LastActionTextIsSetCorrectly(RequestStatus status, PermissionAction action, string lastRequestType, string expected,
         GetProviderRelationshipResponse response)
     {
