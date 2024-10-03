@@ -13,7 +13,7 @@ public class CheckPermissionsSubmitModelValidatorTests
     [TestCase(SetPermissions.AddRecords.Yes, SetPermissions.RecruitApprentices.No)]
     public void AddRecordsAndRecruitApprenticesSet_Valid(string addRecordsSelection, string recruitApprenticesSelection)
     {
-        var model = new ChangePermissionsSubmitModel
+        var model = new AddPermissionsSubmitModel
         {
             PermissionToAddCohorts = addRecordsSelection,
             PermissionToRecruit = recruitApprenticesSelection
@@ -28,7 +28,7 @@ public class CheckPermissionsSubmitModelValidatorTests
     [Test]
     public void AddRecordsNo_RecruitApprenticesNo_InvalidWithExpectedMessage()
     {
-        var model = new ChangePermissionsSubmitModel
+        var model = new AddPermissionsSubmitModel
         {
             PermissionToAddCohorts = SetPermissions.AddRecords.No,
             PermissionToRecruit = SetPermissions.RecruitApprentices.No

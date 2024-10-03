@@ -1,8 +1,8 @@
 ﻿namespace SFA.DAS.Provider.PR.Web.Models.AddEmployer;
 
-public class ChangePermissionsViewModel : ChangePermissionsSubmitModel
+public class AddPermissionsViewModel : AddPermissionsSubmitModel
 {
-    public ChangePermissionsViewModel() { }
+    public AddPermissionsViewModel() { }
 
     public required string Email { get; set; }
     public required string BackLink { get; set; }
@@ -11,6 +11,6 @@ public class ChangePermissionsViewModel : ChangePermissionsSubmitModel
     public required long Ukprn { get; set; }
 }
 
-public class ChangePermissionsSubmitModel : PermissionDescriptionsViewModel
+public class AddPermissionsSubmitModel : PermissionDescriptionsViewModel
 {
 }

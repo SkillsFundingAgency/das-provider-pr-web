@@ -93,14 +93,16 @@ public class CheckDetailsControllerGetTests
         int numberOfSessionSets,
         [Frozen] Mock<ISessionService> sessionServiceMock,
         [Greedy] CheckDetailsController sut,
-        int ukprn)
+        int ukprn,
+        AddEmployerSessionModel addEmployerSessionModel)
     {
         var email = "test@test.com";
-        AddEmployerSessionModel addEmployerSessionModel = new AddEmployerSessionModel { Email = email, IsCheckDetailsVisited = true };
+        addEmployerSessionModel.Email = email;
+        addEmployerSessionModel.IsCheckDetailsVisited = true;
+
         addEmployerSessionModel.PermissionToAddCohorts = permissionToAddCohorts;
         addEmployerSessionModel.PermissionToRecruit = permissionsToRecruit;
 
-        addEmployerSessionModel.Email = email;
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(addEmployerSessionModel);
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink);
@@ -118,18 +120,14 @@ public class CheckDetailsControllerGetTests
         int numberOfSessionsSet,
         [Frozen] Mock<ISessionService> sessionServiceMock,
         [Greedy] CheckDetailsController sut,
-        int ukprn)
+        int ukprn,
+        AddEmployerSessionModel addEmployerSessionModel)
     {
         var email = "test@test.com";
-        AddEmployerSessionModel addEmployerSessionModel = new AddEmployerSessionModel
-        {
-            Email = email,
-            IsCheckDetailsVisited = isCheckDetailsVisited,
-            PermissionToAddCohorts = SetPermissions.AddRecords.Yes,
-            PermissionToRecruit = SetPermissions.RecruitApprentices.Yes
-        };
-
         addEmployerSessionModel.Email = email;
+        addEmployerSessionModel.IsCheckDetailsVisited = isCheckDetailsVisited;
+        addEmployerSessionModel.PermissionToAddCohorts = SetPermissions.AddRecords.Yes;
+        addEmployerSessionModel.PermissionToRecruit = SetPermissions.RecruitApprentices.Yes;
 
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(addEmployerSessionModel);
 
@@ -149,16 +147,13 @@ public class CheckDetailsControllerGetTests
         string permissionsToAddCohortsText,
         [Frozen] Mock<ISessionService> sessionServiceMock,
         [Greedy] CheckDetailsController sut,
-        int ukprn)
+        int ukprn,
+        AddEmployerSessionModel addEmployerSessionModel)
     {
         var email = "test@test.com";
-        AddEmployerSessionModel addEmployerSessionModel = new AddEmployerSessionModel
-        {
-            Email = email,
-            PermissionToAddCohorts = permissionToAddCohorts
-        };
-
         addEmployerSessionModel.Email = email;
+        addEmployerSessionModel.PermissionToAddCohorts = permissionToAddCohorts;
+
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(addEmployerSessionModel);
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink);
@@ -180,16 +175,13 @@ public class CheckDetailsControllerGetTests
         string permissionText,
         [Frozen] Mock<ISessionService> sessionServiceMock,
         [Greedy] CheckDetailsController sut,
-        int ukprn)
+        int ukprn,
+        AddEmployerSessionModel addEmployerSessionModel)
     {
         var email = "test@test.com";
-        AddEmployerSessionModel addEmployerSessionModel = new AddEmployerSessionModel
-        {
-            Email = email,
-            PermissionToRecruit = permission
-        };
-
         addEmployerSessionModel.Email = email;
+        addEmployerSessionModel.PermissionToRecruit = permission;
+
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(addEmployerSessionModel);
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink);
@@ -199,5 +191,48 @@ public class CheckDetailsControllerGetTests
         CheckDetailsViewModel? viewModel = viewResult.Model as CheckDetailsViewModel;
 
         viewModel!.PermissionToRecruitText.Should().Be(permissionText);
+    }
+
+
+    [Test]
+    [MoqInlineAutoData("", "222/AAA", "AORNCODE12345", "org name", "joe", "cool")]
+    [MoqInlineAutoData("test@test.com", "", "AORNCODE12345", "org name", "joe", "cool")]
+    [MoqInlineAutoData("test@test.com", null, "AORNCODE12345", "org name", "joe", "cool")]
+    [MoqInlineAutoData("test@test.com", "222/AAA", "", "org name", "joe", "cool")]
+    [MoqInlineAutoData("test@test.com", "222/AAA", null, "org name", "joe", "cool")]
+    [MoqInlineAutoData("test@test.com", "222/AAA", "AORNCODE12345", "", "joe", "cool")]
+    [MoqInlineAutoData("test@test.com", "222/AAA", "AORNCODE12345", null, "joe", "cool")]
+    [MoqInlineAutoData("test@test.com", "222/AAA", "AORNCODE12345", "org name", "", "cool")]
+    [MoqInlineAutoData("test@test.com", "222/AAA", "AORNCODE12345", "org name", null, "cool")]
+    [MoqInlineAutoData("test@test.com", "222/AAA", "AORNCODE12345", "org name", "joe", "")]
+    [MoqInlineAutoData("test@test.com", "222/AAA", "AORNCODE12345", "org name", "joe", null)]
+    public void Get_IncompleteFlow_RedirectToStart(
+        string email,
+        string? paye,
+        string? aorn,
+        string? organisationName,
+        string? firstName,
+        string? lastName,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Greedy] CheckDetailsController sut,
+        int ukprn,
+        AddEmployerSessionModel addEmployerSessionModel)
+    {
+        addEmployerSessionModel.Email = email;
+        addEmployerSessionModel.Paye = paye;
+        addEmployerSessionModel.Aorn = aorn;
+        addEmployerSessionModel.OrganisationName = organisationName;
+        addEmployerSessionModel.FirstName = firstName;
+        addEmployerSessionModel.LastName = lastName;
+
+        sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(addEmployerSessionModel);
+
+        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink);
+
+        var actual = sut.Index(ukprn);
+
+        actual.Should().BeOfType<RedirectToRouteResult>();
+        actual.As<RedirectToRouteResult>().RouteName.Should().Be(RouteNames.AddEmployerStart);
+        actual.As<RedirectToRouteResult>().RouteValues.Should().ContainKey("ukprn");
     }
 }

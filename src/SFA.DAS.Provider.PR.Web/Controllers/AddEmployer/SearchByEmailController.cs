@@ -16,7 +16,7 @@ namespace SFA.DAS.Provider.PR.Web.Controllers.AddEmployer;
 [Authorize(Policy = nameof(PolicyNames.HasContributorOrAbovePermission))]
 
 [Route("/{ukprn}/addEmployer/searchByEmail", Name = RouteNames.AddEmployerSearchByEmail)]
-public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionService _sessionService, IValidator<SearchByEmailSubmitViewModel> _validator) : Controller
+public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionService _sessionService, IValidator<SearchByEmailSubmitModel> _validator) : Controller
 {
     public const string ViewPath = "~/Views/AddEmployer/SearchByEmail.cshtml";
     public const string MultipleAccountsShutterPathViewPath = "~/Views/AddEmployer/ShutterPages/MultipleAccountsShutterPage.cshtml";
@@ -27,6 +27,12 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
     {
         var viewModel = GetViewModel(ukprn);
         var sessionModel = _sessionService.Get<AddEmployerSessionModel>();
+
+        if (sessionModel != null && sessionModel.IsCheckDetailsVisited)
+        {
+            return RedirectToRoute(RouteNames.CheckEmployerDetails, new { ukprn });
+        }
+
         if (!string.IsNullOrEmpty(sessionModel?.Email))
         {
             viewModel.Email = sessionModel.Email;
@@ -38,23 +44,23 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
     }
 
     [HttpPost]
-    public async Task<IActionResult> Index([FromRoute] int ukprn, SearchByEmailSubmitViewModel submitViewModel, CancellationToken cancellationToken)
+    public async Task<IActionResult> Index([FromRoute] int ukprn, SearchByEmailSubmitModel submitModel, CancellationToken cancellationToken)
     {
-        var result = _validator.Validate(submitViewModel);
+        var result = _validator.Validate(submitModel);
 
         if (!result.IsValid)
         {
             var viewModel = GetViewModel(ukprn);
-            viewModel.Email = submitViewModel.Email;
+            viewModel.Email = submitModel.Email;
             result.AddToModelState(ModelState);
             return View(ViewPath, viewModel);
         }
 
-        var sessionModel = new AddEmployerSessionModel { Email = submitViewModel.Email! };
+        var sessionModel = new AddEmployerSessionModel { Email = submitModel.Email! };
         _sessionService.Set(sessionModel);
 
 
-        var relationshipByEmail = await _outerApiClient.GetRelationshipByEmail(submitViewModel.Email!, ukprn, cancellationToken);
+        var relationshipByEmail = await _outerApiClient.GetRelationshipByEmail(submitModel.Email!, ukprn, cancellationToken);
 
         if (!relationshipByEmail.HasUserAccount)
         {
@@ -115,11 +121,11 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
         return View(OneAccountNoRelationshipViewPath, viewModel);
     }
 
-    private SearchByEmailViewModel GetViewModel(int ukprn)
+    private SearchByEmailModel GetViewModel(int ukprn)
     {
         var cancelLink = Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn });
         var backLink = Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn });
-        return new SearchByEmailViewModel { CancelLink = cancelLink!, BackLink = backLink!, Ukprn = ukprn };
+        return new SearchByEmailModel { CancelLink = cancelLink!, BackLink = backLink!, Ukprn = ukprn };
     }
 
     private static bool HasMultipleAccounts(GetRelationshipByEmailResponse response)

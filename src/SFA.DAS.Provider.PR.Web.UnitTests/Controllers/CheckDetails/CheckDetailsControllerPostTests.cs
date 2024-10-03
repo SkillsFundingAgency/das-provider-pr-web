@@ -23,10 +23,14 @@ public class CheckDetailsControllerPostTests
         int ukprn,
         string firstName,
         string lastName,
+        AddEmployerSessionModel addEmployerSessionModel,
         CancellationToken cancellationToken
     )
     {
-        sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel { Email = Email, FirstName = firstName, LastName = lastName });
+        addEmployerSessionModel.Email = Email;
+        addEmployerSessionModel.FirstName = firstName;
+        addEmployerSessionModel.LastName = lastName;
+        sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(addEmployerSessionModel);
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink);
 

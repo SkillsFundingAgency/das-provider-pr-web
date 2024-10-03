@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using AutoFixture.NUnit3;
+using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
@@ -20,8 +21,10 @@ public class AddPermissionsAndEmployerControllerPostTests
 
     [Test, MoqAutoData]
     public void Post_ReturnsExpectedViewModelAndPath(
-        Mock<IValidator<AddPermissionsAndEmployerSubmitViewModel>> validatorMock,
-        Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<AddPermissionsAndEmployerSubmitModel>> validatorMock,
+        [Greedy] AddPermissionsAndEmployerController sut,
         AddEmployerSessionModel sessionModel,
         int ukprn,
         AddPermissionsAndEmployerViewModel addPermissionsAndEmployerViewModel
@@ -29,9 +32,7 @@ public class AddPermissionsAndEmployerControllerPostTests
     {
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(sessionModel);
 
-        validatorMock.Setup(v => v.Validate(It.IsAny<AddPermissionsAndEmployerSubmitViewModel>())).Returns(new ValidationResult());
-
-        AddPermissionsAndEmployerController sut = new(Mock.Of<IOuterApiClient>(), sessionServiceMock.Object, validatorMock.Object);
+        validatorMock.Setup(v => v.Validate(It.IsAny<AddPermissionsAndEmployerSubmitModel>())).Returns(new ValidationResult());
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerSearchByEmail, NextPageLink);
 
@@ -47,13 +48,16 @@ public class AddPermissionsAndEmployerControllerPostTests
     }
 
     [Test, MoqAutoData]
-    public void Post_SessionModelNotSet_RedirectsToAddEmployerStart(int ukprn,
-        Mock<IValidator<AddPermissionsAndEmployerSubmitViewModel>> validatorMock,
-        Mock<ISessionService> sessionServiceMock,
+    public void Post_SessionModelNotSet_RedirectsToAddEmployerStart(
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<AddPermissionsAndEmployerSubmitModel>> validatorMock,
+        [Greedy] AddPermissionsAndEmployerController sut,
+        int ukprn,
         AddPermissionsAndEmployerViewModel addPermissionsAndEmployerViewModel)
     {
-        validatorMock.Setup(v => v.Validate(It.IsAny<AddPermissionsAndEmployerSubmitViewModel>())).Returns(new ValidationResult());
-        AddPermissionsAndEmployerController sut = new(Mock.Of<IOuterApiClient>(), sessionServiceMock.Object, Mock.Of<IValidator<AddPermissionsAndEmployerSubmitViewModel>>());
+        validatorMock.Setup(v => v.Validate(It.IsAny<AddPermissionsAndEmployerSubmitModel>())).Returns(new ValidationResult());
+
         sut.AddUrlHelperMock()
             .AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink);
 
@@ -66,8 +70,10 @@ public class AddPermissionsAndEmployerControllerPostTests
 
     [Test, MoqAutoData]
     public void Post_Invalid_ReturnsExpectedViewModelAndPath(
-        Mock<IValidator<AddPermissionsAndEmployerSubmitViewModel>> validatorMock,
-        Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<AddPermissionsAndEmployerSubmitModel>> validatorMock,
+        [Greedy] AddPermissionsAndEmployerController sut,
         AddEmployerSessionModel sessionModel,
         int ukprn,
         AddPermissionsAndEmployerViewModel addPermissionsAndEmployerViewModel
@@ -75,12 +81,10 @@ public class AddPermissionsAndEmployerControllerPostTests
     {
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(sessionModel);
 
-        validatorMock.Setup(m => m.Validate(It.IsAny<AddPermissionsAndEmployerSubmitViewModel>())).Returns(new ValidationResult(new List<ValidationFailure>()
+        validatorMock.Setup(m => m.Validate(It.IsAny<AddPermissionsAndEmployerSubmitModel>())).Returns(new ValidationResult(new List<ValidationFailure>()
         {
             new("TestField","Test Message") { ErrorCode = "1001"}
         }));
-
-        AddPermissionsAndEmployerController sut = new(Mock.Of<IOuterApiClient>(), sessionServiceMock.Object, validatorMock.Object);
 
         sut.AddUrlHelperMock()
             .AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink);

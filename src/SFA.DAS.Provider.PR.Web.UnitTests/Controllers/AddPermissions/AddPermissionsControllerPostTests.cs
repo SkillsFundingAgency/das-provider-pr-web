@@ -12,8 +12,8 @@ using SFA.DAS.Provider.PR.Web.Models.Session;
 using SFA.DAS.Provider.PR_Web.UnitTests.TestHelpers;
 using SFA.DAS.Testing.AutoFixture;
 
-namespace SFA.DAS.Provider.PR_Web.UnitTests.Controllers.ChangePermissions;
-public class ChangePermissionsControllerPostTests
+namespace SFA.DAS.Provider.PR_Web.UnitTests.Controllers.AddPermissions;
+public class AddPermissionsControllerPostTests
 {
     private static readonly string CancelLink = Guid.NewGuid().ToString();
     private static readonly string NextPageLink = Guid.NewGuid().ToString();
@@ -21,17 +21,17 @@ public class ChangePermissionsControllerPostTests
 
     [Test, MoqAutoData]
     public void Post_ReturnsExpectedViewModelAndPath(
-        [Frozen] Mock<IValidator<ChangePermissionsSubmitModel>> validatorMock,
+        [Frozen] Mock<IValidator<AddPermissionsSubmitModel>> validatorMock,
         [Frozen] Mock<ISessionService> sessionServiceMock,
-        [Greedy] ChangePermissionsController sut,
+        [Greedy] AddPermissionsController sut,
         AddEmployerSessionModel sessionModel,
         int ukprn,
-        ChangePermissionsViewModel viewModel
+        AddPermissionsViewModel viewModel
     )
     {
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(sessionModel);
 
-        validatorMock.Setup(v => v.Validate(It.IsAny<ChangePermissionsSubmitModel>())).Returns(new ValidationResult());
+        validatorMock.Setup(v => v.Validate(It.IsAny<AddPermissionsSubmitModel>())).Returns(new ValidationResult());
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.CheckEmployerDetails, CheckDetailsLink);
 
@@ -47,12 +47,12 @@ public class ChangePermissionsControllerPostTests
 
     [Test, MoqAutoData]
     public void Post_SessionModelNotSet_RedirectsToAddEmployerStart(int ukprn,
-        [Frozen] Mock<IValidator<ChangePermissionsSubmitModel>> validatorMock,
+        [Frozen] Mock<IValidator<AddPermissionsSubmitModel>> validatorMock,
         [Frozen] Mock<ISessionService> sessionServiceMock,
-        [Greedy] ChangePermissionsController sut,
-        ChangePermissionsViewModel viewModel)
+        [Greedy] AddPermissionsController sut,
+        AddPermissionsViewModel viewModel)
     {
-        validatorMock.Setup(v => v.Validate(It.IsAny<ChangePermissionsSubmitModel>())).Returns(new ValidationResult());
+        validatorMock.Setup(v => v.Validate(It.IsAny<AddPermissionsSubmitModel>())).Returns(new ValidationResult());
         sut.AddUrlHelperMock()
             .AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink);
 
@@ -65,17 +65,17 @@ public class ChangePermissionsControllerPostTests
 
     [Test, MoqAutoData]
     public void Post_Invalid_ReturnsExpectedViewModelAndPath(
-        [Frozen] Mock<IValidator<ChangePermissionsSubmitModel>> validatorMock,
+        [Frozen] Mock<IValidator<AddPermissionsSubmitModel>> validatorMock,
         [Frozen] Mock<ISessionService> sessionServiceMock,
-        [Greedy] ChangePermissionsController sut,
+        [Greedy] AddPermissionsController sut,
         AddEmployerSessionModel sessionModel,
         int ukprn,
-        ChangePermissionsSubmitModel submitViewModel
+        AddPermissionsSubmitModel submitViewModel
     )
     {
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(sessionModel);
 
-        validatorMock.Setup(m => m.Validate(It.IsAny<ChangePermissionsSubmitModel>())).Returns(new ValidationResult(new List<ValidationFailure>()
+        validatorMock.Setup(m => m.Validate(It.IsAny<AddPermissionsSubmitModel>())).Returns(new ValidationResult(new List<ValidationFailure>()
         {
             new("TestField","Test Message") { ErrorCode = "1001"}
         }));
@@ -86,12 +86,12 @@ public class ChangePermissionsControllerPostTests
         var result = sut.Index(ukprn, submitViewModel);
 
         ViewResult? viewResult = result.As<ViewResult>();
-        ChangePermissionsViewModel? viewModel = viewResult.Model as ChangePermissionsViewModel;
+        AddPermissionsViewModel? viewModel = viewResult.Model as AddPermissionsViewModel;
 
         sessionServiceMock.Verify(s => s.Get<AddEmployerSessionModel>(), Times.Once);
         Assert.Multiple(() =>
         {
-            Assert.That(viewResult.ViewName, Is.EqualTo(ChangePermissionsController.ViewPath));
+            Assert.That(viewResult.ViewName, Is.EqualTo(AddPermissionsController.ViewPath));
             Assert.That(viewModel!.CancelLink, Is.EqualTo(CancelLink));
             Assert.That(viewModel.Email, Is.EqualTo(sessionModel.Email));
             Assert.That(viewModel.Ukprn, Is.EqualTo(ukprn));

@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using AutoFixture.NUnit3;
+using FluentAssertions;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -19,12 +20,16 @@ public class GetOneAccountNoRelationshipTests
     private static readonly string ContinueLink = Guid.NewGuid().ToString();
 
     [Test, MoqAutoData]
-    public void OneAccountNoRelationshipFound_BuildsExpectedViewModel(int ukprn)
+    public void OneAccountNoRelationshipFound_BuildsExpectedViewModel(
+        [Frozen] Mock<IOuterApiClient> outerApiMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<SearchByEmailSubmitModel>> validatorMock,
+        [Greedy] SearchByEmailController sut,
+        int ukprn)
     {
         var email = "test@test.com";
-        var sessionServiceMock = new Mock<ISessionService>();
+
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel { Email = email });
-        SearchByEmailController sut = new(Mock.Of<IOuterApiClient>(), sessionServiceMock.Object, Mock.Of<IValidator<SearchByEmailSubmitViewModel>>());
 
         sut.AddUrlHelperMock()
             .AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink)
@@ -43,11 +48,13 @@ public class GetOneAccountNoRelationshipTests
     }
 
     [Test, MoqAutoData]
-    public void SessionModelEmpty_RedirectToAddEmployerStart(int ukprn)
+    public void SessionModelEmpty_RedirectToAddEmployerStart(
+        [Frozen] Mock<IOuterApiClient> outerApiMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<SearchByEmailSubmitModel>> validatorMock,
+        [Greedy] SearchByEmailController sut,
+        int ukprn)
     {
-        var sessionServiceMock = new Mock<ISessionService>();
-        SearchByEmailController sut = new(Mock.Of<IOuterApiClient>(), sessionServiceMock.Object, Mock.Of<IValidator<SearchByEmailSubmitViewModel>>());
-
         var result = sut.OneAccountNoRelationshipFound(ukprn);
         RedirectToRouteResult? redirectToRouteResult = result.As<RedirectToRouteResult>();
         redirectToRouteResult.RouteName.Should().Be(RouteNames.AddEmployerStart);
@@ -55,12 +62,14 @@ public class GetOneAccountNoRelationshipTests
     }
 
     [Test, MoqAutoData]
-    public void SessionModelEmptyEmailAddress_RedirectToAddEmployerStart(int ukprn)
+    public void SessionModelEmptyEmailAddress_RedirectToAddEmployerStart(
+        [Frozen] Mock<IOuterApiClient> outerApiMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<SearchByEmailSubmitModel>> validatorMock,
+        [Greedy] SearchByEmailController sut,
+        int ukprn)
     {
-        var sessionServiceMock = new Mock<ISessionService>();
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel { Email = string.Empty });
-
-        SearchByEmailController sut = new(Mock.Of<IOuterApiClient>(), sessionServiceMock.Object, Mock.Of<IValidator<SearchByEmailSubmitViewModel>>());
 
         var result = sut.OneAccountNoRelationshipFound(ukprn);
         RedirectToRouteResult? redirectToRouteResult = result.As<RedirectToRouteResult>();

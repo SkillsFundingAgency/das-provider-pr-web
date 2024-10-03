@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using AutoFixture.NUnit3;
+using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
@@ -25,16 +26,17 @@ public class SearchByEmailControllerPostTests
 
     [Test, MoqAutoData]
     public async Task Post_SingleAccountsHasRelationship_ReturnsExpectedViewModelAndPath(
-     Mock<IOuterApiClient> outerApiClientMock,
-     Mock<IValidator<SearchByEmailSubmitViewModel>> validatorMock,
-     Mock<ISessionService> sessionServiceMock,
-     int ukprn,
-     SearchByEmailSubmitViewModel searchByEmailSubmitViewModel,
-     GetRelationshipByEmailResponse getRelationshipByEmailResponse,
-     CancellationToken cancellationToken
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<SearchByEmailSubmitModel>> validatorMock,
+        [Greedy] SearchByEmailController sut,
+        int ukprn,
+        SearchByEmailSubmitModel searchByEmailSubmitModel,
+        GetRelationshipByEmailResponse getRelationshipByEmailResponse,
+        CancellationToken cancellationToken
      )
     {
-        searchByEmailSubmitViewModel.Email = Email;
+        searchByEmailSubmitModel.Email = Email;
         getRelationshipByEmailResponse.HasUserAccount = true;
         getRelationshipByEmailResponse.HasOneEmployerAccount = true;
         getRelationshipByEmailResponse.HasOneLegalEntity = true;
@@ -42,13 +44,11 @@ public class SearchByEmailControllerPostTests
 
         outerApiClientMock.Setup(x => x.GetRelationshipByEmail(_emailCallingRelationships, ukprn, cancellationToken)).ReturnsAsync(getRelationshipByEmailResponse);
 
-        validatorMock.Setup(v => v.Validate(It.IsAny<SearchByEmailSubmitViewModel>())).Returns(new ValidationResult());
-
-        SearchByEmailController sut = new(outerApiClientMock.Object, sessionServiceMock.Object, validatorMock.Object);
+        validatorMock.Setup(v => v.Validate(It.IsAny<SearchByEmailSubmitModel>())).Returns(new ValidationResult());
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
 
-        var result = await sut.Index(ukprn, searchByEmailSubmitViewModel, cancellationToken);
+        var result = await sut.Index(ukprn, searchByEmailSubmitModel, cancellationToken);
 
         RedirectToRouteResult? redirectToRouteResult = result.As<RedirectToRouteResult>();
         redirectToRouteResult.RouteName.Should().Be(RouteNames.AddEmployerSearchByEmail);
@@ -60,17 +60,18 @@ public class SearchByEmailControllerPostTests
 
     [Test, MoqAutoData]
     public async Task Post_SingleAccountsHasNoRelationship_ReturnsExpectedViewModelAndPath(
-        Mock<IOuterApiClient> outerApiClientMock,
-        Mock<IValidator<SearchByEmailSubmitViewModel>> validatorMock,
-        Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<IValidator<SearchByEmailSubmitModel>> validatorMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Greedy] SearchByEmailController sut,
         int ukprn,
-        SearchByEmailSubmitViewModel searchByEmailSubmitViewModel,
+        SearchByEmailSubmitModel searchByEmailSubmitModel,
         GetRelationshipByEmailResponse getRelationshipByEmailResponse,
         CancellationToken cancellationToken
     )
     {
 
-        searchByEmailSubmitViewModel.Email = Email;
+        searchByEmailSubmitModel.Email = Email;
         getRelationshipByEmailResponse.HasUserAccount = true;
         getRelationshipByEmailResponse.HasOneEmployerAccount = true;
         getRelationshipByEmailResponse.HasOneLegalEntity = true;
@@ -78,13 +79,11 @@ public class SearchByEmailControllerPostTests
 
         outerApiClientMock.Setup(x => x.GetRelationshipByEmail(_emailCallingRelationships, ukprn, cancellationToken)).ReturnsAsync(getRelationshipByEmailResponse);
 
-        validatorMock.Setup(v => v.Validate(It.IsAny<SearchByEmailSubmitViewModel>())).Returns(new ValidationResult());
-
-        SearchByEmailController sut = new(outerApiClientMock.Object, sessionServiceMock.Object, validatorMock.Object);
+        validatorMock.Setup(v => v.Validate(It.IsAny<SearchByEmailSubmitModel>())).Returns(new ValidationResult());
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
 
-        var result = await sut.Index(ukprn, searchByEmailSubmitViewModel, cancellationToken);
+        var result = await sut.Index(ukprn, searchByEmailSubmitModel, cancellationToken);
 
         RedirectToRouteResult? redirectToRouteResult = result.As<RedirectToRouteResult>();
         redirectToRouteResult.RouteName.Should().Be(RouteNames.OneAccountNoRelationship);
@@ -101,34 +100,34 @@ public class SearchByEmailControllerPostTests
 
     [Test, MoqAutoData]
     public async Task Post_Invalid_ReturnsExpectedViewModelAndPath(
-        Mock<IOuterApiClient> outerApiClientMock,
-        Mock<IValidator<SearchByEmailSubmitViewModel>> validatorMock,
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<IValidator<SearchByEmailSubmitModel>> validatorMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Greedy] SearchByEmailController sut,
         int ukprn,
-        SearchByEmailSubmitViewModel searchByEmailSubmitViewModel,
+        SearchByEmailSubmitModel searchByEmailSubmitModel,
         GetRelationshipByEmailResponse getRelationshipByEmailResponse,
         CancellationToken cancellationToken
     )
     {
-        searchByEmailSubmitViewModel.Email = Email;
+        searchByEmailSubmitModel.Email = Email;
         getRelationshipByEmailResponse.HasUserAccount = true;
         getRelationshipByEmailResponse.HasOneEmployerAccount = true;
         getRelationshipByEmailResponse.HasOneLegalEntity = true;
 
         outerApiClientMock.Setup(x => x.GetRelationshipByEmail(_emailCallingRelationships, ukprn, cancellationToken)).ReturnsAsync(getRelationshipByEmailResponse);
 
-        validatorMock.Setup(m => m.Validate(It.IsAny<SearchByEmailSubmitViewModel>())).Returns(new ValidationResult(new List<ValidationFailure>()
+        validatorMock.Setup(m => m.Validate(It.IsAny<SearchByEmailSubmitModel>())).Returns(new ValidationResult(new List<ValidationFailure>()
         {
             new("TestField","Test Message") { ErrorCode = "1001"}
         }));
 
-        SearchByEmailController sut = new(outerApiClientMock.Object, Mock.Of<ISessionService>(), validatorMock.Object);
-
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
 
-        var result = await sut.Index(ukprn, searchByEmailSubmitViewModel, cancellationToken);
+        var result = await sut.Index(ukprn, searchByEmailSubmitModel, cancellationToken);
 
         ViewResult? viewResult = result.As<ViewResult>();
-        SearchByEmailViewModel? viewModel = viewResult.Model as SearchByEmailViewModel;
+        SearchByEmailModel? viewModel = viewResult.Model as SearchByEmailModel;
         viewModel!.Ukprn.Should().Be(ukprn);
         viewModel.BackLink.Should().Be(BackLink);
         viewModel.CancelLink.Should().Be(CancelLink);
@@ -144,27 +143,27 @@ public class SearchByEmailControllerPostTests
     public async Task Post_MultipleAccounts_RedirectsToShutterPage(
         bool? hasOneEmployerAccount,
         bool? hasOneLegalEntity,
-        Mock<IOuterApiClient> outerApiClientMock,
-        Mock<IValidator<SearchByEmailSubmitViewModel>> validatorMock,
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<IValidator<SearchByEmailSubmitModel>> validatorMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Greedy] SearchByEmailController sut,
         int ukprn,
-        SearchByEmailSubmitViewModel searchByEmailSubmitViewModel,
+        SearchByEmailSubmitModel searchByEmailSubmitModel,
         GetRelationshipByEmailResponse getRelationshipByEmailResponse,
         CancellationToken cancellationToken
     )
     {
-        searchByEmailSubmitViewModel.Email = Email;
+        searchByEmailSubmitModel.Email = Email;
         getRelationshipByEmailResponse.HasUserAccount = true;
         getRelationshipByEmailResponse.HasOneEmployerAccount = hasOneEmployerAccount;
         getRelationshipByEmailResponse.HasOneLegalEntity = hasOneLegalEntity;
 
         outerApiClientMock.Setup(x => x.GetRelationshipByEmail(_emailCallingRelationships, ukprn, cancellationToken)).ReturnsAsync(getRelationshipByEmailResponse);
-        validatorMock.Setup(v => v.Validate(It.IsAny<SearchByEmailSubmitViewModel>())).Returns(new ValidationResult());
-
-        SearchByEmailController sut = new(outerApiClientMock.Object, Mock.Of<ISessionService>(), validatorMock.Object);
+        validatorMock.Setup(v => v.Validate(It.IsAny<SearchByEmailSubmitModel>())).Returns(new ValidationResult());
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerMultipleAccounts, RedirectToMultipleAccountsShutterPage);
 
-        var result = await sut.Index(ukprn, searchByEmailSubmitViewModel, cancellationToken);
+        var result = await sut.Index(ukprn, searchByEmailSubmitModel, cancellationToken);
 
         RedirectToRouteResult? redirectToRouteResult = result.As<RedirectToRouteResult>();
         redirectToRouteResult.RouteName.Should().Be(RouteNames.AddEmployerMultipleAccounts);
@@ -173,26 +172,25 @@ public class SearchByEmailControllerPostTests
 
     [Test, MoqInlineAutoData]
     public async Task Post_HasAccountFalse_RedirectsToSearchByPaye(
-        Mock<IOuterApiClient> outerApiClientMock,
-        Mock<IValidator<SearchByEmailSubmitViewModel>> validatorMock,
-        Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<IValidator<SearchByEmailSubmitModel>> validatorMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Greedy] SearchByEmailController sut,
         int ukprn,
-        SearchByEmailSubmitViewModel searchByEmailSubmitViewModel,
+        SearchByEmailSubmitModel searchByEmailSubmitModel,
         GetRelationshipByEmailResponse getRelationshipByEmailResponse,
         CancellationToken cancellationToken
     )
     {
-        searchByEmailSubmitViewModel.Email = Email;
+        searchByEmailSubmitModel.Email = Email;
         getRelationshipByEmailResponse.HasUserAccount = false;
 
         outerApiClientMock.Setup(x => x.GetRelationshipByEmail(_emailCallingRelationships, ukprn, cancellationToken)).ReturnsAsync(getRelationshipByEmailResponse);
-        validatorMock.Setup(v => v.Validate(It.IsAny<SearchByEmailSubmitViewModel>())).Returns(new ValidationResult());
-
-        SearchByEmailController sut = new(outerApiClientMock.Object, sessionServiceMock.Object, validatorMock.Object);
+        validatorMock.Setup(v => v.Validate(It.IsAny<SearchByEmailSubmitModel>())).Returns(new ValidationResult());
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
 
-        var result = await sut.Index(ukprn, searchByEmailSubmitViewModel, cancellationToken);
+        var result = await sut.Index(ukprn, searchByEmailSubmitModel, cancellationToken);
 
         RedirectToRouteResult? redirectToRouteResult = result.As<RedirectToRouteResult>();
         redirectToRouteResult.RouteName.Should().Be(RouteNames.AddEmployerSearchByPaye);

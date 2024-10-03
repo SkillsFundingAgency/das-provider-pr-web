@@ -1,8 +1,8 @@
 ﻿namespace SFA.DAS.Provider.PR.Web.Models.AddEmployer;
 
-public class SearchByEmailViewModel : SearchByEmailSubmitViewModel
+public class SearchByEmailModel : SearchByEmailSubmitModel
 {
-    public SearchByEmailViewModel() { }
+    public SearchByEmailModel() { }
 
     public required string CancelLink { get; init; }
     public required string BackLink { get; init; }
@@ -10,7 +10,7 @@ public class SearchByEmailViewModel : SearchByEmailSubmitViewModel
 
 }
 
-public class SearchByEmailSubmitViewModel
+public class SearchByEmailSubmitModel
 {
     public string? Email { get; set; }
 }
