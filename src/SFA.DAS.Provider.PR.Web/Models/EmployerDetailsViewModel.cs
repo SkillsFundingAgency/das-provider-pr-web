@@ -9,6 +9,7 @@ public class EmployerDetailsViewModel
     public const string RecruitmentRequiresReviewPermissionText = "Yes, employer will review adverts";
 
     public const string PendingAddTrainingProviderAndPermissionsRequestText = "Add training provider and permissions request sent";
+    public const string AccountCreatedPermissionsSetText = "Apprenticeship service account created";
     //The following are WIP, to be replaced in later stories as more variations of the employer details page are created
     public const string PendingNotImplementedText = "PENDING REQUEST - NOT YET IMPLEMENTED";
     public const string NotPendingNotImplementedText = "NO PENDING REQUEST - NOT YET IMPLEMENTED";
@@ -28,7 +29,7 @@ public class EmployerDetailsViewModel
 
     public string ProviderName { get; set; } = null!;
 
-    public bool PendingPermissionRequest { get; set; } = true;
+    public bool HasExistingPermissions { get; set; } = true;
 
     public Operation[] Operations { get; set; } = [];
 
@@ -43,6 +44,8 @@ public class EmployerDetailsViewModel
     public bool HasPermissionsRequest { get; set; }
 
     public string LastActionText { get; set; } = null!;
+
+    public string LastRequestType { get; set; } = null!;
 
 
     public static implicit operator EmployerDetailsViewModel(GetProviderRelationshipResponse response)
@@ -59,7 +62,8 @@ public class EmployerDetailsViewModel
             Operations = response.Operations,
             LastRequestOperations = SetLastRequestOperations(response),
             HasPermissionsRequest = SetHasPermissionsRequest(response),
-            LastActionText = SetLastActionText(response)
+            LastActionText = SetLastActionText(response),
+            HasExistingPermissions = SetHasExistingPermissions(response)
         };
     }
 
@@ -83,18 +87,31 @@ public class EmployerDetailsViewModel
 
     private static string SetLastActionText(GetProviderRelationshipResponse response)
     {
-        if (response.LastRequestStatus == RequestStatus.Sent)
+        if (String.Equals(response.LastRequestType, "CreateAccount", StringComparison.CurrentCultureIgnoreCase)
+            && response.LastRequestStatus == RequestStatus.Accepted)
+            return AccountCreatedPermissionsSetText;
+        if (String.Equals(response.LastRequestType, "Permission", StringComparison.CurrentCultureIgnoreCase))
         {
-            switch (response.LastAction)
+            if (response.LastRequestStatus == RequestStatus.Sent)
             {
-                case PermissionAction.PermissionCreated:
-                    return PendingAddTrainingProviderAndPermissionsRequestText;
-                default:
-                    return PendingNotImplementedText;
+                switch (response.LastAction)
+                {
+                    case PermissionAction.PermissionCreated:
+                        return PendingAddTrainingProviderAndPermissionsRequestText;
+                    default:
+                        return PendingNotImplementedText;
+                }
             }
         }
 
         return NotPendingNotImplementedText;
+    }
+
+    private static bool SetHasExistingPermissions(GetProviderRelationshipResponse response)
+    {
+        if (response.Operations.Length == 0 && response.LastRequestOperations != null && response.LastRequestOperations.Length != 0)
+            return false;
+        return true;
     }
 
     private static string[] SetPermissionsText(Operation[] operations)

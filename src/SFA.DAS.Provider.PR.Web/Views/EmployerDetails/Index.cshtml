@@ -44,7 +44,7 @@
     </div>
 </div>
 
-<div asp-show="@Model.PendingPermissionRequest">
+<div asp-show="!@Model.HasExistingPermissions">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             <div class="govuk-!-width">
@@ -56,28 +56,25 @@
         </div>
     </div>
 </div>
-        
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
+
+<div asp-show="!@Model.HasPermissionsRequest" class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
         <div class="govuk-!-width">
-            <table class="govuk-table ">
+            <table class="govuk-table govuk-!-margin-bottom-8">
                 <thead class="govuk-table__head">
                 <tr class="govuk-table__row">
                     <th scope="col" class="govuk-table__header"></th>
                     <th scope="col" class="govuk-table__header">Current permissions</th>
-                    <th scope="col" class="govuk-table__header">Requested permissions</th>
                 </tr>
                 </thead>
                 <tbody class="govuk-table__body">
                 <tr class="govuk-table__row">
                     <th scope="row" class="govuk-table__header">Permission to add apprentice records</th>
                     <td class="govuk-table__cell">@Model.CurrentPermissions[0]</td>
-                        <td class="govuk-table__cell">@Model.RequestedPermissions[0]</td>
                 </tr>
                 <tr class="govuk-table__row">
                     <th scope="row" class="govuk-table__header">Permission to recruit apprentices</th>
-                        <td class="govuk-table__cell">@Model.CurrentPermissions[1]</td>
-                    <td class="govuk-table__cell">@Model.RequestedPermissions[1]</td>
+                    <td class="govuk-table__cell">@Model.CurrentPermissions[1]</td>
                 </tr>
                 </tbody>
             </table>
@@ -85,12 +82,58 @@
     </div>
 </div>
 
-<div class="govuk-grid-row">
+<div asp-show="@Model.HasPermissionsRequest" class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <div class="govuk-!-width">
+            <table class="govuk-table govuk-!-margin-bottom-8">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header"></th>
+                        <th scope="col" class="govuk-table__header">Current permissions</th>
+                        <th scope="col" class="govuk-table__header">Requested permissions</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Permission to add apprentice records</th>
+                        <td class="govuk-table__cell">@Model.CurrentPermissions[0]</td>
+                        <td class="govuk-table__cell">@Model.RequestedPermissions[0]</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Permission to recruit apprentices</th>
+                        <td class="govuk-table__cell">@Model.CurrentPermissions[1]</td>
+                        <td class="govuk-table__cell">@Model.RequestedPermissions[1]</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div asp-show="@Model.HasPermissionsRequest" class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <div class="govuk-!-width">
             <p class="govuk-body">
                 To view all your employers, permissions and pending requests go to <a href="@Model.EmployersLink">View employers and manage permissions</a>
             </p>
+        </div>
+    </div>
+</div>
+
+<div asp-show="!@Model.HasPermissionsRequest" class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-!-width">
+            <p class="govuk-body govuk-table govuk-!-margin-bottom-6">
+                Request new permissions from @Model.AccountLegalEntityName.
+            </p>
+        </div>
+    </div>
+    <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-button-group">
+            <button type="submit" class="govuk-button" data-module="govuk-button">
+                Request permissions
+            </button>
+            <a class="govuk-link govuk-body" href="@Model.EmployersLink">View current employers and permissions</a>
         </div>
     </div>
 </div>

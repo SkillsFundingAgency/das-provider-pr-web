@@ -5,6 +5,9 @@ using SFA.DAS.Provider.PR.Web.Models;
 namespace SFA.DAS.Provider.PR_Web.UnitTests.Models;
 public class EmployerDetailsModelTests
 {
+    public const string CreateAccountRequestType = "CreateAccount";
+    public const string PermissionRequestType = "Permission";
+
     [Test, AutoData]
     public void ModelIsCreatedCorrectly_FromApiResponseObject(GetProviderRelationshipResponse response)
     {
@@ -52,14 +55,16 @@ public class EmployerDetailsModelTests
     }
 
     [Test]
-    [InlineAutoData(RequestStatus.Sent, PermissionAction.PermissionCreated, EmployerDetailsViewModel.PendingAddTrainingProviderAndPermissionsRequestText)]
-    [InlineAutoData(RequestStatus.Sent, PermissionAction.ApprovalsRelationship, EmployerDetailsViewModel.PendingNotImplementedText)]
-    [InlineAutoData(RequestStatus.New, PermissionAction.PermissionCreated, EmployerDetailsViewModel.NotPendingNotImplementedText)]
-    public void LastActionTextIsSetCorrectly(RequestStatus status, PermissionAction action, string expected,
+    [InlineAutoData(RequestStatus.Sent, PermissionAction.PermissionCreated, PermissionRequestType, EmployerDetailsViewModel.PendingAddTrainingProviderAndPermissionsRequestText)]
+    [InlineAutoData(RequestStatus.Sent, PermissionAction.ApprovalsRelationship, PermissionRequestType, EmployerDetailsViewModel.PendingNotImplementedText)]
+    [InlineAutoData(RequestStatus.New, PermissionAction.PermissionCreated, PermissionRequestType, EmployerDetailsViewModel.NotPendingNotImplementedText)]
+    [InlineAutoData(RequestStatus.Accepted, PermissionAction.PermissionCreated, CreateAccountRequestType, EmployerDetailsViewModel.AccountCreatedPermissionsSetText)]
+    public void LastActionTextIsSetCorrectly(RequestStatus status, PermissionAction action, string lastRequestType, string expected,
         GetProviderRelationshipResponse response)
     {
         response.LastRequestStatus = status;
         response.LastAction = action;
+        response.LastRequestType = lastRequestType;
 
         var actual = (EmployerDetailsViewModel)response;
 
@@ -78,5 +83,20 @@ public class EmployerDetailsModelTests
         var actual = (EmployerDetailsViewModel)response;
 
         Assert.That(actual.CurrentPermissions.Contains(expected));
+    }
+
+    [Test]
+    [InlineAutoData(new Operation[] { }, new Operation[] { Operation.CreateCohort }, false)]
+    [InlineAutoData(new Operation[] { Operation.CreateCohort }, new Operation[] { }, true)]
+    [InlineAutoData(new Operation[] { Operation.CreateCohort }, new Operation[] { Operation.CreateCohort }, true)]
+    public void HasExistingPermissionsSetCorrectly(Operation[] operations, Operation[] lastRequestOperations,
+        bool expected, GetProviderRelationshipResponse response)
+    {
+        response.Operations = operations;
+        response.LastRequestOperations = lastRequestOperations;
+
+        var actual = (EmployerDetailsViewModel)response;
+
+        Assert.That(actual.HasExistingPermissions, Is.EqualTo(expected));
     }
 }
