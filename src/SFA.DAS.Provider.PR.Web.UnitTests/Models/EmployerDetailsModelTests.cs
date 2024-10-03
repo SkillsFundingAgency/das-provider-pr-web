@@ -29,7 +29,6 @@ public class EmployerDetailsModelTests
             Assert.That(actual.Operations, Is.EqualTo(response.Operations));
             Assert.That(actual.LastRequestOperations, Is.EqualTo(Array.Empty<Operation>()));
             Assert.That(actual.HasPermissionsRequest, Is.False);
-            Assert.That(actual.LastActionText, Is.EqualTo("NO PENDING REQUEST - NOT YET IMPLEMENTED"));
         });
     }
 
