@@ -57,8 +57,7 @@ public class EmployerDetailsModelTests
     [Test]
     [InlineAutoData(RequestStatus.Sent, PermissionAction.PermissionCreated, PermissionRequestType, EmployerDetailsViewModel.PendingAddTrainingProviderAndPermissionsRequestText)]
     [InlineAutoData(RequestStatus.Sent, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsViewModel.PendingPermissionRequestUpdatedText)]
-    [InlineAutoData(RequestStatus.Sent, PermissionAction.ApprovalsRelationship, PermissionRequestType, EmployerDetailsViewModel.PendingNotImplementedText)]
-    [InlineAutoData(RequestStatus.New, PermissionAction.PermissionCreated, PermissionRequestType, EmployerDetailsViewModel.NotPendingNotImplementedText)]
+    [InlineAutoData(RequestStatus.Accepted, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsViewModel.PermissionUpdateAcceptedText)]
     [InlineAutoData(RequestStatus.Accepted, PermissionAction.PermissionCreated, CreateAccountRequestType, EmployerDetailsViewModel.AccountCreatedPermissionsSetText)]
     public void LastActionTextIsSetCorrectly(RequestStatus status, PermissionAction action, string lastRequestType, string expected,
         GetProviderRelationshipResponse response)

@@ -11,9 +11,7 @@ public class EmployerDetailsViewModel
     public const string PendingAddTrainingProviderAndPermissionsRequestText = "Add training provider and permissions request sent";
     public const string AccountCreatedPermissionsSetText = "Apprenticeship service account created";
     public const string PendingPermissionRequestUpdatedText = "Permissions request sent";
-    //The following are WIP, to be replaced in later stories as more variations of the employer details page are created
-    public const string PendingNotImplementedText = "PENDING REQUEST - NOT YET IMPLEMENTED";
-    public const string NotPendingNotImplementedText = "NO PENDING REQUEST - NOT YET IMPLEMENTED";
+    public const string PermissionUpdateAcceptedText = "Permissions set";
 
 
     public long AccountLegalEntityId { get; set; }
@@ -88,26 +86,32 @@ public class EmployerDetailsViewModel
 
     private static string SetLastActionText(GetProviderRelationshipResponse response)
     {
+        string lastActionText = "";
         if (String.Equals(response.LastRequestType, "CreateAccount", StringComparison.CurrentCultureIgnoreCase)
             && response.LastRequestStatus == RequestStatus.Accepted)
-            return AccountCreatedPermissionsSetText;
+            lastActionText = AccountCreatedPermissionsSetText;
         if (String.Equals(response.LastRequestType, "Permission", StringComparison.CurrentCultureIgnoreCase))
         {
-            if (response.LastRequestStatus == RequestStatus.Sent)
+            switch (response.LastRequestStatus)
             {
-                switch (response.LastAction)
-                {
-                    case PermissionAction.PermissionCreated:
-                        return PendingAddTrainingProviderAndPermissionsRequestText;
-                    case PermissionAction.PermissionUpdated:
-                        return PendingPermissionRequestUpdatedText;
-                    default:
-                        return PendingNotImplementedText;
-                }
+                case RequestStatus.Sent:
+                    switch (response.LastAction)
+                    {
+                        case PermissionAction.PermissionCreated:
+                            lastActionText = PendingAddTrainingProviderAndPermissionsRequestText;
+                            break;
+                        case PermissionAction.PermissionUpdated:
+                            lastActionText = PendingPermissionRequestUpdatedText;
+                            break;
+                    }
+                    break;
+                case RequestStatus.Accepted:
+                    lastActionText = PermissionUpdateAcceptedText;
+                    break;
             }
         }
 
-        return NotPendingNotImplementedText;
+        return lastActionText;
     }
 
     private static bool SetHasExistingPermissions(GetProviderRelationshipResponse response)
