@@ -13,6 +13,7 @@ public class EmployerDetailsViewModel
     public const string PendingPermissionRequestUpdatedText = "Permissions request sent";
     public const string PermissionUpdateAcceptedText = "Permissions set";
     public const string PermissionUpdateDeclinedText = "Permissions request declined";
+    public const string PermissionUpdateExpiredText = "Permissions request expired";
 
 
     public long AccountLegalEntityId { get; set; }
@@ -111,6 +112,9 @@ public class EmployerDetailsViewModel
                     break;
                 case RequestStatus.Declined:
                     lastActionText = PermissionUpdateDeclinedText;
+                    break;
+                case RequestStatus.Expired:
+                    lastActionText = PermissionUpdateExpiredText;
                     break;
             }
         }
