@@ -100,9 +100,7 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
             return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
         }
 
-        var accountLegalEntityId = sessionModel.AccountLegalEntityId.Value;
-
-        var accountLegalEntityIdEncoded = encodingService.Encode(accountLegalEntityId, EncodingType.PublicAccountLegalEntityId);
+        var accountLegalEntityIdEncoded = encodingService.Encode(sessionModel.AccountLegalEntityId.Value, EncodingType.PublicAccountLegalEntityId);
         var employerAccountLink = Url.RouteUrl(RouteNames.EmployerDetails, new { ukprn, accountLegalEntityId = accountLegalEntityIdEncoded })!;
         var shutterViewModel = new EmailLinkedToAccountWithRelationshipShutterPageViewModel(email, employerName, employerAccountLink);
 
