@@ -18,7 +18,7 @@ namespace SFA.DAS.Provider.PR.Web.Controllers.AddEmployer;
 [Authorize(Policy = nameof(PolicyNames.HasContributorOrAbovePermission))]
 
 [Route("/{ukprn}/addEmployer", Name = RouteNames.AddPermissionsAndEmployer)]
-public class AddPermissionsAndEmployerController(IOuterApiClient _outerApiClient, ISessionService _sessionService, IValidator<AddPermissionsAndEmployerSubmitViewModel> _validator) : Controller
+public class AddPermissionsAndEmployerController(IOuterApiClient _outerApiClient, ISessionService _sessionService, IValidator<AddPermissionsAndEmployerSubmitModel> _validator) : Controller
 {
     public const string ViewPath = "~/Views/AddEmployer/AddPermissionsAndEmployer.cshtml";
     public const string ViewPathSent = "~/Views/AddEmployer/AddEmployerConfirmation.cshtml";

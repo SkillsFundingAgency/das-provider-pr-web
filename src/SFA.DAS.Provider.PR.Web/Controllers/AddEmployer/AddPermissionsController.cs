@@ -13,9 +13,9 @@ namespace SFA.DAS.Provider.PR.Web.Controllers.AddEmployer;
 [Authorize(Policy = nameof(PolicyNames.HasContributorOrAbovePermission))]
 
 [Route("/{ukprn}/addEmployer/changePermissions", Name = RouteNames.ChangePermissions)]
-public class ChangePermissionsController(ISessionService _sessionService, IValidator<ChangePermissionsSubmitModel> _validator) : Controller
+public class AddPermissionsController(ISessionService _sessionService, IValidator<AddPermissionsSubmitModel> _validator) : Controller
 {
-    public const string ViewPath = "~/Views/AddEmployer/ChangePermissions.cshtml";
+    public const string ViewPath = "~/Views/AddEmployer/AddPermissions.cshtml";
 
     [HttpGet]
     public IActionResult Index([FromRoute] int ukprn)
@@ -33,7 +33,7 @@ public class ChangePermissionsController(ISessionService _sessionService, IValid
     }
 
     [HttpPost]
-    public IActionResult Index([FromRoute] int ukprn, ChangePermissionsSubmitModel submitViewModel)
+    public IActionResult Index([FromRoute] int ukprn, AddPermissionsSubmitModel submitViewModel)
     {
         var result = _validator.Validate(submitViewModel);
 
@@ -59,11 +59,11 @@ public class ChangePermissionsController(ISessionService _sessionService, IValid
     }
 
 
-    private ChangePermissionsViewModel GetViewModel(int ukprn, AddEmployerSessionModel sessionModel)
+    private AddPermissionsViewModel GetViewModel(int ukprn, AddEmployerSessionModel sessionModel)
     {
         var cancelLink = Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn })!;
         var backLink = Url.RouteUrl(RouteNames.CheckEmployerDetails, new { ukprn })!;
-        return new ChangePermissionsViewModel
+        return new AddPermissionsViewModel
         {
             Email = sessionModel.Email,
             OrganisationName = sessionModel.OrganisationName?.ToUpper()!,

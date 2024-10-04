@@ -14,7 +14,7 @@ namespace SFA.DAS.Provider.PR.Web.Controllers.AddEmployer;
 [Authorize(Policy = nameof(PolicyNames.HasContributorOrAbovePermission))]
 
 [Route("/{ukprn}/addEmployer/searchByPaye", Name = RouteNames.AddEmployerSearchByPaye)]
-public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionService _sessionService, IValidator<SearchByPayeSubmitViewModel> _validator) : Controller
+public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionService _sessionService, IValidator<SearchByPayeSubmitModel> _validator) : Controller
 {
     public const string ViewPath = "~/Views/AddEmployer/SearchByPaye.cshtml";
     public const string PayeAornShutterPathViewPath = "~/Views/AddEmployer/ShutterPages/PayeAornShutterPage.cshtml";
@@ -28,6 +28,11 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
         if (string.IsNullOrEmpty(sessionModel?.Email))
         {
             return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
+        }
+
+        if (sessionModel.IsCheckDetailsVisited)
+        {
+            return RedirectToRoute(RouteNames.CheckEmployerDetails, new { ukprn });
         }
 
         var viewModel = GetViewModel(ukprn);
@@ -48,17 +53,17 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
     }
 
     [HttpPost]
-    public async Task<IActionResult> Index([FromRoute] int ukprn, SearchByPayeSubmitViewModel submitViewModel, CancellationToken cancellationToken)
+    public async Task<IActionResult> Index([FromRoute] int ukprn, SearchByPayeSubmitModel submitModel, CancellationToken cancellationToken)
     {
 
-        var result = _validator.Validate(submitViewModel);
+        var result = _validator.Validate(submitModel);
 
         if (!result.IsValid)
         {
             var viewModel = GetViewModel(ukprn);
-            viewModel.Email = submitViewModel.Email;
-            viewModel.Paye = submitViewModel.Paye;
-            viewModel.Aorn = submitViewModel.Aorn;
+            viewModel.Email = submitModel.Email;
+            viewModel.Paye = submitModel.Paye;
+            viewModel.Aorn = submitModel.Aorn;
             result.AddToModelState(ModelState);
             return View(ViewPath, viewModel);
         }
@@ -69,8 +74,8 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
             return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
         }
 
-        sessionModel.Paye = submitViewModel.Paye;
-        sessionModel.Aorn = submitViewModel.Aorn;
+        sessionModel.Paye = submitModel.Paye;
+        sessionModel.Aorn = submitModel.Aorn;
         sessionModel.IsCheckDetailsVisited = false;
         _sessionService.Set(sessionModel);
 
@@ -164,11 +169,11 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
         return View(PayeAornShutterPathViewPath, shutterViewModel);
     }
 
-    private SearchByPayeViewModel GetViewModel(int ukprn)
+    private SearchByPayeModel GetViewModel(int ukprn)
     {
         var cancelLink = Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn });
         var backLink = Url.RouteUrl(RouteNames.AddEmployerSearchByEmail, new { ukprn });
-        return new SearchByPayeViewModel { CancelLink = cancelLink!, BackLink = backLink!, Ukprn = ukprn };
+        return new SearchByPayeModel { CancelLink = cancelLink!, BackLink = backLink!, Ukprn = ukprn };
     }
 
 }

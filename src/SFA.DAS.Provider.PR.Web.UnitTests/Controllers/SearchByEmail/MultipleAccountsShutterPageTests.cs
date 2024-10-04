@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using AutoFixture.NUnit3;
+using FluentAssertions;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -16,10 +17,13 @@ public class MultipleAccountsShutterPageTests
     private static readonly string AddLink = Guid.NewGuid().ToString();
 
     [Test, MoqAutoData]
-    public void MultipleAccountsShutterPage_BuildsExpectedViewModel(int ukprn)
+    public void MultipleAccountsShutterPage_BuildsExpectedViewModel(
+        [Frozen] Mock<IOuterApiClient> outerApiMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<SearchByEmailSubmitModel>> validatorMock,
+        [Greedy] SearchByEmailController sut,
+        int ukprn)
     {
-        SearchByEmailController sut = new(Mock.Of<IOuterApiClient>(), Mock.Of<ISessionService>(), Mock.Of<IValidator<SearchByEmailSubmitViewModel>>());
-
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, AddLink);
 
         var result = sut.MultipleAccountsShutterPage(ukprn);

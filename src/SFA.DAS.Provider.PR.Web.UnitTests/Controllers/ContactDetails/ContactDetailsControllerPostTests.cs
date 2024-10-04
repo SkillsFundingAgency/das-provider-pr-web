@@ -21,7 +21,7 @@ public class ContactDetailsControllerPostTests
 
     [Test, MoqAutoData]
     public void Post_ReturnsExpectedViewModelAndPath(
-        Mock<IValidator<ContactDetailsSubmitViewModel>> validatorMock,
+        Mock<IValidator<ContactDetailsSubmitModel>> validatorMock,
         Mock<ISessionService> sessionServiceMock,
         int ukprn,
         string firstName,
@@ -29,7 +29,7 @@ public class ContactDetailsControllerPostTests
         CancellationToken cancellationToken
         )
     {
-        ContactDetailsSubmitViewModel contactDetailsSubmitViewModel = new()
+        ContactDetailsSubmitModel contactDetailsSubmitModel = new()
         {
             FirstName = firstName,
             LastName = lastName
@@ -37,13 +37,13 @@ public class ContactDetailsControllerPostTests
 
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel { Email = Email, FirstName = firstName, LastName = lastName });
 
-        validatorMock.Setup(v => v.Validate(It.IsAny<ContactDetailsSubmitViewModel>())).Returns(new ValidationResult());
+        validatorMock.Setup(v => v.Validate(It.IsAny<ContactDetailsSubmitModel>())).Returns(new ValidationResult());
 
         ContactDetailsController sut = new(sessionServiceMock.Object, validatorMock.Object);
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
 
-        var result = sut.Index(ukprn, contactDetailsSubmitViewModel, cancellationToken);
+        var result = sut.Index(ukprn, contactDetailsSubmitModel, cancellationToken);
 
         RedirectToRouteResult? redirectToRouteResult = result.As<RedirectToRouteResult>();
         redirectToRouteResult.RouteName.Should().Be(RouteNames.CheckEmployerDetails);
@@ -54,7 +54,7 @@ public class ContactDetailsControllerPostTests
 
     [Test, MoqAutoData]
     public void Post_SessionModelNotFound_RedirectedToStart(
-        Mock<IValidator<ContactDetailsSubmitViewModel>> validatorMock,
+        Mock<IValidator<ContactDetailsSubmitModel>> validatorMock,
         Mock<ISessionService> sessionServiceMock,
         int ukprn,
         string firstName,
@@ -62,7 +62,7 @@ public class ContactDetailsControllerPostTests
         CancellationToken cancellationToken
        )
     {
-        ContactDetailsSubmitViewModel contactDetailsSubmitViewModel = new()
+        ContactDetailsSubmitModel contactDetailsSubmitModel = new()
         {
             FirstName = firstName,
             LastName = lastName
@@ -70,13 +70,13 @@ public class ContactDetailsControllerPostTests
 
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns((AddEmployerSessionModel)null!);
 
-        validatorMock.Setup(v => v.Validate(It.IsAny<ContactDetailsSubmitViewModel>())).Returns(new ValidationResult());
+        validatorMock.Setup(v => v.Validate(It.IsAny<ContactDetailsSubmitModel>())).Returns(new ValidationResult());
 
         ContactDetailsController sut = new(sessionServiceMock.Object, validatorMock.Object);
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
 
-        var actual = sut.Index(ukprn, contactDetailsSubmitViewModel, cancellationToken);
+        var actual = sut.Index(ukprn, contactDetailsSubmitModel, cancellationToken);
         actual.Should().BeOfType<RedirectToRouteResult>();
         actual.As<RedirectToRouteResult>().RouteName.Should().Be(RouteNames.AddEmployerStart);
         actual.As<RedirectToRouteResult>().RouteValues.Should().ContainKey("ukprn");
@@ -84,7 +84,7 @@ public class ContactDetailsControllerPostTests
 
     [Test, MoqAutoData]
     public void Post_RedirectsToStartIfEmailNotSetInSession(
-        Mock<IValidator<ContactDetailsSubmitViewModel>> validatorMock,
+        Mock<IValidator<ContactDetailsSubmitModel>> validatorMock,
         Mock<ISessionService> sessionServiceMock,
         int ukprn,
         string firstName,
@@ -92,7 +92,7 @@ public class ContactDetailsControllerPostTests
         CancellationToken cancellationToken
     )
     {
-        ContactDetailsSubmitViewModel contactDetailsSubmitViewModel = new()
+        ContactDetailsSubmitModel contactDetailsSubmitModel = new()
         {
             FirstName = firstName,
             LastName = lastName
@@ -100,13 +100,13 @@ public class ContactDetailsControllerPostTests
 
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel { Email = string.Empty });
 
-        validatorMock.Setup(v => v.Validate(It.IsAny<ContactDetailsSubmitViewModel>())).Returns(new ValidationResult());
+        validatorMock.Setup(v => v.Validate(It.IsAny<ContactDetailsSubmitModel>())).Returns(new ValidationResult());
 
         ContactDetailsController sut = new(sessionServiceMock.Object, validatorMock.Object);
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
 
-        var actual = sut.Index(ukprn, contactDetailsSubmitViewModel, cancellationToken);
+        var actual = sut.Index(ukprn, contactDetailsSubmitModel, cancellationToken);
         actual.Should().BeOfType<RedirectToRouteResult>();
         actual.As<RedirectToRouteResult>().RouteName.Should().Be(RouteNames.AddEmployerStart);
         actual.As<RedirectToRouteResult>().RouteValues.Should().ContainKey("ukprn");
@@ -114,7 +114,7 @@ public class ContactDetailsControllerPostTests
 
     [Test, MoqAutoData]
     public void Post_Invalid_ReturnsExpectedViewModelAndPath(
-        Mock<IValidator<ContactDetailsSubmitViewModel>> validatorMock,
+        Mock<IValidator<ContactDetailsSubmitModel>> validatorMock,
         Mock<ISessionService> sessionServiceMock,
         int ukprn,
         string firstName,
@@ -122,7 +122,7 @@ public class ContactDetailsControllerPostTests
         CancellationToken cancellationToken
     )
     {
-        ContactDetailsSubmitViewModel contactDetailsSubmitViewModel = new()
+        ContactDetailsSubmitModel contactDetailsSubmitModel = new()
         {
             FirstName = firstName,
             LastName = lastName
@@ -139,7 +139,7 @@ public class ContactDetailsControllerPostTests
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink).AddUrlForRoute(RouteNames.AddEmployerSearchByPaye, BackLink);
 
-        var result = sut.Index(ukprn, contactDetailsSubmitViewModel, cancellationToken);
+        var result = sut.Index(ukprn, contactDetailsSubmitModel, cancellationToken);
 
         ViewResult? viewResult = result.As<ViewResult>();
         ContactDetailsViewModel? viewModel = viewResult.Model as ContactDetailsViewModel;

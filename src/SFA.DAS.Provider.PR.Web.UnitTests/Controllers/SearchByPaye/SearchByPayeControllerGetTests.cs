@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using AutoFixture.NUnit3;
+using FluentAssertions;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -15,24 +16,27 @@ namespace SFA.DAS.Provider.PR_Web.UnitTests.Controllers.SearchByPaye;
 public class SearchByPayeControllerGetTests
 {
     private static readonly string BackLink = Guid.NewGuid().ToString();
-    private static readonly string CancelLink = Guid.Empty.ToString();
+    private static readonly string CancelLink = Guid.NewGuid().ToString();
+    private static readonly string CheckDetailsLink = Guid.NewGuid().ToString();
 
     [Test, MoqAutoData]
-    public void Get_BuildsExpectedViewModel(int ukprn)
+    public void Get_BuildsExpectedViewModel(
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<SearchByPayeSubmitModel>> validatorMock,
+        [Greedy] SearchByPayeController sut,
+        int ukprn)
     {
         var email = "test@test.com";
-        var sessionServiceMock = new Mock<ISessionService>();
+
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel { Email = email });
 
-        SearchByPayeController sut = new(Mock.Of<IOuterApiClient>(), sessionServiceMock.Object, Mock.Of<IValidator<SearchByPayeSubmitViewModel>>());
-
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink).AddUrlForRoute(RouteNames.AddEmployerSearchByEmail, BackLink);
-
 
         var result = sut.Index(ukprn);
 
         ViewResult? viewResult = result.As<ViewResult>();
-        SearchByPayeViewModel? viewModel = viewResult.Model as SearchByPayeViewModel;
+        SearchByPayeModel? viewModel = viewResult.Model as SearchByPayeModel;
         viewModel!.Ukprn.Should().Be(ukprn);
         viewModel.BackLink.Should().Be(BackLink);
         viewModel.CancelLink.Should().Be(CancelLink);
@@ -42,19 +46,24 @@ public class SearchByPayeControllerGetTests
     }
 
     [Test, MoqAutoData]
-    public void Get_AddsExpectedPayeAndAornToViewModel(int ukprn, string paye, string aorn)
+    public void Get_AddsExpectedPayeAndAornToViewModel(
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<SearchByPayeSubmitModel>> validatorMock,
+        [Greedy] SearchByPayeController sut,
+        int ukprn,
+        string paye,
+        string aorn)
     {
         var email = "test@test.com";
-        var sessionServiceMock = new Mock<ISessionService>();
-        sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel { Email = email, Paye = paye, Aorn = aorn });
 
-        SearchByPayeController sut = new(Mock.Of<IOuterApiClient>(), sessionServiceMock.Object, Mock.Of<IValidator<SearchByPayeSubmitViewModel>>());
+        sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel { Email = email, Paye = paye, Aorn = aorn });
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink).AddUrlForRoute(RouteNames.AddEmployerSearchByEmail, BackLink);
 
         var result = sut.Index(ukprn);
 
-        SearchByPayeViewModel? viewModel = ((ViewResult)result).Model as SearchByPayeViewModel;
+        SearchByPayeModel? viewModel = ((ViewResult)result).Model as SearchByPayeModel;
 
         viewModel.Should().NotBeNull();
         viewModel!.Paye.Should().Be(paye);
@@ -62,15 +71,16 @@ public class SearchByPayeControllerGetTests
     }
 
     [Test, MoqAutoData]
-    public void Get_RedirectsToStartIfSessionNotSet(int ukprn)
+    public void Get_RedirectsToStartIfSessionNotSet(
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<SearchByPayeSubmitModel>> validatorMock,
+        [Greedy] SearchByPayeController sut,
+        int ukprn)
     {
-        var sessionServiceMock = new Mock<ISessionService>();
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns((AddEmployerSessionModel)null!);
 
-        SearchByPayeController sut = new(Mock.Of<IOuterApiClient>(), sessionServiceMock.Object, Mock.Of<IValidator<SearchByPayeSubmitViewModel>>());
-
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink).AddUrlForRoute(RouteNames.AddEmployerSearchByEmail, BackLink);
-
 
         var actual = sut.Index(ukprn);
 
@@ -81,20 +91,41 @@ public class SearchByPayeControllerGetTests
 
 
     [Test, MoqAutoData]
-    public void Get_RedirectsToStartIfEmailNotSetInSession(int ukprn)
+    public void Get_RedirectsToStartIfEmailNotSetInSession(
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<SearchByPayeSubmitModel>> validatorMock,
+        [Greedy] SearchByPayeController sut,
+        int ukprn)
     {
-        var sessionServiceMock = new Mock<ISessionService>();
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel { Email = string.Empty });
 
-        SearchByPayeController sut = new(Mock.Of<IOuterApiClient>(), sessionServiceMock.Object, Mock.Of<IValidator<SearchByPayeSubmitViewModel>>());
-
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink).AddUrlForRoute(RouteNames.AddEmployerSearchByEmail, BackLink);
-
 
         var actual = sut.Index(ukprn);
 
         actual.Should().BeOfType<RedirectToRouteResult>();
         actual.As<RedirectToRouteResult>().RouteName.Should().Be(RouteNames.AddEmployerStart);
+        actual.As<RedirectToRouteResult>().RouteValues.Should().ContainKey("ukprn");
+    }
+
+    [Test, MoqAutoData]
+    public void Get_HasVisitedCheckDetails_RedirectToCheckDetails(
+        [Frozen] Mock<IOuterApiClient> outerApiMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<SearchByPayeSubmitModel>> validatorMock,
+        [Greedy] SearchByPayeController sut,
+        int ukprn)
+    {
+        var email = "test@test.com";
+        sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel { Email = email, IsCheckDetailsVisited = true });
+
+        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink).AddUrlForRoute(RouteNames.CheckEmployerDetails, CheckDetailsLink);
+
+        var actual = sut.Index(ukprn);
+
+        actual.Should().BeOfType<RedirectToRouteResult>();
+        actual.As<RedirectToRouteResult>().RouteName.Should().Be(RouteNames.CheckEmployerDetails);
         actual.As<RedirectToRouteResult>().RouteValues.Should().ContainKey("ukprn");
     }
 }

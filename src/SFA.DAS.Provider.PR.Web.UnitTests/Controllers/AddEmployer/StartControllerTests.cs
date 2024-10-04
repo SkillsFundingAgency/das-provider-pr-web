@@ -13,9 +13,8 @@ namespace SFA.DAS.Provider.PR_Web.UnitTests.Controllers.AddEmployer;
 public class StartControllerTests
 {
     [Test, AutoData]
-    public void ReturnsExpectedStartViewModel(int ukprn, string homeLink, string addSearchByEmailLink)
+    public void ReturnsExpectedStartViewModel([Frozen] Mock<ISessionService> sessionServiceMock, int ukprn, string homeLink, string addSearchByEmailLink)
     {
-        var sessionServiceMock = new Mock<ISessionService>();
         StartController sut = new StartController(sessionServiceMock.Object);
         sut
             .AddUrlHelperMock()

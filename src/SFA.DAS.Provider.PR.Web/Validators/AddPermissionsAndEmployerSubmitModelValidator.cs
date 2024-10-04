@@ -4,11 +4,11 @@ using SFA.DAS.Provider.PR.Web.Models.AddEmployer;
 
 namespace SFA.DAS.Provider.PR.Web.Validators;
 
-public class CheckPermissionsSubmitModelValidator : AbstractValidator<AddPermissionsSubmitModel>
+public class AddPermissionsAndEmployerSubmitModelValidator : AbstractValidator<AddPermissionsAndEmployerSubmitModel>
 {
     public const string BothSelectionsAreNoErrorMessage = "You must select yes for at least one permission";
 
-    public CheckPermissionsSubmitModelValidator()
+    public AddPermissionsAndEmployerSubmitModelValidator()
     {
         RuleFor(s => s.PermissionToAddCohorts)
             .Cascade(CascadeMode.Stop)
@@ -16,8 +16,8 @@ public class CheckPermissionsSubmitModelValidator : AbstractValidator<AddPermiss
             .WithMessage(BothSelectionsAreNoErrorMessage);
     }
 
-    private static bool HasAtLeastOnePermission(AddPermissionsSubmitModel viewModel, string? addRecords)
+    private static bool HasAtLeastOnePermission(AddPermissionsAndEmployerSubmitModel model, string? addRecords)
     {
-        return !(viewModel.PermissionToAddCohorts == SetPermissions.AddRecords.No && viewModel.PermissionToRecruit == SetPermissions.RecruitApprentices.No);
+        return !(model.PermissionToAddCohorts == SetPermissions.AddRecords.No && model.PermissionToRecruit == SetPermissions.RecruitApprentices.No);
     }
 }
