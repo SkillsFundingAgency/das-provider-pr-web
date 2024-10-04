@@ -21,4 +21,5 @@ public static class RouteNames
     public const string CheckEmployerDetails = nameof(CheckEmployerDetails);
     public const string ChangePermissions = nameof(ChangePermissions);
     public const string InvitationSent = nameof(InvitationSent);
+    public const string PayeAornMatchedEmailNotLinkedLink = nameof(PayeAornMatchedEmailNotLinkedLink);
 }

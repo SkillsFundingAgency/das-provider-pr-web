@@ -19,6 +19,7 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
     public const string ViewPath = "~/Views/AddEmployer/SearchByPaye.cshtml";
     public const string PayeAornShutterPathViewPath = "~/Views/AddEmployer/ShutterPages/PayeAornShutterPage.cshtml";
     public const string InviteAlreadySentShutterPathViewPath = "~/Views/AddEmployer/ShutterPages/InviteAlreadySentShutterPage.cshtml";
+    public const string PayeAornMatchedEmailNotLinkedShutterPathViewPath = "~/Views/AddEmployer/ShutterPages/PayeAornMatchedEmailNotLinkedShutterPage.cshtml";
 
     [HttpGet]
     public IActionResult Index([FromRoute] int ukprn)
@@ -83,37 +84,44 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
 
         var relationshipsRequest = await _outerApiClient.GetProviderRelationshipsByUkprnPayeAorn(ukprn, sessionModel.Aorn!, encodedPaye, cancellationToken);
 
-        bool? hasActiveRequest = relationshipsRequest?.HasActiveRequest;
+        bool? hasActiveRequest = relationshipsRequest.HasActiveRequest;
 
         if (hasActiveRequest is true)
         {
             return RedirectToRoute(RouteNames.AddEmployerInvitationAlreadySent, new { ukprn });
         }
 
-        bool? hasInvalidPaye = relationshipsRequest?.HasInvalidPaye;
+        bool? hasInvalidPaye = relationshipsRequest.HasInvalidPaye;
 
         if (hasInvalidPaye is true)
         {
             return RedirectToRoute(RouteNames.AddEmployerPayeAornNotCorrect, new { ukprn });
         }
 
-        bool? hasOneLegalEntity = relationshipsRequest?.HasOneLegalEntity;
+        var accountDoesNotExist = relationshipsRequest.Account == null;
+
+        if (accountDoesNotExist)
+        {
+            sessionModel.OrganisationName = relationshipsRequest.Organisation?.Name;
+            _sessionService.Set(sessionModel);
+            return RedirectToRoute(RouteNames.AddEmployerContactDetails, new { ukprn });
+        }
+
+        /// If you get here, there is definitely one or more legal entities, as 'accountDoesNotExist' is false
+        bool hasOneLegalEntity = relationshipsRequest.HasOneLegalEntity!.Value;
 
         if (hasOneLegalEntity is false)
         {
             return RedirectToRoute(RouteNames.AddEmployerMultipleAccounts, new { ukprn });
         }
 
-        var hasExistingAccount = relationshipsRequest?.Account != null;
+        sessionModel.AccountLegalEntityId = relationshipsRequest.AccountLegalEntityId;
+        sessionModel.AccountLegalEntityName = relationshipsRequest.AccountLegalEntityName;
+        sessionModel.AccountId = relationshipsRequest.Account!.AccountId;
+        sessionModel.OrganisationName = relationshipsRequest.Organisation?.Name;
+        _sessionService.Set(sessionModel);
+        return RedirectToRoute(RouteNames.PayeAornMatchedEmailNotLinkedLink, new { ukprn });
 
-        if (!hasExistingAccount)
-        {
-            sessionModel.OrganisationName = relationshipsRequest?.Organisation?.Name;
-            _sessionService.Set(sessionModel);
-            return RedirectToRoute(RouteNames.AddEmployerContactDetails, new { ukprn });
-        }
-
-        return RedirectToRoute(RouteNames.AddEmployerSearchByPaye, new { ukprn });
     }
 
 
@@ -150,7 +158,8 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
             sessionModel.Paye,
             sessionModel.Aorn!,
             sessionModel.Email,
-            backLink, checkEmployerLink
+            backLink,
+            checkEmployerLink
         );
 
         return View(InviteAlreadySentShutterPathViewPath, shutterViewModel);
@@ -167,6 +176,31 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
         );
 
         return View(PayeAornShutterPathViewPath, shutterViewModel);
+    }
+
+    [HttpGet]
+    [Route("payeAornMatchedEmailNotLinked", Name = RouteNames.PayeAornMatchedEmailNotLinkedLink)]
+    public IActionResult PayeAornMatchedEmailNotLinkedShutterPage([FromRoute] int ukprn)
+    {
+        var sessionModel = _sessionService.Get<AddEmployerSessionModel>();
+        if (string.IsNullOrEmpty(sessionModel?.Paye))
+        {
+            return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
+        }
+
+        var cancelLink = Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn })!;
+        var continueLink = Url.RouteUrl(RouteNames.AddPermissionsAndEmployer, new { ukprn })!;
+        var shutterViewModel = new PayeAornMatchedEmailNotLinkedViewModel
+        {
+            EmployerName = sessionModel.OrganisationName!,
+            PayeReference = sessionModel.Paye!,
+            Aorn = sessionModel.Aorn!,
+            Email = sessionModel.Email,
+            CancelLink = cancelLink,
+            ContinueLink = continueLink
+        };
+
+        return View(PayeAornMatchedEmailNotLinkedShutterPathViewPath, shutterViewModel);
     }
 
     private SearchByPayeModel GetViewModel(int ukprn)
