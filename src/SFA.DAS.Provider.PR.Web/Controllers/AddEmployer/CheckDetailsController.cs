@@ -1,18 +1,22 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SFA.DAS.Provider.PR.Domain.Interfaces;
+using SFA.DAS.Provider.PR.Domain.OuterApi.Requests.Commands;
 using SFA.DAS.Provider.PR.Web.Authorization;
 using SFA.DAS.Provider.PR.Web.Constants;
+using SFA.DAS.Provider.PR.Web.Extensions;
 using SFA.DAS.Provider.PR.Web.Infrastructure;
 using SFA.DAS.Provider.PR.Web.Infrastructure.Services;
 using SFA.DAS.Provider.PR.Web.Models.AddEmployer;
 using SFA.DAS.Provider.PR.Web.Models.Session;
+using SFA.DAS.Provider.PR.Web.Services;
 
 namespace SFA.DAS.Provider.PR.Web.Controllers.AddEmployer;
 
 [Authorize(Policy = nameof(PolicyNames.HasContributorOrAbovePermission))]
 
 [Route("/{ukprn}/addEmployer/checkDetails", Name = RouteNames.CheckEmployerDetails)]
-public class CheckDetailsController(ISessionService _sessionService) : Controller
+public class CheckDetailsController(IOuterApiClient _outerApiClient, ISessionService _sessionService) : Controller
 {
     public const string ViewPath = "~/Views/AddEmployer/CheckDetails.cshtml";
 
@@ -21,7 +25,7 @@ public class CheckDetailsController(ISessionService _sessionService) : Controlle
     {
         var sessionModel = _sessionService.Get<AddEmployerSessionModel>();
 
-        if (string.IsNullOrEmpty(sessionModel?.Email))
+        if (!IsCompleteFlow(sessionModel))
         {
             return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
         }
@@ -32,16 +36,34 @@ public class CheckDetailsController(ISessionService _sessionService) : Controlle
     }
 
     [HttpPost]
-    public IActionResult Index([FromRoute] int ukprn, CancellationToken cancellationToken)
+    public async Task<IActionResult> Index([FromRoute] int ukprn, CancellationToken cancellationToken)
     {
         var sessionModel = _sessionService.Get<AddEmployerSessionModel>();
 
-        if (string.IsNullOrEmpty(sessionModel?.Email))
+        if (!IsCompleteFlow(sessionModel))
         {
             return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
         }
 
-        return RedirectToRoute(RouteNames.CheckEmployerDetails, new { ukprn });
+        var userRef = User.GetUserId();
+        var operations = OperationsMappingService.MapDescriptionsToOperations(sessionModel);
+
+        var command = new CreateAccountRequestCommand
+        {
+            Ukprn = ukprn,
+            RequestedBy = userRef!,
+            EmployerOrganisationName = sessionModel.OrganisationName!,
+            EmployerContactFirstName = sessionModel.FirstName!,
+            EmployerContactLastName = sessionModel.LastName!,
+            EmployerContactEmail = sessionModel.Email,
+            EmployerPaye = sessionModel.Paye!,
+            EmployerAorn = sessionModel.Aorn!,
+            Operations = operations,
+        };
+
+        await _outerApiClient.CreateAccount(command, cancellationToken);
+
+        return RedirectToRoute(RouteNames.InvitationSent, new { ukprn });
     }
 
     private CheckDetailsViewModel GetViewModel(int ukprn, AddEmployerSessionModel sessionModel)
@@ -104,5 +126,18 @@ public class CheckDetailsController(ISessionService _sessionService) : Controlle
             SetPermissions.RecruitApprentices.YesWithReview => SetPermissionsText.RecruitmentWithReviewPermissionText,
             _ => SetPermissionsText.NoPermissionText
         };
+    }
+
+    private static bool IsCompleteFlow(AddEmployerSessionModel? sessionModel)
+    {
+        if (string.IsNullOrEmpty(sessionModel?.Email)) return false;
+
+        if (string.IsNullOrEmpty(sessionModel.Paye) || string.IsNullOrEmpty(sessionModel.Aorn)) return false;
+
+        if (string.IsNullOrWhiteSpace(sessionModel.OrganisationName)) return false;
+
+        if (string.IsNullOrWhiteSpace(sessionModel.FirstName) || string.IsNullOrEmpty(sessionModel.LastName)) return false;
+
+        return true;
     }
 }

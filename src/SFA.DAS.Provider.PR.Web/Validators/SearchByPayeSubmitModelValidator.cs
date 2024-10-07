@@ -4,14 +4,14 @@ using SFA.DAS.Provider.PR.Web.Models.AddEmployer;
 
 namespace SFA.DAS.Provider.PR.Web.Validators;
 
-public class SearchByPayeSubmitViewModelValidator : AbstractValidator<SearchByPayeSubmitViewModel>
+public class SearchByPayeSubmitModelValidator : AbstractValidator<SearchByPayeSubmitModel>
 {
     public const string NoPayeErrorMessage = "Enter an employer PAYE reference";
     public const string InvalidPayeErrorMessage = "Enter an employer PAYE reference in the correct format";
     public const string NoAornErrorMessage = "Enter an Accounts office reference";
     public const string InvalidAornErrorMessage = "Enter your Accounts Office reference in the correct format";
 
-    public SearchByPayeSubmitViewModelValidator()
+    public SearchByPayeSubmitModelValidator()
     {
         RuleFor(s => s.Paye)
             .Cascade(CascadeMode.Stop)

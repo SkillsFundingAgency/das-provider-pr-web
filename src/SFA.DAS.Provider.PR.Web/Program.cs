@@ -31,7 +31,7 @@ builder.Services
     .AddSession(configuration)
     .AddHealthChecks(configuration)
     .AddAuthentication(configuration)
-    .AddValidatorsFromAssembly(typeof(SearchByEmailSubmitViewModelValidator).Assembly)
+    .AddValidatorsFromAssembly(typeof(SearchByEmailSubmitModelValidator).Assembly)
     .AddAuthorizationServicePolicies()
     .AddProviderUiServiceRegistration(configuration);
 

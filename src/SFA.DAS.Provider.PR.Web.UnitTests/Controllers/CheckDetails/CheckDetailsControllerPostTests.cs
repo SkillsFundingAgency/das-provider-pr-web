@@ -17,30 +17,35 @@ public class CheckDetailsControllerPostTests
     private static readonly string Email = "test@account.com";
 
     [Test, MoqAutoData]
-    public void Post_ReturnsExpectedViewModelAndPath(
+    public async Task Post_ReturnsExpectedViewModelAndPath(
         [Frozen] Mock<ISessionService> sessionServiceMock,
         [Greedy] CheckDetailsController sut,
         int ukprn,
         string firstName,
         string lastName,
+        AddEmployerSessionModel addEmployerSessionModel,
         CancellationToken cancellationToken
     )
     {
-        sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel { Email = Email, FirstName = firstName, LastName = lastName });
+        addEmployerSessionModel.Email = Email;
+        addEmployerSessionModel.FirstName = firstName;
+        addEmployerSessionModel.LastName = lastName;
+        sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(addEmployerSessionModel);
 
+        sut.AddDefaultContext();
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink);
 
-        var result = sut.Index(ukprn, cancellationToken);
+        var result = await sut.Index(ukprn, cancellationToken);
 
         RedirectToRouteResult? redirectToRouteResult = result.As<RedirectToRouteResult>();
-        redirectToRouteResult.RouteName.Should().Be(RouteNames.CheckEmployerDetails);
+        redirectToRouteResult.RouteName.Should().Be(RouteNames.InvitationSent);
         redirectToRouteResult.RouteValues!.First().Value.Should().Be(ukprn);
         sessionServiceMock.Verify(s => s.Set(It.IsAny<AddEmployerSessionModel>()), Times.Never);
         sessionServiceMock.Verify(s => s.Get<AddEmployerSessionModel>(), Times.Once);
     }
 
     [Test, MoqAutoData]
-    public void Post_SessionModelNotFound_RedirectedToStart(
+    public async Task Post_SessionModelNotFound_RedirectedToStart(
         [Frozen] Mock<ISessionService> sessionServiceMock,
         [Greedy] CheckDetailsController sut,
         int ukprn,
@@ -52,14 +57,14 @@ public class CheckDetailsControllerPostTests
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink);
 
-        var actual = sut.Index(ukprn, cancellationToken);
+        var actual = await sut.Index(ukprn, cancellationToken);
         actual.Should().BeOfType<RedirectToRouteResult>();
         actual.As<RedirectToRouteResult>().RouteName.Should().Be(RouteNames.AddEmployerStart);
         actual.As<RedirectToRouteResult>().RouteValues.Should().ContainKey("ukprn");
     }
 
     [Test, MoqAutoData]
-    public void Post_RedirectsToStartIfEmailNotSetInSession(
+    public async Task Post_RedirectsToStartIfEmailNotSetInSession(
         [Frozen] Mock<ISessionService> sessionServiceMock,
         [Greedy] CheckDetailsController sut,
         int ukprn,
@@ -70,7 +75,7 @@ public class CheckDetailsControllerPostTests
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink);
 
-        var actual = sut.Index(ukprn, cancellationToken);
+        var actual = await sut.Index(ukprn, cancellationToken);
         actual.Should().BeOfType<RedirectToRouteResult>();
         actual.As<RedirectToRouteResult>().RouteName.Should().Be(RouteNames.AddEmployerStart);
         actual.As<RedirectToRouteResult>().RouteValues.Should().ContainKey("ukprn");

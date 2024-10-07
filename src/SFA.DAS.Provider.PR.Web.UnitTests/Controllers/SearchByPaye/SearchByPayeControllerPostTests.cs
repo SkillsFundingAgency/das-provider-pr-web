@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using AutoFixture.NUnit3;
+using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
@@ -23,99 +24,11 @@ public class SearchByPayeControllerPostTests
     private static readonly string Email = "test@account.com";
 
     [Test, MoqAutoData]
-    public async Task Post_NotMultipleAccounts_ReturnsExpectedViewModelAndPath(
-     Mock<IOuterApiClient> outerApiClientMock,
-     Mock<IValidator<SearchByPayeSubmitViewModel>> validatorMock,
-     Mock<ISessionService> sessionServiceMock,
-     int ukprn,
-     string paye,
-     string aorn,
-     GetRelationshipsByUkprnPayeAornResponse getRelationshipsByUkprnPayeAornResponse,
-     CancellationToken cancellationToken
-     )
-    {
-        SearchByPayeSubmitViewModel searchByPayeSubmitViewModel = new()
-        {
-            Email = Email,
-            Aorn = aorn,
-            Paye = paye
-        };
-
-        var encodedPaye = Uri.EscapeDataString(paye);
-
-        var email = "test@test.com";
-
-        sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel { Email = email, Paye = paye, Aorn = aorn, IsCheckDetailsVisited = true });
-
-        getRelationshipsByUkprnPayeAornResponse.HasActiveRequest = false;
-        getRelationshipsByUkprnPayeAornResponse.HasOneLegalEntity = null;
-
-        outerApiClientMock.Setup(x => x.GetProviderRelationshipsByUkprnPayeAorn(ukprn, aorn, encodedPaye, cancellationToken)).ReturnsAsync(getRelationshipsByUkprnPayeAornResponse);
-
-        validatorMock.Setup(v => v.Validate(It.IsAny<SearchByPayeSubmitViewModel>())).Returns(new ValidationResult());
-
-        SearchByPayeController sut = new(outerApiClientMock.Object, sessionServiceMock.Object, validatorMock.Object);
-
-        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
-
-        var result = await sut.Index(ukprn, searchByPayeSubmitViewModel, cancellationToken);
-
-        RedirectToRouteResult? redirectToRouteResult = result.As<RedirectToRouteResult>();
-        redirectToRouteResult.RouteName.Should().Be(RouteNames.AddEmployerSearchByPaye);
-        redirectToRouteResult.RouteValues!.First().Value.Should().Be(ukprn);
-
-        outerApiClientMock.Verify(o => o.GetProviderRelationshipsByUkprnPayeAorn(ukprn, aorn, encodedPaye, cancellationToken), Times.Once);
-        sessionServiceMock.Verify(s => s.Set(It.Is<AddEmployerSessionModel>(s => s.IsCheckDetailsVisited == false)), Times.Once);
-        sessionServiceMock.Verify(s => s.Get<AddEmployerSessionModel>(), Times.Once);
-    }
-
-    [Test, MoqAutoData]
-    public async Task Post_OuterApiReturnNull_ReturnsExpectedViewModelAndPath(
-  Mock<IOuterApiClient> outerApiClientMock,
-  Mock<IValidator<SearchByPayeSubmitViewModel>> validatorMock,
-  Mock<ISessionService> sessionServiceMock,
-  int ukprn,
-  string paye,
-  string aorn,
-  CancellationToken cancellationToken
-  )
-    {
-        SearchByPayeSubmitViewModel searchByPayeSubmitViewModel = new()
-        {
-            Email = Email,
-            Aorn = aorn,
-            Paye = paye
-        };
-
-        var encodedPaye = Uri.EscapeDataString(paye);
-
-        var email = "test@test.com";
-
-        sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel { Email = email, Paye = paye, Aorn = aorn });
-
-        outerApiClientMock.Setup(x => x.GetProviderRelationshipsByUkprnPayeAorn(ukprn, aorn, encodedPaye, cancellationToken)).ReturnsAsync((GetRelationshipsByUkprnPayeAornResponse)null!);
-
-        validatorMock.Setup(v => v.Validate(It.IsAny<SearchByPayeSubmitViewModel>())).Returns(new ValidationResult());
-
-        SearchByPayeController sut = new(outerApiClientMock.Object, sessionServiceMock.Object, validatorMock.Object);
-
-        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
-
-        var result = await sut.Index(ukprn, searchByPayeSubmitViewModel, cancellationToken);
-
-        RedirectToRouteResult? redirectToRouteResult = result.As<RedirectToRouteResult>();
-        redirectToRouteResult.RouteName.Should().Be(RouteNames.AddEmployerContactDetails);
-        redirectToRouteResult.RouteValues!.First().Value.Should().Be(ukprn);
-
-        outerApiClientMock.Verify(o => o.GetProviderRelationshipsByUkprnPayeAorn(ukprn, aorn, encodedPaye, cancellationToken), Times.Once);
-        sessionServiceMock.Verify(s => s.Set(It.IsAny<AddEmployerSessionModel>()), Times.Exactly(2));
-        sessionServiceMock.Verify(s => s.Get<AddEmployerSessionModel>(), Times.Once);
-    }
-
-    [Test, MoqAutoData]
     public async Task Post_SessionModelNotFound_RedirectedToStart(
-        Mock<IValidator<SearchByPayeSubmitViewModel>> validatorMock,
-        Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<SearchByPayeSubmitModel>> validatorMock,
+        [Greedy] SearchByPayeController sut,
         int ukprn,
         string paye,
         string aorn,
@@ -123,7 +36,7 @@ public class SearchByPayeControllerPostTests
         CancellationToken cancellationToken
        )
     {
-        SearchByPayeSubmitViewModel searchByPayeSubmitViewModel = new()
+        SearchByPayeSubmitModel searchByPayeSubmitModel = new()
         {
             Email = Email,
             Aorn = aorn,
@@ -132,13 +45,11 @@ public class SearchByPayeControllerPostTests
 
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns((AddEmployerSessionModel)null!);
 
-        validatorMock.Setup(v => v.Validate(It.IsAny<SearchByPayeSubmitViewModel>())).Returns(new ValidationResult());
-
-        SearchByPayeController sut = new(Mock.Of<IOuterApiClient>(), sessionServiceMock.Object, validatorMock.Object);
+        validatorMock.Setup(v => v.Validate(It.IsAny<SearchByPayeSubmitModel>())).Returns(new ValidationResult());
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
 
-        var actual = await sut.Index(ukprn, searchByPayeSubmitViewModel, cancellationToken);
+        var actual = await sut.Index(ukprn, searchByPayeSubmitModel, cancellationToken);
         actual.Should().BeOfType<RedirectToRouteResult>();
         actual.As<RedirectToRouteResult>().RouteName.Should().Be(RouteNames.AddEmployerStart);
         actual.As<RedirectToRouteResult>().RouteValues.Should().ContainKey("ukprn");
@@ -146,8 +57,10 @@ public class SearchByPayeControllerPostTests
 
     [Test, MoqAutoData]
     public async Task Post_RedirectsToStartIfEmailNotSetInSession(
-        Mock<IValidator<SearchByPayeSubmitViewModel>> validatorMock,
-        Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<SearchByPayeSubmitModel>> validatorMock,
+        [Greedy] SearchByPayeController sut,
         int ukprn,
         string paye,
         string aorn,
@@ -155,7 +68,7 @@ public class SearchByPayeControllerPostTests
         CancellationToken cancellationToken
     )
     {
-        SearchByPayeSubmitViewModel searchByPayeSubmitViewModel = new()
+        SearchByPayeSubmitModel searchByPayeSubmitModel = new()
         {
             Email = Email,
             Aorn = aorn,
@@ -164,13 +77,11 @@ public class SearchByPayeControllerPostTests
 
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel { Email = string.Empty });
 
-        validatorMock.Setup(v => v.Validate(It.IsAny<SearchByPayeSubmitViewModel>())).Returns(new ValidationResult());
-
-        SearchByPayeController sut = new(Mock.Of<IOuterApiClient>(), sessionServiceMock.Object, validatorMock.Object);
+        validatorMock.Setup(v => v.Validate(It.IsAny<SearchByPayeSubmitModel>())).Returns(new ValidationResult());
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
 
-        var actual = await sut.Index(ukprn, searchByPayeSubmitViewModel, cancellationToken);
+        var actual = await sut.Index(ukprn, searchByPayeSubmitModel, cancellationToken);
         actual.Should().BeOfType<RedirectToRouteResult>();
         actual.As<RedirectToRouteResult>().RouteName.Should().Be(RouteNames.AddEmployerStart);
         actual.As<RedirectToRouteResult>().RouteValues.Should().ContainKey("ukprn");
@@ -179,48 +90,49 @@ public class SearchByPayeControllerPostTests
 
     [Test, MoqAutoData]
     public async Task Post_Invalid_ReturnsExpectedViewModelAndPath(
-        Mock<IOuterApiClient> outerApiClientMock,
-        Mock<IValidator<SearchByPayeSubmitViewModel>> validatorMock,
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<SearchByPayeSubmitModel>> validatorMock,
+        [Greedy] SearchByPayeController sut,
         int ukprn,
-        SearchByPayeSubmitViewModel searchByPayeSubmitViewModel,
+        SearchByPayeSubmitModel searchByPayeSubmitModel,
         GetRelationshipsByUkprnPayeAornResponse getRelationshipsByUkprnPayeAornResponse,
         CancellationToken cancellationToken
     )
     {
-        searchByPayeSubmitViewModel.Email = Email;
+        searchByPayeSubmitModel.Email = Email;
 
-        validatorMock.Setup(m => m.Validate(It.IsAny<SearchByPayeSubmitViewModel>())).Returns(new ValidationResult(new List<ValidationFailure>()
+        validatorMock.Setup(m => m.Validate(It.IsAny<SearchByPayeSubmitModel>())).Returns(new ValidationResult(new List<ValidationFailure>()
         {
             new("TestField","Test Message") { ErrorCode = "1001"}
         }));
 
-        SearchByPayeController sut = new(outerApiClientMock.Object, Mock.Of<ISessionService>(), validatorMock.Object);
-
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink).AddUrlForRoute(RouteNames.AddEmployerSearchByEmail, BackLink);
 
-        var result = await sut.Index(ukprn, searchByPayeSubmitViewModel, cancellationToken);
+        var result = await sut.Index(ukprn, searchByPayeSubmitModel, cancellationToken);
 
         ViewResult? viewResult = result.As<ViewResult>();
-        SearchByPayeViewModel? viewModel = viewResult.Model as SearchByPayeViewModel;
+        SearchByPayeModel? viewModel = viewResult.Model as SearchByPayeModel;
         viewModel!.Ukprn.Should().Be(ukprn);
         viewModel.BackLink.Should().Be(BackLink);
         viewModel.CancelLink.Should().Be(CancelLink);
-        viewModel.Paye.Should().Be(searchByPayeSubmitViewModel.Paye);
-        viewModel.Aorn.Should().Be(searchByPayeSubmitViewModel.Aorn);
+        viewModel.Paye.Should().Be(searchByPayeSubmitModel.Paye);
+        viewModel.Aorn.Should().Be(searchByPayeSubmitModel.Aorn);
     }
 
     [Test, MoqAutoData]
     public async Task Post_HasActiveRequest_RedirectsToShutterPage(
-        Mock<IOuterApiClient> outerApiClientMock,
-        Mock<IValidator<SearchByPayeSubmitViewModel>> validatorMock,
-        Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<SearchByPayeSubmitModel>> validatorMock,
+        [Greedy] SearchByPayeController sut,
         int ukprn,
         string paye,
         string aorn,
         CancellationToken cancellationToken
     )
     {
-        SearchByPayeSubmitViewModel searchByPayeSubmitViewModel = new()
+        SearchByPayeSubmitModel searchByPayeSubmitModel = new()
         {
             Email = Email,
             Aorn = aorn,
@@ -241,13 +153,11 @@ public class SearchByPayeControllerPostTests
 
         outerApiClientMock.Setup(x => x.GetProviderRelationshipsByUkprnPayeAorn(ukprn, aorn, encodedPaye, cancellationToken)).ReturnsAsync(getRelationshipsByUkprnPayeAornResponse);
 
-        validatorMock.Setup(v => v.Validate(It.IsAny<SearchByPayeSubmitViewModel>())).Returns(new ValidationResult());
-
-        SearchByPayeController sut = new(outerApiClientMock.Object, sessionServiceMock.Object, validatorMock.Object);
+        validatorMock.Setup(v => v.Validate(It.IsAny<SearchByPayeSubmitModel>())).Returns(new ValidationResult());
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
 
-        var result = await sut.Index(ukprn, searchByPayeSubmitViewModel, cancellationToken);
+        var result = await sut.Index(ukprn, searchByPayeSubmitModel, cancellationToken);
 
         RedirectToRouteResult? redirectToRouteResult = result.As<RedirectToRouteResult>();
         redirectToRouteResult.RouteName.Should().Be(RouteNames.AddEmployerInvitationAlreadySent);
@@ -256,17 +166,18 @@ public class SearchByPayeControllerPostTests
 
     [Test, MoqAutoData]
     public async Task Post_MultipleAccounts_RedirectsToShutterPage(
-       Mock<IOuterApiClient> outerApiClientMock,
-       Mock<IValidator<SearchByPayeSubmitViewModel>> validatorMock,
-       Mock<ISessionService> sessionServiceMock,
-       int ukprn,
-       string paye,
-       string aorn,
-       GetRelationshipsByUkprnPayeAornResponse getRelationshipsByUkprnPayeAornResponse,
-       CancellationToken cancellationToken
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<SearchByPayeSubmitModel>> validatorMock,
+        [Greedy] SearchByPayeController sut,
+        int ukprn,
+        string paye,
+        string aorn,
+        GetRelationshipsByUkprnPayeAornResponse getRelationshipsByUkprnPayeAornResponse,
+        CancellationToken cancellationToken
        )
     {
-        SearchByPayeSubmitViewModel searchByPayeSubmitViewModel = new()
+        SearchByPayeSubmitModel searchByPayeSubmitModel = new()
         {
             Email = Email,
             Aorn = aorn,
@@ -284,13 +195,11 @@ public class SearchByPayeControllerPostTests
 
         outerApiClientMock.Setup(x => x.GetProviderRelationshipsByUkprnPayeAorn(ukprn, aorn, encodedPaye, cancellationToken)).ReturnsAsync(getRelationshipsByUkprnPayeAornResponse);
 
-        validatorMock.Setup(v => v.Validate(It.IsAny<SearchByPayeSubmitViewModel>())).Returns(new ValidationResult());
-
-        SearchByPayeController sut = new(outerApiClientMock.Object, sessionServiceMock.Object, validatorMock.Object);
+        validatorMock.Setup(v => v.Validate(It.IsAny<SearchByPayeSubmitModel>())).Returns(new ValidationResult());
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
 
-        var result = await sut.Index(ukprn, searchByPayeSubmitViewModel, cancellationToken);
+        var result = await sut.Index(ukprn, searchByPayeSubmitModel, cancellationToken);
 
         RedirectToRouteResult? redirectToRouteResult = result.As<RedirectToRouteResult>();
         redirectToRouteResult.RouteName.Should().Be(RouteNames.AddEmployerMultipleAccounts);
@@ -303,17 +212,18 @@ public class SearchByPayeControllerPostTests
 
     [Test, MoqAutoData]
     public async Task Post_PayeAornNotCorrect_RedirectsToPayeAornNotFoundShutterPage(
-       Mock<IOuterApiClient> outerApiClientMock,
-       Mock<IValidator<SearchByPayeSubmitViewModel>> validatorMock,
-       Mock<ISessionService> sessionServiceMock,
-       int ukprn,
-       string paye,
-       string aorn,
-       GetRelationshipsByUkprnPayeAornResponse getRelationshipsByUkprnPayeAornResponse,
-       CancellationToken cancellationToken
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<SearchByPayeSubmitModel>> validatorMock,
+        [Greedy] SearchByPayeController sut,
+        int ukprn,
+        string paye,
+        string aorn,
+        GetRelationshipsByUkprnPayeAornResponse getRelationshipsByUkprnPayeAornResponse,
+        CancellationToken cancellationToken
        )
     {
-        SearchByPayeSubmitViewModel searchByPayeSubmitViewModel = new()
+        SearchByPayeSubmitModel searchByPayeSubmitModel = new()
         {
             Email = Email,
             Aorn = aorn,
@@ -331,13 +241,11 @@ public class SearchByPayeControllerPostTests
 
         outerApiClientMock.Setup(x => x.GetProviderRelationshipsByUkprnPayeAorn(ukprn, aorn, encodedPaye, cancellationToken)).ReturnsAsync(getRelationshipsByUkprnPayeAornResponse);
 
-        validatorMock.Setup(v => v.Validate(It.IsAny<SearchByPayeSubmitViewModel>())).Returns(new ValidationResult());
-
-        SearchByPayeController sut = new(outerApiClientMock.Object, sessionServiceMock.Object, validatorMock.Object);
+        validatorMock.Setup(v => v.Validate(It.IsAny<SearchByPayeSubmitModel>())).Returns(new ValidationResult());
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
 
-        var result = await sut.Index(ukprn, searchByPayeSubmitViewModel, cancellationToken);
+        var result = await sut.Index(ukprn, searchByPayeSubmitModel, cancellationToken);
 
         RedirectToRouteResult? redirectToRouteResult = result.As<RedirectToRouteResult>();
         redirectToRouteResult.RouteName.Should().Be(RouteNames.AddEmployerPayeAornNotCorrect);
@@ -346,17 +254,18 @@ public class SearchByPayeControllerPostTests
 
     [Test, MoqAutoData]
     public async Task Post_NotInEAS_RedirectsToAddContactDetails(
-      Mock<IOuterApiClient> outerApiClientMock,
-      Mock<IValidator<SearchByPayeSubmitViewModel>> validatorMock,
-      Mock<ISessionService> sessionServiceMock,
-      int ukprn,
-      string paye,
-      string aorn,
-      GetRelationshipsByUkprnPayeAornResponse getRelationshipsByUkprnPayeAornResponse,
-      CancellationToken cancellationToken
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<SearchByPayeSubmitModel>> validatorMock,
+        [Greedy] SearchByPayeController sut,
+        int ukprn,
+        string paye,
+        string aorn,
+        GetRelationshipsByUkprnPayeAornResponse getRelationshipsByUkprnPayeAornResponse,
+        CancellationToken cancellationToken
       )
     {
-        SearchByPayeSubmitViewModel searchByPayeSubmitViewModel = new()
+        SearchByPayeSubmitModel searchByPayeSubmitModel = new()
         {
             Email = Email,
             Aorn = aorn,
@@ -376,13 +285,11 @@ public class SearchByPayeControllerPostTests
 
         outerApiClientMock.Setup(x => x.GetProviderRelationshipsByUkprnPayeAorn(ukprn, aorn, encodedPaye, cancellationToken)).ReturnsAsync(getRelationshipsByUkprnPayeAornResponse);
 
-        validatorMock.Setup(v => v.Validate(It.IsAny<SearchByPayeSubmitViewModel>())).Returns(new ValidationResult());
-
-        SearchByPayeController sut = new(outerApiClientMock.Object, sessionServiceMock.Object, validatorMock.Object);
+        validatorMock.Setup(v => v.Validate(It.IsAny<SearchByPayeSubmitModel>())).Returns(new ValidationResult());
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink).AddUrlForRoute(RouteNames.AddEmployerContactDetails, AddEmployerContactDetails);
 
-        var result = await sut.Index(ukprn, searchByPayeSubmitViewModel, cancellationToken);
+        var result = await sut.Index(ukprn, searchByPayeSubmitModel, cancellationToken);
 
         RedirectToRouteResult? redirectToRouteResult = result.As<RedirectToRouteResult>();
         redirectToRouteResult.RouteName.Should().Be(RouteNames.AddEmployerContactDetails);
@@ -395,18 +302,19 @@ public class SearchByPayeControllerPostTests
 
     [Test, MoqAutoData]
     public async Task Post_NotInEASOrganisationIsNull_RedirectsToAddContactDetails(
-      Mock<IOuterApiClient> outerApiClientMock,
-      Mock<IValidator<SearchByPayeSubmitViewModel>> validatorMock,
-      Mock<ISessionService> sessionServiceMock,
-      int ukprn,
-      string paye,
-      string aorn,
-      GetRelationshipsByUkprnPayeAornResponse getRelationshipsByUkprnPayeAornResponse,
-      string organisationName,
-      CancellationToken cancellationToken
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<SearchByPayeSubmitModel>> validatorMock,
+        [Greedy] SearchByPayeController sut,
+        int ukprn,
+        string paye,
+        string aorn,
+        GetRelationshipsByUkprnPayeAornResponse getRelationshipsByUkprnPayeAornResponse,
+        string organisationName,
+        CancellationToken cancellationToken
       )
     {
-        SearchByPayeSubmitViewModel searchByPayeSubmitViewModel = new()
+        SearchByPayeSubmitModel searchByPayeSubmitModel = new()
         {
             Email = Email,
             Aorn = aorn,
@@ -426,18 +334,78 @@ public class SearchByPayeControllerPostTests
 
         outerApiClientMock.Setup(x => x.GetProviderRelationshipsByUkprnPayeAorn(ukprn, aorn, encodedPaye, cancellationToken)).ReturnsAsync(getRelationshipsByUkprnPayeAornResponse);
 
-        validatorMock.Setup(v => v.Validate(It.IsAny<SearchByPayeSubmitViewModel>())).Returns(new ValidationResult());
-
-        SearchByPayeController sut = new(outerApiClientMock.Object, sessionServiceMock.Object, validatorMock.Object);
+        validatorMock.Setup(v => v.Validate(It.IsAny<SearchByPayeSubmitModel>())).Returns(new ValidationResult());
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink).AddUrlForRoute(RouteNames.AddEmployerContactDetails, AddEmployerContactDetails);
 
-        var result = await sut.Index(ukprn, searchByPayeSubmitViewModel, cancellationToken);
+        var result = await sut.Index(ukprn, searchByPayeSubmitModel, cancellationToken);
 
         RedirectToRouteResult? redirectToRouteResult = result.As<RedirectToRouteResult>();
         redirectToRouteResult.RouteName.Should().Be(RouteNames.AddEmployerContactDetails);
         redirectToRouteResult.RouteValues!.First().Value.Should().Be(ukprn);
 
         sessionServiceMock.Verify(s => s.Set(It.Is<AddEmployerSessionModel>(x => x.OrganisationName == organisationName)), Times.AtLeastOnce);
+    }
+
+    [Test]
+    [MoqInlineAutoData(null, null, null)]
+    [MoqInlineAutoData(5L, "LE Name", "org name")]
+
+    public async Task Post_PayeAndAornLinkedEmailNotMatched_RedirectsToExpectedShutterPage(
+        long? accountLegalEntityId,
+        string accountLegalEntityName,
+        string? organisationName,
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<SearchByPayeSubmitModel>> validatorMock,
+        [Greedy] SearchByPayeController sut,
+        int ukprn,
+        string paye,
+        string aorn,
+        GetRelationshipsByUkprnPayeAornResponse getRelationshipsByUkprnPayeAornResponse,
+        AccountDetails? accountDetails,
+        CancellationToken cancellationToken
+      )
+    {
+        SearchByPayeSubmitModel searchByPayeSubmitModel = new()
+        {
+            Email = Email,
+            Aorn = aorn,
+            Paye = paye
+        };
+
+        var encodedPaye = Uri.EscapeDataString(paye);
+
+        var email = "test@test.com";
+
+        sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel { Email = email, Paye = paye, Aorn = aorn });
+
+        getRelationshipsByUkprnPayeAornResponse.HasActiveRequest = false;
+        getRelationshipsByUkprnPayeAornResponse.HasOneLegalEntity = true;
+        getRelationshipsByUkprnPayeAornResponse.AccountLegalEntityId = accountLegalEntityId;
+        getRelationshipsByUkprnPayeAornResponse.Account = accountDetails;
+        getRelationshipsByUkprnPayeAornResponse.AccountLegalEntityName = accountLegalEntityName;
+        getRelationshipsByUkprnPayeAornResponse.Organisation = new OrganisationDetails { Name = organisationName };
+
+        outerApiClientMock.Setup(x => x.GetProviderRelationshipsByUkprnPayeAorn(ukprn, aorn, encodedPaye, cancellationToken)).ReturnsAsync(getRelationshipsByUkprnPayeAornResponse);
+
+        validatorMock.Setup(v => v.Validate(It.IsAny<SearchByPayeSubmitModel>())).Returns(new ValidationResult());
+
+        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink).AddUrlForRoute(RouteNames.AddEmployerContactDetails, AddEmployerContactDetails);
+
+        var result = await sut.Index(ukprn, searchByPayeSubmitModel, cancellationToken);
+
+        RedirectToRouteResult? redirectToRouteResult = result.As<RedirectToRouteResult>();
+        redirectToRouteResult.RouteName.Should().Be(RouteNames.PayeAornMatchedEmailNotLinkedLink);
+        redirectToRouteResult.RouteValues!.First().Value.Should().Be(ukprn);
+
+        var expectedAccountId = getRelationshipsByUkprnPayeAornResponse.Account?.AccountId;
+
+        sessionServiceMock.Verify(s => s.Set(It.Is<AddEmployerSessionModel>(
+            x => x.OrganisationName == organisationName
+            && x.AccountLegalEntityId == getRelationshipsByUkprnPayeAornResponse.AccountLegalEntityId
+            && x.AccountLegalEntityName == getRelationshipsByUkprnPayeAornResponse.AccountLegalEntityName
+            && x.OrganisationName == getRelationshipsByUkprnPayeAornResponse.Organisation.Name
+        )), Times.AtLeastOnce);
     }
 }

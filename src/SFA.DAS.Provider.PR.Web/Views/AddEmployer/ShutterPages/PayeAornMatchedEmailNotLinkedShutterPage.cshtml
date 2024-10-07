@@ -1,0 +1,41 @@
+﻿@using SFA.DAS.Provider.PR.Web.Infrastructure
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model SFA.DAS.Provider.PR.Web.Models.AddEmployer.PayeAornMatchedEmailNotLinkedViewModel
+@{
+    ViewData["Title"] = "Paye and Aorn matched, email not linked";
+}
+@section breadcrumb {
+    <a class="das-js-back-link">Back</a>
+}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l">
+            Account  found
+        </h1>
+    </div>
+    <div class="govuk-grid-column-two-thirds">
+        <p class="govuk-body">
+            <div class="govuk-inset-text">
+                @Model.EmployerName.ToUpper() <br /><br />
+                Employer PAYE reference: @Model.PayeReference <br />
+                Accounts Office reference: @Model.Aorn
+
+            </div>
+        </p>
+        <p class="govuk-body">
+            We found an apprenticeship service account with the details you provided. <strong>@Model.Email</strong> is not linked to this account.
+        </p>
+        <p class="govuk-body">
+            Continue to ask to be added as a training provider and request permissions. We will email the authorised person on the employer account with this request.
+        </p>
+        <p class="govuk-body">
+            If the authorised person has left the employer, the employer can contact the <a class="govuk-link" rel="noopener" href="https://assessors.apprenticeships.education.gov.uk/Home/ContactUs" target="_blank">Apprenticeship service helpdesk</a> who can help add a new authorised person.
+        </p>
+        <div class="govuk-button-group">
+            <a href="@Model.ContinueLink" role="button" draggable="false" class="govuk-button" data-module="govuk-button">
+                Continue
+            </a>
+            <a class="govuk-link" href="@Model.CancelLink">Cancel</a>
+        </div>
+    </div>
+</div>

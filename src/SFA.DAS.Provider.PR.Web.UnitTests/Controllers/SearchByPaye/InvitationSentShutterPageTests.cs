@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using AutoFixture.NUnit3;
 using FluentAssertions;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
@@ -18,26 +19,32 @@ namespace SFA.DAS.Provider.PR_Web.UnitTests.Controllers.SearchByPaye;
 public class InvitationSentShutterPageTests
 {
     private static readonly string AddEmployerSearchByPayeLink = Guid.NewGuid().ToString();
+    private static readonly string EmployerDetailsLink = Guid.NewGuid().ToString();
     private const string Email = "test@test.com";
 
     [Test, MoqAutoData]
     public async Task InvitationSentShutterPage_BuildsExpectedViewModel(
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<SearchByEmailSubmitModel>> validatorMock,
+        [Greedy] SearchByPayeController sut,
         int ukprn,
         string aorn,
         string paye,
         string employerOrganisationName,
+        int accountLegalEntityId,
         GetRequestByUkprnPayeResponse getRequestByUkprnPayeResponse,
         CancellationToken cancellationToken)
     {
         var createAccount = "CreateAccount";
-        Mock<ISessionService> sessionServiceMock = new Mock<ISessionService>();
-        Mock<IOuterApiClient> outerApiClientMock = new Mock<IOuterApiClient>();
+
 
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel
         {
             Email = Email,
             Paye = paye,
-            Aorn = aorn
+            Aorn = aorn,
+            AccountLegalEntityId = accountLegalEntityId
         });
 
         getRequestByUkprnPayeResponse.EmployerOrganisationName = employerOrganisationName;
@@ -47,9 +54,7 @@ public class InvitationSentShutterPageTests
 
         outerApiClientMock.Setup(o => o.GetRequest(ukprn, paye, cancellationToken)).ReturnsAsync(resultResponse);
 
-        SearchByPayeController sut = new(outerApiClientMock.Object, sessionServiceMock.Object, Mock.Of<IValidator<SearchByPayeSubmitViewModel>>());
-
-        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerSearchByPaye, AddEmployerSearchByPayeLink);
+        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerSearchByPaye, AddEmployerSearchByPayeLink).AddUrlForRoute(RouteNames.EmployerDetails, EmployerDetailsLink);
 
         var result = await sut.InvitationSentShutterPage(ukprn, cancellationToken);
 
@@ -57,27 +62,27 @@ public class InvitationSentShutterPageTests
         InviteAlreadySentShutterPageViewModel? viewModel = viewResult.Model as InviteAlreadySentShutterPageViewModel;
 
         var expectedViewModel = new InviteAlreadySentShutterPageViewModel(employerOrganisationName, paye, aorn, Email,
-            AddEmployerSearchByPayeLink, "");
+            AddEmployerSearchByPayeLink, EmployerDetailsLink);
 
         viewModel.Should().BeEquivalentTo(expectedViewModel);
     }
 
     [Test, MoqAutoData]
     public async Task InvitationSentShutterPage_RedirectsToStartIfSessionModelNotSet(
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<SearchByEmailSubmitModel>> validatorMock,
+        [Greedy] SearchByPayeController sut,
         int ukprn,
         string aorn,
         string employerOrganisationName,
         CancellationToken cancellationToken)
     {
-        Mock<ISessionService> sessionServiceMock = new Mock<ISessionService>();
-
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns((AddEmployerSessionModel)null!);
 
         var getRequestResponse = new GetRequestByUkprnPayeResponse { EmployerOrganisationName = employerOrganisationName };
 
         Response<GetRequestByUkprnPayeResponse> resultResponse = new(null, new(HttpStatusCode.OK), () => getRequestResponse);
-
-        SearchByPayeController sut = new(Mock.Of<IOuterApiClient>(), sessionServiceMock.Object, Mock.Of<IValidator<SearchByPayeSubmitViewModel>>());
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerSearchByPaye, AddEmployerSearchByPayeLink);
 
@@ -90,13 +95,15 @@ public class InvitationSentShutterPageTests
 
     [Test, MoqAutoData]
     public async Task InvitationSentShutterPage_RedirectsToStartIfSessionModelPayeNotSet(
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<SearchByEmailSubmitModel>> validatorMock,
+        [Greedy] SearchByPayeController sut,
         int ukprn,
         string aorn,
         string employerOrganisationName,
         CancellationToken cancellationToken)
     {
-        Mock<ISessionService> sessionServiceMock = new Mock<ISessionService>();
-
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel
         {
             Email = Email,
@@ -106,8 +113,6 @@ public class InvitationSentShutterPageTests
         var getRequestResponse = new GetRequestByUkprnPayeResponse { EmployerOrganisationName = employerOrganisationName };
 
         Response<GetRequestByUkprnPayeResponse> resultResponse = new(null, new(HttpStatusCode.OK), () => getRequestResponse);
-
-        SearchByPayeController sut = new(Mock.Of<IOuterApiClient>(), sessionServiceMock.Object, Mock.Of<IValidator<SearchByPayeSubmitViewModel>>());
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerSearchByPaye, AddEmployerSearchByPayeLink);
 
@@ -120,15 +125,16 @@ public class InvitationSentShutterPageTests
 
     [Test, MoqAutoData]
     public async Task InvitationSentShutterPage_RedirectsToStartIfResponseCodeIsNotOk(
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<SearchByEmailSubmitModel>> validatorMock,
+        [Greedy] SearchByPayeController sut,
         int ukprn,
         string paye,
         string aorn,
         string employerOrganisationName,
         CancellationToken cancellationToken)
     {
-        Mock<IOuterApiClient> outerApiClientMock = new Mock<IOuterApiClient>();
-        Mock<ISessionService> sessionServiceMock = new Mock<ISessionService>();
-
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel
         {
             Email = Email,
@@ -139,8 +145,6 @@ public class InvitationSentShutterPageTests
 
         Response<GetRequestByUkprnPayeResponse> resultResponse = new(null, new(HttpStatusCode.NotFound), () => getRequestResponse);
         outerApiClientMock.Setup(o => o.GetRequest(ukprn, paye, cancellationToken)).ReturnsAsync(resultResponse);
-
-        SearchByPayeController sut = new(outerApiClientMock.Object, sessionServiceMock.Object, Mock.Of<IValidator<SearchByPayeSubmitViewModel>>());
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerSearchByPaye, AddEmployerSearchByPayeLink);
 
