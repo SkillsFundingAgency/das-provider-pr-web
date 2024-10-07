@@ -2,6 +2,7 @@
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SFA.DAS.Encoding;
 using SFA.DAS.Provider.PR.Domain.Interfaces;
 using SFA.DAS.Provider.PR.Web.Authorization;
 using SFA.DAS.Provider.PR.Web.Infrastructure;
@@ -14,7 +15,7 @@ namespace SFA.DAS.Provider.PR.Web.Controllers.AddEmployer;
 [Authorize(Policy = nameof(PolicyNames.HasContributorOrAbovePermission))]
 
 [Route("/{ukprn}/addEmployer/searchByPaye", Name = RouteNames.AddEmployerSearchByPaye)]
-public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionService _sessionService, IValidator<SearchByPayeSubmitModel> _validator) : Controller
+public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionService _sessionService, IEncodingService encodingService, IValidator<SearchByPayeSubmitModel> _validator) : Controller
 {
     public const string ViewPath = "~/Views/AddEmployer/SearchByPaye.cshtml";
     public const string PayeAornShutterPathViewPath = "~/Views/AddEmployer/ShutterPages/PayeAornShutterPage.cshtml";
@@ -88,6 +89,12 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
 
         if (hasActiveRequest is true)
         {
+            var requestResponse = await _outerApiClient.GetRequest(ukprn, sessionModel.Paye!, cancellationToken);
+
+            sessionModel.AccountLegalEntityId = requestResponse.GetContent().AccountLegalEntityId!.Value;
+
+            _sessionService.Set(sessionModel);
+
             return RedirectToRoute(RouteNames.AddEmployerInvitationAlreadySent, new { ukprn });
         }
 
@@ -152,14 +159,18 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
 
         var backLink = Url.RouteUrl(RouteNames.AddEmployerSearchByPaye, new { ukprn })!;
 
-        var checkEmployerLink = "";
+        var accountLegalEntityId = sessionModel.AccountLegalEntityId!.Value;
+
+        var accountLegalEntityIdEncoded = encodingService.Encode(accountLegalEntityId, EncodingType.PublicAccountLegalEntityId);
+        var employerAccountLink = Url.RouteUrl(RouteNames.EmployerDetails, new { ukprn, accountLegalEntityId = accountLegalEntityIdEncoded })!;
+
         var shutterViewModel = new InviteAlreadySentShutterPageViewModel(
             employerName,
             sessionModel.Paye,
             sessionModel.Aorn!,
             sessionModel.Email,
             backLink,
-            checkEmployerLink
+            employerAccountLink
         );
 
         return View(InviteAlreadySentShutterPathViewPath, shutterViewModel);

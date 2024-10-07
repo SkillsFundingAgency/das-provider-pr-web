@@ -7,6 +7,7 @@ public static class RouteNames
 {
     public const string Home = nameof(Home);
     public const string Employers = nameof(Employers);
+    public const string EmployerDetails = nameof(EmployerDetails);
     public const string ProviderSignOut = "provider-signout";
     public const string AddEmployerStart = nameof(AddEmployerStart);
     public const string AddEmployerSearchByEmail = nameof(AddEmployerSearchByEmail);
@@ -22,4 +23,5 @@ public static class RouteNames
     public const string ChangePermissions = nameof(ChangePermissions);
     public const string InvitationSent = nameof(InvitationSent);
     public const string PayeAornMatchedEmailNotLinkedLink = nameof(PayeAornMatchedEmailNotLinkedLink);
+    public const string EmailLinkedToAccountWithRelationship = nameof(EmailLinkedToAccountWithRelationship);
 }

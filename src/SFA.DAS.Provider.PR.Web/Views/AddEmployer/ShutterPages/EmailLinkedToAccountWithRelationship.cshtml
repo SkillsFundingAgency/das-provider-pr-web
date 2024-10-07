@@ -1,0 +1,32 @@
+﻿@using SFA.DAS.Provider.PR.Web.Infrastructure
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model SFA.DAS.Provider.PR.Web.Models.AddEmployer.EmailLinkedToAccountWithRelationshipShutterPageViewModel
+@{
+    ViewData["Title"] = "Email linked with relationship to account";
+}
+@section breadcrumb {
+    <a class="das-js-back-link">Back</a>
+}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l">
+            Account  found
+        </h1>
+    </div>
+    <div class="govuk-grid-column-two-thirds">
+      
+        <p class="govuk-body">
+            We’ve found an apprenticeship service account linked to <strong>@Model.Email</strong>.
+            Your organisation is already linked to this employer.
+        </p>
+        <p class="govuk-body">
+            You can view details about the employer account, including what permissions you have. You’ll also be able to request new permissions.
+        </p>
+       
+        <div class="govuk-button-group"> 
+            <p class="govuk-body"> 
+                 <a class="govuk-link" href="@Model.EmployerAccountLink">Employer account details for @Model.EmployerName.ToUpper()</a>
+            </p>
+        </div>
+    </div>
+</div>
