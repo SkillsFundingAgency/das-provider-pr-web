@@ -23,6 +23,7 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
     public const string MultipleAccountsShutterPathViewPath = "~/Views/AddEmployer/ShutterPages/MultipleAccountsShutterPage.cshtml";
     public const string OneAccountNoRelationshipViewPath = "~/Views/AddEmployer/OneAccountNoRelationship.cshtml";
     public const string EmailLinkedToAccountWithRelationshipShutterPageViewPath = "~/Views/AddEmployer/ShutterPages/EmailLinkedToAccountWithRelationship.cshtml";
+    public const string EmailSearchInviteAlreadySentShutterPageViewPath = "~/Views/AddEmployer/ShutterPages/EmailSearchInviteAlreadySentShutterPage.cshtml";
 
     [HttpGet]
     public IActionResult Index([FromRoute] int ukprn)
@@ -64,7 +65,12 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
 
         var relationshipByEmail = await _outerApiClient.GetRelationshipByEmail(submitModel.Email!, ukprn, cancellationToken);
 
-        if (!relationshipByEmail.HasUserAccount)
+        if (relationshipByEmail.HasActiveRequest)
+        {
+            return RedirectToRoute(RouteNames.EmailSearchInviteAlreadySent, new { ukprn });
+        }
+
+        if (!relationshipByEmail.HasUserAccount!.Value)
         {
             return RedirectToRoute(RouteNames.AddEmployerSearchByPaye, new { ukprn });
         }
@@ -85,6 +91,36 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
         return RedirectToRoute(relationshipByEmail.HasRelationship is true
             ? RouteNames.EmailLinkedToAccountWithRelationship :
             RouteNames.OneAccountNoRelationship, new { ukprn });
+    }
+
+    [HttpGet]
+    [Route("emailSearchInviteAlreadySent", Name = RouteNames.EmailSearchInviteAlreadySent)]
+    public async Task<IActionResult> EmailSearchInviteAlreadySent([FromRoute] int ukprn, CancellationToken cancellationToken)
+    {
+        var sessionModel = _sessionService.Get<AddEmployerSessionModel>();
+        var email = sessionModel?.Email;
+
+        if (string.IsNullOrEmpty(email))
+        {
+            return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
+        }
+
+        var requestResponse = await _outerApiClient.GetRequestByUkprnAndEmail(ukprn, email, cancellationToken);
+        var response = requestResponse.GetContent();
+
+        long? accountLegalEntityId = response?.AccountLegalEntityId;
+        string? employerName = response?.EmployerOrganisationName?.ToUpper();
+
+        if (string.IsNullOrEmpty(employerName) || accountLegalEntityId == null)
+        {
+            return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
+        }
+
+        var accountLegalEntityIdEncoded = encodingService.Encode(accountLegalEntityId.Value, EncodingType.PublicAccountLegalEntityId);
+        var employerAccountLink = Url.RouteUrl(RouteNames.EmployerDetails, new { ukprn, accountLegalEntityId = accountLegalEntityIdEncoded })!;
+        var shutterViewModel = new EmailSearchInviteAlreadySentShutterPageViewModel(email, employerName, employerAccountLink);
+
+        return View(EmailSearchInviteAlreadySentShutterPageViewPath, shutterViewModel);
     }
 
     [HttpGet]

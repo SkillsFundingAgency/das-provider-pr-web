@@ -1,7 +1,8 @@
 ﻿namespace SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
 public class GetRelationshipByEmailResponse
 {
-    public bool HasUserAccount { get; set; }
+    public bool HasActiveRequest { get; set; }
+    public bool? HasUserAccount { get; set; }
     public bool? HasOneEmployerAccount { get; set; }
     public long? AccountId { get; set; }
     public bool? HasOneLegalEntity { get; set; }

@@ -24,4 +24,5 @@ public static class RouteNames
     public const string InvitationSent = nameof(InvitationSent);
     public const string PayeAornMatchedEmailNotLinkedLink = nameof(PayeAornMatchedEmailNotLinkedLink);
     public const string EmailLinkedToAccountWithRelationship = nameof(EmailLinkedToAccountWithRelationship);
+    public const string EmailSearchInviteAlreadySent = nameof(EmailSearchInviteAlreadySent);
 }
