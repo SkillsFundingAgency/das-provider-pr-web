@@ -21,6 +21,7 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
     public const string PayeAornShutterPathViewPath = "~/Views/AddEmployer/ShutterPages/PayeAornShutterPage.cshtml";
     public const string InviteAlreadySentShutterPathViewPath = "~/Views/AddEmployer/ShutterPages/InviteAlreadySentShutterPage.cshtml";
     public const string PayeAornMatchedEmailNotLinkedShutterPathViewPath = "~/Views/AddEmployer/ShutterPages/PayeAornMatchedEmailNotLinkedShutterPage.cshtml";
+    public const string PayeAornMatchedEmailNotLinkedHasRelationshipShutterPathViewPath = "~/Views/AddEmployer/ShutterPages/PayeAornMatchedEmailNotLinkedHasRelationshipShutterPage.cshtml";
 
     [HttpGet]
     public IActionResult Index([FromRoute] int ukprn)
@@ -127,10 +128,14 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
         sessionModel.AccountId = relationshipsRequest.Account!.AccountId;
         sessionModel.OrganisationName = relationshipsRequest.Organisation?.Name;
         _sessionService.Set(sessionModel);
-        return RedirectToRoute(RouteNames.PayeAornMatchedEmailNotLinkedLink, new { ukprn });
 
+        if (relationshipsRequest.HasRelationship!.Value)
+        {
+            return RedirectToRoute(RouteNames.PayeAornMatchedEmailNotLinkedHasRelationshipLink, new { ukprn });
+        }
+
+        return RedirectToRoute(RouteNames.PayeAornMatchedEmailNotLinkedNoRelationshipLink, new { ukprn });
     }
-
 
     [HttpGet]
     [Route("invitationSent", Name = RouteNames.AddEmployerInvitationAlreadySent)]
@@ -190,7 +195,7 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
     }
 
     [HttpGet]
-    [Route("payeAornMatchedEmailNotLinked", Name = RouteNames.PayeAornMatchedEmailNotLinkedLink)]
+    [Route("payeAornMatchedEmailNotLinked", Name = RouteNames.PayeAornMatchedEmailNotLinkedNoRelationshipLink)]
     public IActionResult PayeAornMatchedEmailNotLinkedShutterPage([FromRoute] int ukprn)
     {
         var sessionModel = _sessionService.Get<AddEmployerSessionModel>();
@@ -212,6 +217,34 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
         };
 
         return View(PayeAornMatchedEmailNotLinkedShutterPathViewPath, shutterViewModel);
+    }
+
+    [HttpGet]
+    [Route("payeAornMatchedEmailNotLinkedRelationship", Name = RouteNames.PayeAornMatchedEmailNotLinkedHasRelationshipLink)]
+    public IActionResult PayeAornMatchedEmailNotLinkedHasRelationshipShutterPage([FromRoute] int ukprn)
+    {
+        var sessionModel = _sessionService.Get<AddEmployerSessionModel>();
+        if (string.IsNullOrEmpty(sessionModel?.Paye))
+        {
+            return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
+        }
+
+        var accountLegalEntityId = sessionModel.AccountLegalEntityId!.Value;
+
+        var accountLegalEntityIdEncoded = encodingService.Encode(accountLegalEntityId, EncodingType.PublicAccountLegalEntityId);
+        var employerAccountLink = Url.RouteUrl(RouteNames.EmployerDetails, new { ukprn, accountLegalEntityId = accountLegalEntityIdEncoded })!;
+
+
+        var shutterViewModel = new PayeAornMatchedEmailNotLinkedHasRelationshipViewModel
+        {
+            EmployerName = sessionModel.OrganisationName!.ToUpper(),
+            PayeReference = sessionModel.Paye!,
+            Aorn = sessionModel.Aorn!,
+            Email = sessionModel.Email,
+            EmployerAccountLink = employerAccountLink
+        };
+
+        return View(PayeAornMatchedEmailNotLinkedHasRelationshipShutterPathViewPath, shutterViewModel);
     }
 
     private SearchByPayeModel GetViewModel(int ukprn)

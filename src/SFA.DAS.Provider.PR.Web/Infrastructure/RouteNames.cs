@@ -22,7 +22,9 @@ public static class RouteNames
     public const string CheckEmployerDetails = nameof(CheckEmployerDetails);
     public const string ChangePermissions = nameof(ChangePermissions);
     public const string InvitationSent = nameof(InvitationSent);
-    public const string PayeAornMatchedEmailNotLinkedLink = nameof(PayeAornMatchedEmailNotLinkedLink);
+    public const string PayeAornMatchedEmailNotLinkedNoRelationshipLink = nameof(PayeAornMatchedEmailNotLinkedNoRelationshipLink);
+    public const string PayeAornMatchedEmailNotLinkedHasRelationshipLink =
+        nameof(PayeAornMatchedEmailNotLinkedHasRelationshipLink);
     public const string EmailLinkedToAccountWithRelationship = nameof(EmailLinkedToAccountWithRelationship);
     public const string EmailSearchInviteAlreadySent = nameof(EmailSearchInviteAlreadySent);
 }
