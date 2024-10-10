@@ -20,6 +20,7 @@ public class SearchByEmailControllerPostTests
     private static readonly string BackLink = Guid.NewGuid().ToString();
     private static readonly string CancelLink = BackLink;
     private static readonly string RedirectToMultipleAccountsShutterPage = Guid.NewGuid().ToString();
+    private static readonly string EmailSearchInviteAlreadySentPage = Guid.NewGuid().ToString();
 
     private static readonly string Email = "test@account.com";
     private readonly string _emailCallingRelationships = Email;
@@ -37,6 +38,8 @@ public class SearchByEmailControllerPostTests
      )
     {
         searchByEmailSubmitModel.Email = Email;
+
+        getRelationshipByEmailResponse.HasActiveRequest = false;
         getRelationshipByEmailResponse.HasUserAccount = true;
         getRelationshipByEmailResponse.HasOneEmployerAccount = true;
         getRelationshipByEmailResponse.HasOneLegalEntity = true;
@@ -59,6 +62,33 @@ public class SearchByEmailControllerPostTests
     }
 
     [Test, MoqAutoData]
+    public async Task Post_HasActiveRequest_ReturnsExpectedViewModelAndPath(
+      [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+      [Frozen] Mock<IValidator<SearchByEmailSubmitModel>> validatorMock,
+      [Frozen] Mock<ISessionService> sessionServiceMock,
+      [Greedy] SearchByEmailController sut,
+      int ukprn,
+      SearchByEmailSubmitModel searchByEmailSubmitModel,
+      GetRelationshipByEmailResponse getRelationshipByEmailResponse,
+      CancellationToken cancellationToken
+  )
+    {
+
+        searchByEmailSubmitModel.Email = Email;
+        getRelationshipByEmailResponse.HasActiveRequest = true;
+
+        outerApiClientMock.Setup(x => x.GetRelationshipByEmail(_emailCallingRelationships, ukprn, cancellationToken)).ReturnsAsync(getRelationshipByEmailResponse);
+
+        validatorMock.Setup(v => v.Validate(It.IsAny<SearchByEmailSubmitModel>())).Returns(new ValidationResult());
+
+        var result = await sut.Index(ukprn, searchByEmailSubmitModel, cancellationToken);
+
+        RedirectToRouteResult? redirectToRouteResult = result.As<RedirectToRouteResult>();
+        redirectToRouteResult.RouteName.Should().Be(RouteNames.EmailSearchInviteAlreadySent);
+        redirectToRouteResult.RouteValues!.First().Value.Should().Be(ukprn);
+    }
+
+    [Test, MoqAutoData]
     public async Task Post_SingleAccountsHasNoRelationship_ReturnsExpectedViewModelAndPath(
         [Frozen] Mock<IOuterApiClient> outerApiClientMock,
         [Frozen] Mock<IValidator<SearchByEmailSubmitModel>> validatorMock,
@@ -72,6 +102,7 @@ public class SearchByEmailControllerPostTests
     {
 
         searchByEmailSubmitModel.Email = Email;
+        getRelationshipByEmailResponse.HasActiveRequest = false;
         getRelationshipByEmailResponse.HasUserAccount = true;
         getRelationshipByEmailResponse.HasOneEmployerAccount = true;
         getRelationshipByEmailResponse.HasOneLegalEntity = true;
@@ -95,7 +126,6 @@ public class SearchByEmailControllerPostTests
                  && x.AccountLegalEntityId == getRelationshipByEmailResponse.AccountLegalEntityId
             && x.AccountLegalEntityName == getRelationshipByEmailResponse.AccountLegalEntityName
             )), Times.AtLeastOnce);
-
     }
 
     [Test, MoqAutoData]
@@ -111,6 +141,7 @@ public class SearchByEmailControllerPostTests
     )
     {
         searchByEmailSubmitModel.Email = Email;
+        getRelationshipByEmailResponse.HasActiveRequest = false;
         getRelationshipByEmailResponse.HasUserAccount = true;
         getRelationshipByEmailResponse.HasOneEmployerAccount = true;
         getRelationshipByEmailResponse.HasOneLegalEntity = true;
@@ -154,6 +185,7 @@ public class SearchByEmailControllerPostTests
     )
     {
         searchByEmailSubmitModel.Email = Email;
+        getRelationshipByEmailResponse.HasActiveRequest = false;
         getRelationshipByEmailResponse.HasUserAccount = true;
         getRelationshipByEmailResponse.HasOneEmployerAccount = hasOneEmployerAccount;
         getRelationshipByEmailResponse.HasOneLegalEntity = hasOneLegalEntity;
@@ -183,6 +215,7 @@ public class SearchByEmailControllerPostTests
     )
     {
         searchByEmailSubmitModel.Email = Email;
+        getRelationshipByEmailResponse.HasActiveRequest = false;
         getRelationshipByEmailResponse.HasUserAccount = false;
 
         outerApiClientMock.Setup(x => x.GetRelationshipByEmail(_emailCallingRelationships, ukprn, cancellationToken)).ReturnsAsync(getRelationshipByEmailResponse);
