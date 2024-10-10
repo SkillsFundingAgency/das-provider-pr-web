@@ -1,13 +1,9 @@
 ﻿using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
+using SFA.DAS.Provider.PR.Web.Constants;
 
 namespace SFA.DAS.Provider.PR.Web.Models;
 public class EmployerDetailsViewModel
 {
-    public const string NoPermissionText = "No";
-    public const string RecruitmentPermissionText = "Yes";
-    public const string CohortsPermissionText = "Yes, employer will review records";
-    public const string RecruitmentRequiresReviewPermissionText = "Yes, employer will review adverts";
-
     public const string PendingAddTrainingProviderAndPermissionsRequestText = "Add training provider and permissions request sent";
     public const string AccountCreatedPermissionsSetText = "Apprenticeship service account created";
     public const string PendingPermissionRequestUpdatedText = "Permissions request sent";
@@ -38,9 +34,9 @@ public class EmployerDetailsViewModel
 
     public Operation[]? LastRequestOperations { get; set; } = [];
 
-    public string[] CurrentPermissions => SetPermissionsText(Operations);
+    public string[] CurrentPermissions => SetPermissionText(Operations);
 
-    public string[] RequestedPermissions => SetPermissionsText(LastRequestOperations ?? Array.Empty<Operation>());
+    public string[] RequestedPermissions => SetPermissionText(LastRequestOperations ?? Array.Empty<Operation>());
 
     public string EmployersLink { get; set; } = null!;
 
@@ -144,19 +140,19 @@ public class EmployerDetailsViewModel
         return true;
     }
 
-    private static string[] SetPermissionsText(Operation[] operations)
+    private static string[] SetPermissionText(Operation[] operations)
     {
         string[] permissionsText = new string[2];
 
-        permissionsText[0] = NoPermissionText;
+        permissionsText[0] = SetPermissionsText.NoPermissionText;
         if (operations.Contains(Operation.CreateCohort))
-            permissionsText[0] = CohortsPermissionText;
+            permissionsText[0] = SetPermissionsText.CohortsPermissionText;
 
-        permissionsText[1] = NoPermissionText;
+        permissionsText[1] = SetPermissionsText.NoPermissionText;
         if (operations.Contains(Operation.Recruitment))
-            permissionsText[1] = RecruitmentPermissionText;
+            permissionsText[1] = SetPermissionsText.RecruitmentPermissionText;
         if (operations.Contains(Operation.RecruitmentRequiresReview))
-            permissionsText[1] = RecruitmentRequiresReviewPermissionText;
+            permissionsText[1] = SetPermissionsText.RecruitmentWithReviewPermissionText;
 
         return permissionsText;
     }

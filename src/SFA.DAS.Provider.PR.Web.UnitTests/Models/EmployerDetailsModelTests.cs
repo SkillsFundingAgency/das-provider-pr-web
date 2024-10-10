@@ -1,5 +1,6 @@
 ﻿using AutoFixture.NUnit3;
 using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
+using SFA.DAS.Provider.PR.Web.Constants;
 using SFA.DAS.Provider.PR.Web.Models;
 
 namespace SFA.DAS.Provider.PR_Web.UnitTests.Models;
@@ -77,9 +78,9 @@ public class EmployerDetailsModelTests
     }
 
     [Test]
-    [InlineAutoData(new Operation[] { Operation.CreateCohort }, EmployerDetailsViewModel.CohortsPermissionText)]
-    [InlineAutoData(new Operation[] { Operation.Recruitment }, EmployerDetailsViewModel.RecruitmentPermissionText)]
-    [InlineAutoData(new Operation[] { Operation.RecruitmentRequiresReview }, EmployerDetailsViewModel.RecruitmentRequiresReviewPermissionText)]
+    [InlineAutoData(new Operation[] { Operation.CreateCohort }, SetPermissionsText.CohortsPermissionText)]
+    [InlineAutoData(new Operation[] { Operation.Recruitment }, SetPermissionsText.RecruitmentPermissionText)]
+    [InlineAutoData(new Operation[] { Operation.RecruitmentRequiresReview }, SetPermissionsText.RecruitmentWithReviewPermissionText)]
     public void CurrentPermissionsSetCorrectly(Operation[] operations, string expected,
         GetProviderRelationshipResponse response)
     {
