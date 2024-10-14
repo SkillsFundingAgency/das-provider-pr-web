@@ -92,9 +92,12 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
         {
             var requestResponse = await _outerApiClient.GetRequest(ukprn, sessionModel.Paye!, cancellationToken);
 
-            sessionModel.AccountLegalEntityId = requestResponse.GetContent().AccountLegalEntityId!.Value;
-
-            _sessionService.Set(sessionModel);
+            var request = requestResponse.GetContent();
+            if (request.AccountLegalEntityId != null)
+            {
+                sessionModel.AccountLegalEntityId = request.AccountLegalEntityId!.Value;
+                _sessionService.Set(sessionModel);
+            }
 
             return RedirectToRoute(RouteNames.AddEmployerInvitationAlreadySent, new { ukprn });
         }
@@ -149,25 +152,31 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
             return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
         }
 
-        string employerName;
-
         var requestResponse = await _outerApiClient.GetRequest(ukprn, sessionModel.Paye, cancellationToken);
 
-        if (requestResponse.ResponseMessage.IsSuccessStatusCode && requestResponse.GetContent().RequestType == createAccount)
-        {
-            employerName = requestResponse.GetContent().EmployerOrganisationName!;
-        }
-        else
+        var request = requestResponse.GetContent();
+
+        if (!requestResponse.ResponseMessage.IsSuccessStatusCode || request.RequestType != createAccount)
         {
             return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
         }
 
+        string employerName = request.EmployerOrganisationName!;
+
         var backLink = Url.RouteUrl(RouteNames.AddEmployerSearchByPaye, new { ukprn })!;
 
-        var accountLegalEntityId = sessionModel.AccountLegalEntityId!.Value;
+        long? accountLegalEntityId = sessionModel.AccountLegalEntityId;
 
-        var accountLegalEntityIdEncoded = encodingService.Encode(accountLegalEntityId, EncodingType.PublicAccountLegalEntityId);
-        var employerAccountLink = Url.RouteUrl(RouteNames.EmployerDetails, new { ukprn, accountLegalEntityId = accountLegalEntityIdEncoded })!;
+        string employerAccountLink;
+        if (accountLegalEntityId != null)
+        {
+            var accountLegalEntityIdEncoded = encodingService.Encode(accountLegalEntityId.Value, EncodingType.PublicAccountLegalEntityId);
+            employerAccountLink = Url.RouteUrl(RouteNames.EmployerDetails, new { ukprn, accountLegalEntityId = accountLegalEntityIdEncoded })!;
+        }
+        else
+        {
+            employerAccountLink = Url.RouteUrl(RouteNames.EmployerDetailsByRequestId, new { request.RequestId })!;
+        }
 
         var shutterViewModel = new InviteAlreadySentShutterPageViewModel(
             employerName,
