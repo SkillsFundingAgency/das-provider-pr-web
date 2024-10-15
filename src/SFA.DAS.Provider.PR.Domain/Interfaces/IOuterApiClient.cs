@@ -38,5 +38,5 @@ public interface IOuterApiClient
 
     [AllowAnyStatusCode]
     [Get("requests/{requestid}")]
-    Task<GetRequestsByRequestIdResponse> GetRequestByRequestId([Path] Guid requestid, CancellationToken cancellationToken);
+    Task<Response<GetRequestsByRequestIdResponse>> GetRequestByRequestId([Path] Guid requestid, CancellationToken cancellationToken);
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Encoding;
 using SFA.DAS.Provider.PR.Domain.Interfaces;
@@ -35,23 +36,18 @@ public class EmployerDetailsController(IOuterApiClient _outerApiclient, IEncodin
     public async Task<IActionResult> Index([FromRoute] int ukprn, [FromRoute] Guid requestid,
         CancellationToken cancellationToken)
     {
-        GetRequestsByRequestIdResponse response;
-        try
-        {
-            response = await _outerApiclient.GetRequestByRequestId(requestid, cancellationToken);
-        }
-        catch
+        var response = await _outerApiclient.GetRequestByRequestId(requestid, cancellationToken);
+
+        if (response.ResponseMessage.StatusCode == HttpStatusCode.NotFound)
         {
             return RedirectToAction("HttpStatusCodeHandler", "Error", new { statusCode = 404 });
         }
 
-        EmployerDetailsViewModel model = response;
+        EmployerDetailsViewModel model = response.GetContent();
 
-        if (string.IsNullOrEmpty(model.AccountLegalEntityPublicHashedId))
-        {
-            model.AccountLegalEntityPublicHashedId =
-                encodingService.Encode(model.AccountLegalEntityId, EncodingType.PublicAccountLegalEntityId);
-        }
+        model.AccountLegalEntityPublicHashedId =
+            encodingService.Encode(model.AccountLegalEntityId, EncodingType.PublicAccountLegalEntityId);
+
         model.EmployersLink = Url.RouteUrl(RouteNames.Employers, new { ukprn })!;
 
         return View(model);

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using RestEase;
 using SFA.DAS.Provider.PR.Domain.Interfaces;
 using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
 using SFA.DAS.Provider.PR.Web.Authorization;
@@ -53,14 +54,14 @@ public class EmployersController(IOuterApiClient _outerApiclient, IOptions<Appli
             var newEmployer = (EmployerPermissionViewModel)employer;
             if (newEmployer.HasPendingRequest)
             {
-                GetRequestsByRequestIdResponse response =
-                    await _outerApiclient.GetRequestByRequestId((Guid)employer.RequestId!, cancellationToken);
+                Response<GetRequestsByRequestIdResponse> response = await
+                    _outerApiclient.GetRequestByRequestId((Guid)employer.RequestId!, cancellationToken);
 
-                if (string.Equals(response.RequestType, "AddAccount", StringComparison.CurrentCultureIgnoreCase) ||
-                    string.Equals(response.RequestType, "CreateAccount", StringComparison.CurrentCultureIgnoreCase))
+                if (string.Equals(response.GetContent().RequestType, RequestType.AddAccount.ToString(), StringComparison.CurrentCultureIgnoreCase) ||
+                    string.Equals(response.GetContent().RequestType, RequestType.CreateAccount.ToString(), StringComparison.CurrentCultureIgnoreCase))
                 {
                     newEmployer.EmployerDetailsUrl = Url.RouteUrl(RouteNames.EmployerDetailsByRequestId,
-                        new { ukprn, response.RequestId })!;
+                        new { ukprn, response.GetContent().RequestId })!;
                 }
             }
 
