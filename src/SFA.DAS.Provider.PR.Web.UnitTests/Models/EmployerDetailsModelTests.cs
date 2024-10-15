@@ -56,7 +56,6 @@ public class EmployerDetailsModelTests
     }
 
     [Test]
-    [InlineAutoData(RequestStatus.Sent, PermissionAction.PermissionCreated, PermissionRequestType, EmployerDetailsViewModel.PendingAddTrainingProviderAndPermissionsRequestText)]
     [InlineAutoData(RequestStatus.Sent, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsViewModel.PendingPermissionRequestUpdatedText)]
     [InlineAutoData(RequestStatus.Accepted, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsViewModel.PermissionUpdateAcceptedText)]
     [InlineAutoData(RequestStatus.Declined, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsViewModel.PermissionUpdateDeclinedText)]
@@ -65,12 +64,25 @@ public class EmployerDetailsModelTests
     [InlineAutoData(RequestStatus.Accepted, PermissionAction.RecruitRelationship, AddAccountRequestType, EmployerDetailsViewModel.ExistingRecruitRelationshipText)]
     [InlineAutoData(RequestStatus.Accepted, PermissionAction.ApprovalsRelationship, AddAccountRequestType, EmployerDetailsViewModel.ExistingApprovalsRelationshipText)]
 
-    public void LastActionTextIsSetCorrectly(RequestStatus status, PermissionAction action, string lastRequestType, string expected,
+    public void LastActionTextIsSetCorrectly_WhenExistingRelationshipExists(RequestStatus status, PermissionAction action, string lastRequestType, string expected,
         GetProviderRelationshipResponse response)
     {
         response.LastRequestStatus = status;
         response.LastAction = action;
         response.LastRequestType = lastRequestType;
+
+        var actual = (EmployerDetailsViewModel)response;
+
+        Assert.That(actual.LastActionText, Is.EqualTo(expected));
+    }
+
+    [Test]
+    [InlineAutoData("AddAccount", EmployerDetailsViewModel.PendingAddTrainingProviderAndPermissionsRequestText)]
+    [InlineAutoData("CreateAccount", EmployerDetailsViewModel.PendingCreateAccountInvitationText)]
+    public void LastActionTextIsSetCorrectly_WhenExistingDoesNotRelationshipExist(string lastRequestType, string expected,
+        GetRequestsByRequestIdResponse response)
+    {
+        response.RequestType = lastRequestType;
 
         var actual = (EmployerDetailsViewModel)response;
 

@@ -11,8 +11,8 @@ using SFA.DAS.Provider.PR.Web.Infrastructure;
 using SFA.DAS.Provider.PR.Web.Models;
 using SFA.DAS.Provider.PR_Web.UnitTests.TestHelpers;
 
-namespace SFA.DAS.Provider.PR_Web.UnitTests.Controllers;
-public class EmployerDetailsControllerTests
+namespace SFA.DAS.Provider.PR_Web.UnitTests.Controllers.EmployerDetails;
+public class EmployerDetailsAccountLegalEntityIndexTests
 {
     [Test, AutoData]
     public async Task IndexWithUkprnAndAccountlegalentityid_ReturnsDefaultView(int ukprn,
@@ -60,6 +60,5 @@ public class EmployerDetailsControllerTests
         var actual = await sut.Index(ukprn, hashedAccountLegalEntityId, CancellationToken.None);
 
         actual.As<ViewResult>().Model.As<EmployerDetailsViewModel>().EmployersLink.Should().Be(employerUrl);
-
     }
 }
