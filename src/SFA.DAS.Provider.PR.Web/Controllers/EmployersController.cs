@@ -35,7 +35,7 @@ public class EmployersController(IOuterApiClient _outerApiclient, IOptions<Appli
                 Pagination = new(response.TotalCount, pageSize, Url, RouteNames.Employers, submitModel.ConvertToDictionary()),
                 ClearFiltersLink = Url.RouteUrl(RouteNames.Employers, new { ukprn })!,
                 AddEmployerLink = Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn })!,
-                Employers = BuildEmployers(response.Employers.ToList(), ukprn),
+                Employers = await BuildEmployers(response.Employers.ToList(), ukprn, cancellationToken),
                 TotalCount = "employer".ToQuantity(response.TotalCount)
             };
 
@@ -45,14 +45,32 @@ public class EmployersController(IOuterApiClient _outerApiclient, IOptions<Appli
         return View(NoRelationshipsHomePage, new NoRelationshipsHomeViewModel(Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn })!));
     }
 
-    private List<EmployerPermissionViewModel> BuildEmployers(List<ProviderRelationshipModel> employers, int ukprn)
+    private async Task<List<EmployerPermissionViewModel>> BuildEmployers(List<ProviderRelationshipModel> employers, int ukprn, CancellationToken cancellationToken)
     {
         var employerList = new List<EmployerPermissionViewModel>();
         foreach (var employer in employers)
         {
             var newEmployer = (EmployerPermissionViewModel)employer;
-            newEmployer.EmployerDetailsUrl =
-                Url.RouteUrl(RouteNames.EmployerDetails, new { ukprn, accountLegalEntityId = employer.AgreementId })!;
+            if (newEmployer.HasPendingRequest)
+            {
+                GetRequestsByRequestIdResponse response =
+                    await _outerApiclient.GetRequestByRequestId((Guid)employer.RequestId!, cancellationToken);
+
+                if (string.Equals(response.RequestType, "AddAccount", StringComparison.CurrentCultureIgnoreCase) ||
+                    string.Equals(response.RequestType, "CreateAccount", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    newEmployer.EmployerDetailsUrl = Url.RouteUrl(RouteNames.EmployerDetailsByRequestId,
+                        new { ukprn, response.RequestId })!;
+                }
+            }
+
+            if (newEmployer.EmployerDetailsUrl == null)
+            {
+                newEmployer.EmployerDetailsUrl =
+                    Url.RouteUrl(RouteNames.EmployerDetails,
+                        new { ukprn, accountLegalEntityId = employer.AgreementId })!;
+            }
+
             employerList.Add(newEmployer);
         }
         return employerList;

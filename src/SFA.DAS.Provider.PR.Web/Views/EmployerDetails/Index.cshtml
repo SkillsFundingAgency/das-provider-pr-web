@@ -9,7 +9,8 @@
         <div class="govuk-!-width">
             <h1 class="govuk-heading-l govuk-!-margin-bottom-6">Employer account details</h1>
             <h2 class="govuk-heading-m govuk-!-margin-bottom-1">@Model.AccountLegalEntityName</h2>
-            <p class="govuk-body govuk-!-margin-bottom-8"><strong>Agreement ID: </strong>@Model.AccountLegalEntityPublicHashedId</p>
+            <p asp-show="!@Model.ShowAgreementId" class="govuk-body govuk-!-margin-bottom-8"></p>
+            <p asp-show="@Model.ShowAgreementId" class="govuk-body govuk-!-margin-bottom-8"><strong>Agreement ID: </strong>@Model.AccountLegalEntityPublicHashedId</p>
         </div>
     </div>
 </div>

@@ -60,6 +60,68 @@ public class EmployerDetailsControllerTests
         var actual = await sut.Index(ukprn, hashedAccountLegalEntityId, CancellationToken.None);
 
         actual.As<ViewResult>().Model.As<EmployerDetailsViewModel>().EmployersLink.Should().Be(employerUrl);
+    }
 
+    [Test, AutoData]
+    public async Task IndexWithUkprnAndRequestId_ReturnsDefaultView(int ukprn, Guid requestId,
+        GetRequestsByRequestIdResponse response)
+    {
+        Mock<IEncodingService> encodingService = new();
+
+        Mock<IOuterApiClient> outerApiClientMock = new();
+        outerApiClientMock.Setup(x => x.GetRequestByRequestId(requestId, CancellationToken.None))
+            .ReturnsAsync(response);
+
+        EmployerDetailsController
+            sut = new EmployerDetailsController(outerApiClientMock.Object, encodingService.Object);
+
+        sut.AddDefaultContext().AddUrlHelperMock();
+
+        var actual = await sut.Index(ukprn, requestId, CancellationToken.None);
+
+        using (new AssertionScope())
+        {
+            actual.Should().BeOfType<ViewResult>();
+            actual.As<ViewResult>().ViewName.Should().BeNull();
+            actual.As<ViewResult>().Model.Should().BeOfType<EmployerDetailsViewModel>();
+            actual.As<ViewResult>().Model.As<EmployerDetailsViewModel>();
+        }
+    }
+
+    [Test, AutoData]
+    public async Task IndexWithUkprnAndRequestId_BuildsEmployerLinkCorrectly(int ukprn, Guid requestId,
+        GetRequestsByRequestIdResponse response, string employerUrl)
+    {
+        Mock<IEncodingService> encodingService = new();
+
+        Mock<IOuterApiClient> outerApiClientMock = new();
+        outerApiClientMock.Setup(x => x.GetRequestByRequestId(requestId, CancellationToken.None))
+            .ReturnsAsync(response);
+
+        EmployerDetailsController sut = new(outerApiClientMock.Object, encodingService.Object);
+
+        sut.AddDefaultContext().AddUrlHelperMock().AddUrlForRoute(RouteNames.Employers, employerUrl);
+
+        var actual = await sut.Index(ukprn, requestId, CancellationToken.None);
+
+        actual.As<ViewResult>().Model.As<EmployerDetailsViewModel>().EmployersLink.Should().Be(employerUrl);
+    }
+
+    [Test, AutoData]
+    public async Task IndexWithInvalidRequestId_RoutesToError(int ukprn, Guid requestId,
+        GetRequestsByRequestIdResponse response)
+    {
+        Mock<IEncodingService> encodingService = new();
+
+        Mock<IOuterApiClient> outerApiClientMock = new();
+        outerApiClientMock.Setup(x => x.GetRequestByRequestId(It.IsAny<Guid>(), CancellationToken.None))
+            .Throws(new Exception());
+
+        EmployerDetailsController sut = new(outerApiClientMock.Object, encodingService.Object);
+
+        var actual = await sut.Index(ukprn, requestId, CancellationToken.None) as RedirectToActionResult;
+
+        actual!.ActionName.Should().Be("HttpStatusCodeHandler");
+        actual!.ControllerName.Should().Be("Error");
     }
 }

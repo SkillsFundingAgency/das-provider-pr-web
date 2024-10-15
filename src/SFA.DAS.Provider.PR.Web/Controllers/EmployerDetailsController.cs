@@ -29,4 +29,31 @@ public class EmployerDetailsController(IOuterApiClient _outerApiclient, IEncodin
 
         return View(model);
     }
+
+    [Route("{ukprn:int}/employers/{requestid:Guid}", Name = RouteNames.EmployerDetailsByRequestId)]
+    [HttpGet]
+    public async Task<IActionResult> Index([FromRoute] int ukprn, [FromRoute] Guid requestid,
+        CancellationToken cancellationToken)
+    {
+        GetRequestsByRequestIdResponse response;
+        try
+        {
+            response = await _outerApiclient.GetRequestByRequestId(requestid, cancellationToken);
+        }
+        catch (Exception e)
+        {
+            return RedirectToAction("HttpStatusCodeHandler", "Error", new { statusCode = 404 });
+        }
+
+        EmployerDetailsViewModel model = response;
+
+        if (string.IsNullOrEmpty(model.AccountLegalEntityPublicHashedId))
+        {
+            model.AccountLegalEntityPublicHashedId =
+                encodingService.Encode(model.AccountLegalEntityId, EncodingType.PublicAccountLegalEntityId);
+        }
+        model.EmployersLink = Url.RouteUrl(RouteNames.Employers, new { ukprn })!;
+
+        return View(model);
+    }
 }

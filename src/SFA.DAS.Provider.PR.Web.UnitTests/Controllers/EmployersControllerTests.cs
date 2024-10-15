@@ -17,11 +17,15 @@ namespace SFA.DAS.Provider.PR_Web.UnitTests.Controllers;
 public class EmployersControllerTests
 {
     [Test, AutoData]
-    public async Task IndexWithUkprn_HasRelationships_ReturnsDefaultView(int ukprn, GetProviderRelationshipsResponse response, string clearFilterUrl, string addEmployerUrl, ApplicationSettings applicationSettings, CancellationToken cancellationToken)
+    public async Task IndexWithUkprn_HasRelationships_ReturnsDefaultView(int ukprn, GetProviderRelationshipsResponse response, GetRequestsByRequestIdResponse responseByRequest, string clearFilterUrl, string addEmployerUrl, ApplicationSettings applicationSettings, CancellationToken cancellationToken)
     {
         Mock<IOuterApiClient> outerApiClientMock = new();
         response.HasAnyRelationships = true;
         outerApiClientMock.Setup(c => c.GetProviderRelationships(ukprn, It.IsAny<Dictionary<string, string>>(), cancellationToken)).ReturnsAsync(response);
+
+        responseByRequest.RequestType = "Permission";
+        outerApiClientMock.Setup(c => c.GetRequestByRequestId(It.IsAny<Guid>(), cancellationToken))
+            .ReturnsAsync(responseByRequest);
 
         Mock<IOptions<ApplicationSettings>> applicationSettingsMock = new();
         applicationSettingsMock.Setup(a => a.Value).Returns(applicationSettings);
@@ -62,12 +66,19 @@ public class EmployersControllerTests
     }
 
     [Test, AutoData]
-    public async Task IndexWithUkprn_HasRelationships_BuildsEmployerDetailsLink(int ukprn, GetProviderRelationshipsResponse response, string employerDetailsLink, ApplicationSettings applicationSettings, ProviderRelationshipModel employer, CancellationToken cancellationToken)
+    public async Task IndexWithUkprn_HasExistingRelationships_BuildsEmployerDetailsLink(int ukprn, GetProviderRelationshipsResponse response, GetRequestsByRequestIdResponse responseByRequest, string employerDetailsLink, ApplicationSettings applicationSettings, ProviderRelationshipModel employer, CancellationToken cancellationToken)
     {
         Mock<IOuterApiClient> outerApiClientMock = new();
-        response.HasAnyRelationships = true;
+
+        employer.RequestId = null;
         response.Employers = new List<ProviderRelationshipModel> { employer };
+        response.HasAnyRelationships = true;
+
         outerApiClientMock.Setup(c => c.GetProviderRelationships(ukprn, It.IsAny<Dictionary<string, string>>(), cancellationToken)).ReturnsAsync(response);
+
+        responseByRequest.RequestType = "Permission";
+        outerApiClientMock.Setup(c => c.GetRequestByRequestId(It.IsAny<Guid>(), cancellationToken))
+            .ReturnsAsync(responseByRequest);
 
         Mock<IOptions<ApplicationSettings>> applicationSettingsMock = new();
         applicationSettingsMock.Setup(a => a.Value).Returns(applicationSettings);
@@ -78,5 +89,34 @@ public class EmployersControllerTests
         var actual = await sut.Index(ukprn, new(), cancellationToken);
 
         actual.As<ViewResult>().Model.As<EmployersViewModel>().Employers.First().EmployerDetailsUrl.Should().Be(employerDetailsLink);
+    }
+
+    [Test]
+    [InlineAutoData("AddAccount")]
+    [InlineAutoData("CreateAccount")]
+    public async Task IndexWithUkprn_HasRelationshipRequests_BuildsEmployerDetailsLink(string requestType, int ukprn, GetProviderRelationshipsResponse response, GetRequestsByRequestIdResponse responseByRequest, string employerDetailsLink, ApplicationSettings applicationSettings, ProviderRelationshipModel employer, CancellationToken cancellationToken)
+    {
+        Mock<IOuterApiClient> outerApiClientMock = new();
+
+        employer.RequestId = new Guid();
+        response.Employers = new List<ProviderRelationshipModel> { employer };
+        response.HasAnyRelationships = true;
+
+        outerApiClientMock.Setup(c => c.GetProviderRelationships(ukprn, It.IsAny<Dictionary<string, string>>(), cancellationToken)).ReturnsAsync(response);
+
+        responseByRequest.RequestType = requestType;
+        outerApiClientMock.Setup(c => c.GetRequestByRequestId(It.IsAny<Guid>(), cancellationToken))
+            .ReturnsAsync(responseByRequest);
+
+        Mock<IOptions<ApplicationSettings>> applicationSettingsMock = new();
+        applicationSettingsMock.Setup(a => a.Value).Returns(applicationSettings);
+
+        EmployersController sut = new(outerApiClientMock.Object, applicationSettingsMock.Object);
+        sut.AddDefaultContext().AddUrlHelperMock().AddUrlForRoute(RouteNames.EmployerDetails, employerDetailsLink);
+
+        var actual = await sut.Index(ukprn, new(), cancellationToken);
+
+        actual.As<ViewResult>().Model.As<EmployersViewModel>().Employers.First().EmployerDetailsUrl.Should().Be(employerDetailsLink);
+        outerApiClientMock.Verify(x => x.GetRequestByRequestId((Guid)employer.RequestId, cancellationToken), Times.AtLeast(1));
     }
 }
