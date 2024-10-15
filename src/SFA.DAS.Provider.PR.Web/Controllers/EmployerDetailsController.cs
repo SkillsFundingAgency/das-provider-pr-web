@@ -40,7 +40,7 @@ public class EmployerDetailsController(IOuterApiClient _outerApiclient, IEncodin
         {
             response = await _outerApiclient.GetRequestByRequestId(requestid, cancellationToken);
         }
-        catch (Exception e)
+        catch
         {
             return RedirectToAction("HttpStatusCodeHandler", "Error", new { statusCode = 404 });
         }
