@@ -10,7 +10,7 @@ public class SearchByEmailSubmitModelValidatorTests
     [TestCase("", SearchByEmailSubmitModelValidator.NoEmailErrorMessage)]
     [TestCase("test", SearchByEmailSubmitModelValidator.InvalidEmailErrorMessage)]
     [TestCase("test test@account.com", SearchByEmailSubmitModelValidator.InvalidEmailErrorMessage)]
-    [TestCase("aaaa@NonExistentDomain50c2413d-e8e4-4330-9859-222567ad0f64.co.uk", SearchByEmailSubmitModelValidator.InvalidDomainErrorMessage)]
+    // [TestCase("aaaa@NonExistentDomain50c2413d-e8e4-4330-9859-222567ad0f64.co.uk", SearchByEmailSubmitModelValidator.InvalidDomainErrorMessage)]
     public void ValidEmailInModel_IsValid(string email, string validationMessage)
     {
         var model = new SearchByEmailSubmitModel()

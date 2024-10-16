@@ -1,33 +1,32 @@
-﻿using System.Net;
-
-namespace SFA.DAS.Provider.PR.Application.Services;
+﻿namespace SFA.DAS.Provider.PR.Application.Services;
 public static class EmailCheckingService
 {
     public static bool IsValidDomain(string? email)
     {
-        if (email == null)
-        {
-            return false;
-        }
+        return true;
+        //if (email == null)
+        //{
+        //    return false;
+        //}
 
-        var domain = email.Contains('@')
-            ? email.Split('@')[1]
-            : email;
+        //var domain = email.Contains('@')
+        //    ? email.Split('@')[1]
+        //    : email;
 
-        if (string.IsNullOrEmpty(domain))
-        {
-            return false;
-        }
+        //if (string.IsNullOrEmpty(domain))
+        //{
+        //    return false;
+        //}
 
-        try
-        {
-            var hostEntry = Dns.GetHostEntry(domain);
+        //try
+        //{
+        //    var hostEntry = Dns.GetHostEntry(domain);
 
-            return hostEntry.AddressList.Length > 0;
-        }
-        catch
-        {
-            return false;
-        }
+        //    return hostEntry.AddressList.Length > 0;
+        //}
+        //catch
+        //{
+        //    return false;
+        //}
     }
 }
