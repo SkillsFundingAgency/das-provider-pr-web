@@ -26,6 +26,7 @@ builder.Services
         builder.AddFilter<ApplicationInsightsLoggerProvider>(string.Empty, LogLevel.Information);
         builder.AddFilter<ApplicationInsightsLoggerProvider>("Microsoft", LogLevel.Information);
     })
+    .AddDataProtection(configuration)
     .AddHttpContextAccessor()
     .AddServiceRegistrations(configuration)
     .AddSession(configuration)
