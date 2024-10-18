@@ -1,0 +1,36 @@
+﻿@using SFA.DAS.Provider.PR.Web.Infrastructure
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model SFA.DAS.Provider.PR.Web.Models.AddEmployer.PayeAornMatchedEmailNotLinkedHasRelationshipViewModel
+@{
+    ViewData["Title"] = "Paye and Aorn matched, email not linked, relationship exists";
+}
+@section breadcrumb {
+    <a class="das-js-back-link">Back</a>
+}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l">
+            Account  found
+        </h1>
+    </div>
+    <div class="govuk-grid-column-two-thirds">
+        <p class="govuk-body">
+            <div class="govuk-inset-text">
+                @Model.EmployerName <br /><br />
+                Employer PAYE reference: @Model.PayeReference <br />
+                Accounts Office reference: @Model.Aorn
+            </div>
+        </p>
+        <p class="govuk-body">
+            We found an apprenticeship service account with the details you provided. Your organisation is already linked to this employer. <strong>@Model.Email</strong> is not linked to this account.
+        </p>
+        <p class="govuk-body">
+            You can view details about the employer account, including what permissions you have. You'll also be able to request new permissions.
+            </p>
+        <div class="govuk-button-group">
+            <p class="govuk-body">
+                <a class="govuk-link" href="@Model.EmployerAccountLink">Employer account details to @Model.EmployerName</a>
+            </p>
+        </div>
+    </div>
+</div>
