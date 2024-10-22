@@ -99,27 +99,31 @@ public class EmployerDetailsViewModel
 
     private static bool SetHasPermissionsRequest(GetProviderRelationshipResponse response)
     {
-        return response.LastRequestOperations != null && response.LastRequestOperations.Length != 0;
+        return response.LastRequestOperations != null && response.LastRequestOperations.Length != 0
+            && (response.LastRequestStatus == RequestStatus.Sent || response.LastRequestStatus == RequestStatus.New);
     }
 
     private static string SetLastActionText(GetProviderRelationshipResponse response)
     {
         string lastActionText = "";
+
         if (String.Equals(response.LastRequestType, "CreateAccount", StringComparison.CurrentCultureIgnoreCase)
             && response.LastRequestStatus == RequestStatus.Accepted)
             lastActionText = AccountCreatedPermissionsSetText;
+
         if (String.Equals(response.LastRequestType, "Permission", StringComparison.CurrentCultureIgnoreCase))
         {
+            if (response.LastRequestStatus == RequestStatus.Sent || response.LastRequestStatus == RequestStatus.New)
+            {
+                if (response.LastAction == PermissionAction.PermissionCreated)
+                    lastActionText = PendingAddTrainingProviderAndPermissionsRequestText;
+                else
+                {
+                    lastActionText = PendingPermissionRequestUpdatedText;
+                }
+            }
             switch (response.LastRequestStatus)
             {
-                case RequestStatus.Sent:
-                    switch (response.LastAction)
-                    {
-                        case PermissionAction.PermissionUpdated:
-                            lastActionText = PendingPermissionRequestUpdatedText;
-                            break;
-                    }
-                    break;
                 case RequestStatus.Accepted:
                     lastActionText = PermissionUpdateAcceptedText;
                     break;
