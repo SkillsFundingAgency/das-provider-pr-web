@@ -44,17 +44,6 @@ public class EmployerDetailsModelTests
         Assert.That(actual.LastRequestOperations, Is.EqualTo(response.LastRequestOperations));
     }
 
-    [Test, AutoData]
-    public void ResponseContainsLastRequestOperations_ModelBuildsHasPermissionsRequestCorrectly(
-        GetProviderRelationshipResponse response)
-    {
-        response.LastRequestOperations = new Operation[2];
-
-        var actual = (EmployerDetailsViewModel)response;
-
-        Assert.That(actual.HasPermissionsRequest, Is.True);
-    }
-
     [Test]
     [InlineAutoData(RequestStatus.Sent, PermissionAction.PermissionCreated, PermissionRequestType, EmployerDetailsViewModel.PendingAddTrainingProviderAndPermissionsRequestText)]
     [InlineAutoData(RequestStatus.Sent, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsViewModel.PendingPermissionRequestUpdatedText)]
@@ -104,5 +93,22 @@ public class EmployerDetailsModelTests
         var actual = (EmployerDetailsViewModel)response;
 
         Assert.That(actual.HasExistingPermissions, Is.EqualTo(expected));
+    }
+
+    [Test]
+    [InlineAutoData(new Operation[] { }, RequestStatus.Declined, false)]
+    [InlineAutoData(new Operation[] { }, RequestStatus.New, false)]
+    [InlineAutoData(new Operation[] { Operation.CreateCohort }, RequestStatus.Declined, false)]
+    [InlineAutoData(new Operation[] { Operation.CreateCohort }, RequestStatus.New, true)]
+    [InlineAutoData(new Operation[] { Operation.CreateCohort }, RequestStatus.Sent, true)]
+    public void HasPermissionsRequestSetCorrectly(Operation[] operations, RequestStatus status, bool expected,
+        GetProviderRelationshipResponse response)
+    {
+        response.LastRequestOperations = operations;
+        response.LastRequestStatus = status;
+
+        var actual = (EmployerDetailsViewModel)response;
+
+        Assert.That(actual.HasPermissionsRequest, Is.EqualTo(expected));
     }
 }
