@@ -23,6 +23,8 @@ public class EmployerDetailsViewModel
 
     public long Ukprn { get; set; }
 
+    public Operation[] Operations { get; set; } = [];
+
     public PermissionAction? LastAction { get; set; }
 
     public string LastActionDate { get; set; } = null!;
@@ -30,8 +32,6 @@ public class EmployerDetailsViewModel
     public string ProviderName { get; set; } = null!;
 
     public bool HasExistingPermissions { get; set; } = true;
-
-    public Operation[] Operations { get; set; } = [];
 
     public Operation[]? LastRequestOperations { get; set; } = [];
 
@@ -190,3 +190,4 @@ public class EmployerDetailsViewModel
         return response.AccountLegalEntityId != null;
     }
 }
+

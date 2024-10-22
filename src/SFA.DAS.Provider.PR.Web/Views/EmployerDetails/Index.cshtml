@@ -143,12 +143,14 @@
             </p>
         </div>
     </div>
-    <form asp-route="@RouteNames.EmployerDetails" method="POST">
-        <input asp-for="Operations" id="operations" type="hidden"/>
-        <input asp-for="AccountLegalEntityName" id="accountLegalEntityName" type="hidden"/>
+    <form asp-route="@RouteNames.RequestPermissions" method="GET">
+       @*  <input asp-for="Operations" id="Operations" type="hidden"/>
+        <input asp-for="AccountLegalEntityName" id="AccountLegalEntityName" type="hidden"/> *@
+        @Html.HiddenFor(x=> x.AccountLegalEntityName)
+        @Html.HiddenFor(x => x.Operations)
         <div class="govuk-grid-column-two-thirds">
             <div class="govuk-button-group">
-                <button type="submit" id="continue" class="govuk-button" data-module="govuk-button">
+                <button type="submit" id="continue" class="govuk-button" data-disable-on-submit="true">
                     Request permissions
                 </button>
                 <a class="govuk-link govuk-body" href="@Model.EmployersLink">View current employers and permissions</a>
@@ -156,4 +158,3 @@
         </div>
     </form>
 </div>
-

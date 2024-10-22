@@ -2,7 +2,7 @@
 
 namespace SFA.DAS.Provider.PR.Web.Models;
 
-public class RequestPermissionsViewModel
+public class RequestPermissionsViewModel : RequestPermissionsSubmitModel
 {
     public Operation[] Operations { get; set; } = [];
 
@@ -12,7 +12,23 @@ public class RequestPermissionsViewModel
 
     public string BackLink { get; set; } = null!;
 
-    public int Ukprn { get; set; }
+    public long Ukprn { get; set; }
 
-    public string AccountLegalEntityId { get; set; } = null!;
+    public long AccountLegalEntityId { get; set; }
+
+    public static implicit operator RequestPermissionsViewModel(GetProviderRelationshipResponse response)
+    {
+        return new RequestPermissionsViewModel
+        {
+            Operations = response.Operations,
+            AccountLegalEntityName = response.AccountLegalEntityName,
+            Ukprn = response.Ukprn,
+            AccountLegalEntityId = response.AccountLegalEntityId
+        };
+    }
+}
+
+public class RequestPermissionsSubmitModel
+{
+
 }

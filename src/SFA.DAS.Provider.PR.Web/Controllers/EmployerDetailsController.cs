@@ -52,10 +52,4 @@ public class EmployerDetailsController(IOuterApiClient _outerApiclient, IEncodin
 
         return View(model);
     }
-
-    [HttpPost]
-    public IActionResult Index([FromRoute] int ukprn, [FromRoute] string accountlegalentityid)
-    {
-        return RedirectToRoute(RouteNames.RequestPermissions, new { ukprn, accountlegalentityid });
-    }
 }
