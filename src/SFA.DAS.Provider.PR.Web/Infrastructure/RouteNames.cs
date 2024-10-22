@@ -8,6 +8,7 @@ public static class RouteNames
     public const string Home = nameof(Home);
     public const string Employers = nameof(Employers);
     public const string EmployerDetails = nameof(EmployerDetails);
+    public const string EmployerDetailsByRequestId = nameof(EmployerDetailsByRequestId);
     public const string ProviderSignOut = "provider-signout";
     public const string AddEmployerStart = nameof(AddEmployerStart);
     public const string AddEmployerSearchByEmail = nameof(AddEmployerSearchByEmail);
@@ -22,7 +23,9 @@ public static class RouteNames
     public const string CheckEmployerDetails = nameof(CheckEmployerDetails);
     public const string ChangePermissions = nameof(ChangePermissions);
     public const string InvitationSent = nameof(InvitationSent);
-    public const string PayeAornMatchedEmailNotLinkedLink = nameof(PayeAornMatchedEmailNotLinkedLink);
+    public const string PayeAornMatchedEmailNotLinkedNoRelationshipLink = nameof(PayeAornMatchedEmailNotLinkedNoRelationshipLink);
+    public const string PayeAornMatchedEmailNotLinkedHasRelationshipLink =
+        nameof(PayeAornMatchedEmailNotLinkedHasRelationshipLink);
     public const string EmailLinkedToAccountWithRelationship = nameof(EmailLinkedToAccountWithRelationship);
     public const string EmailSearchInviteAlreadySent = nameof(EmailSearchInviteAlreadySent);
 }

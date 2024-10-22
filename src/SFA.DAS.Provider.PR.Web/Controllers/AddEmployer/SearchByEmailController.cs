@@ -109,16 +109,26 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
         var response = requestResponse.GetContent();
 
         long? accountLegalEntityId = response?.AccountLegalEntityId;
+
         string? employerName = response?.EmployerOrganisationName?.ToUpper();
 
-        if (string.IsNullOrEmpty(employerName) || accountLegalEntityId == null)
+        if (string.IsNullOrEmpty(employerName))
         {
             return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
         }
 
-        var accountLegalEntityIdEncoded = encodingService.Encode(accountLegalEntityId.Value, EncodingType.PublicAccountLegalEntityId);
-        var employerAccountLink = Url.RouteUrl(RouteNames.EmployerDetails, new { ukprn, accountLegalEntityId = accountLegalEntityIdEncoded })!;
-        var shutterViewModel = new EmailSearchInviteAlreadySentShutterPageViewModel(email, employerName, employerAccountLink);
+        var employerAccountLink = string.Empty;
+        if (accountLegalEntityId != null)
+        {
+            var accountLegalEntityIdEncoded = encodingService.Encode(accountLegalEntityId.Value, EncodingType.PublicAccountLegalEntityId);
+            employerAccountLink = Url.RouteUrl(RouteNames.EmployerDetails, new { ukprn, accountLegalEntityId = accountLegalEntityIdEncoded })!;
+        }
+        else
+        {
+            employerAccountLink = Url.RouteUrl(RouteNames.EmployerDetailsByRequestId, new { ukprn, response!.RequestId });
+        }
+
+        var shutterViewModel = new EmailSearchInviteAlreadySentShutterPageViewModel(email, employerName, employerAccountLink!);
 
         return View(EmailSearchInviteAlreadySentShutterPageViewPath, shutterViewModel);
     }
