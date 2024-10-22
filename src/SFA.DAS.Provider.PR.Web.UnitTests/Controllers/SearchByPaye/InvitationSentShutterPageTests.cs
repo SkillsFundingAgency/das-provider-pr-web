@@ -20,6 +20,7 @@ public class InvitationSentShutterPageTests
 {
     private static readonly string AddEmployerSearchByPayeLink = Guid.NewGuid().ToString();
     private static readonly string EmployerDetailsLink = Guid.NewGuid().ToString();
+    private static readonly string EmployerDetailsByRequestLink = Guid.NewGuid().ToString();
     private const string Email = "test@test.com";
 
     [Test, MoqAutoData]
@@ -63,6 +64,52 @@ public class InvitationSentShutterPageTests
 
         var expectedViewModel = new InviteAlreadySentShutterPageViewModel(employerOrganisationName, paye, aorn, Email,
             AddEmployerSearchByPayeLink, EmployerDetailsLink);
+
+        viewModel.Should().BeEquivalentTo(expectedViewModel);
+    }
+
+    [Test, MoqAutoData]
+    public async Task InvitationSentShutterPage_AccountLegalEntityNotSet_BuildsExpectedViewModel(
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IValidator<SearchByEmailSubmitModel>> validatorMock,
+        [Greedy] SearchByPayeController sut,
+        int ukprn,
+        string aorn,
+        string paye,
+        string employerOrganisationName,
+        GetRequestByUkprnPayeResponse getRequestByUkprnPayeResponse,
+        CancellationToken cancellationToken)
+    {
+        var createAccount = "CreateAccount";
+
+
+        sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel
+        {
+            Email = Email,
+            Paye = paye,
+            Aorn = aorn,
+            AccountLegalEntityId = null
+        });
+
+        getRequestByUkprnPayeResponse.EmployerOrganisationName = employerOrganisationName;
+        getRequestByUkprnPayeResponse.RequestType = createAccount;
+
+        Response<GetRequestByUkprnPayeResponse> resultResponse =
+            new(null, new(HttpStatusCode.OK), () => getRequestByUkprnPayeResponse);
+
+        outerApiClientMock.Setup(o => o.GetRequest(ukprn, paye, cancellationToken)).ReturnsAsync(resultResponse);
+
+        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerSearchByPaye, AddEmployerSearchByPayeLink)
+            .AddUrlForRoute(RouteNames.EmployerDetailsByRequestId, EmployerDetailsByRequestLink);
+
+        var result = await sut.InvitationSentShutterPage(ukprn, cancellationToken);
+
+        ViewResult? viewResult = result.As<ViewResult>();
+        InviteAlreadySentShutterPageViewModel? viewModel = viewResult.Model as InviteAlreadySentShutterPageViewModel;
+
+        var expectedViewModel = new InviteAlreadySentShutterPageViewModel(employerOrganisationName, paye, aorn, Email,
+            AddEmployerSearchByPayeLink, EmployerDetailsByRequestLink);
 
         viewModel.Should().BeEquivalentTo(expectedViewModel);
     }
