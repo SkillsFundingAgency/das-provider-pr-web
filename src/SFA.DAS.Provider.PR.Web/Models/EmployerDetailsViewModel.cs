@@ -53,11 +53,11 @@ public class EmployerDetailsViewModel
         {
             AccountLegalEntityId = response.AccountLegalEntityId,
             AccountLegalEntityPublicHashedId = response.AccountLegalEntityPublicHashedId,
-            AccountLegalEntityName = response.AccountLegalEntityName,
+            AccountLegalEntityName = response.AccountLegalEntityName.ToUpper(),
             Ukprn = response.Ukprn,
             LastAction = response.LastAction,
             LastActionDate = SetLastActionDate(response),
-            ProviderName = response.ProviderName,
+            ProviderName = response.ProviderName.ToUpper(),
             Operations = response.Operations,
             LastRequestOperations = SetLastRequestOperations(response),
             HasPermissionsRequest = SetHasPermissionsRequest(response),
@@ -69,7 +69,7 @@ public class EmployerDetailsViewModel
     private static string SetLastActionDate(GetProviderRelationshipResponse response)
     {
         if (response.LastActionTime != null)
-            return response.LastActionTime.Value.Date.ToShortDateString();
+            return response.LastActionTime.Value.Date.ToString("d MMM yyyy");
         return "";
     }
     private static Operation[] SetLastRequestOperations(GetProviderRelationshipResponse response)
