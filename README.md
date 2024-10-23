@@ -82,7 +82,7 @@ AppSettings.Development.json file
   },
   "AllowedHosts": "*",
   "ConfigurationStorageConnectionString": "UseDevelopmentStorage=true;",
-  "ConfigNames": "SFA.DAS.ProviderPR.Web,SFA.DAS.Provider.DfeSignIn",
+  "ConfigNames": "SFA.DAS.ProviderPR.Web,SFA.DAS.Provider.DfeSignIn,SFA.DAS.Encoding",
   "EnvironmentName": "LOCAL",
   "Version": "1.0",
   "cdn": {
