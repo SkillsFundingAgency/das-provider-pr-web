@@ -144,8 +144,6 @@
         </div>
     </div>
     <form asp-route="@RouteNames.RequestPermissions" method="GET">
-       @*  <input asp-for="Operations" id="Operations" type="hidden"/>
-        <input asp-for="AccountLegalEntityName" id="AccountLegalEntityName" type="hidden"/> *@
         @Html.HiddenFor(x=> x.AccountLegalEntityName)
         @Html.HiddenFor(x => x.Operations)
         <div class="govuk-grid-column-two-thirds">

@@ -1,4 +1,5 @@
 ﻿using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
+using SFA.DAS.Provider.PR.Web.Models.AddEmployer;
 
 namespace SFA.DAS.Provider.PR.Web.Models;
 
@@ -28,7 +29,7 @@ public class RequestPermissionsViewModel : RequestPermissionsSubmitModel
     }
 }
 
-public class RequestPermissionsSubmitModel
+public class RequestPermissionsSubmitModel : PermissionDescriptionsViewModel
 {
 
 }

@@ -11,11 +11,12 @@
     <div class="govuk-grid-column-two-thirds">
         <partial name="_validationSummary" />
         <form asp-route="@RouteNames.RequestPermissions" method="post">
+            @Html.HiddenFor(x => x.Operations)
             <div class="govuk-!-width">
                 <h1 class="govuk-heading-l govuk-!-margin-bottom-6">Request Permissions</h1>
                 <p class="govuk-body govuk-!-margin-bottom-8">Select the permissions you want to request from @Model.AccountLegalEntityName.</p>
             </div>
-            
+
             <div class="govuk-!-width">
                 <partial name="_PermissionChoices"/>
                 <div class="govuk-button-group">
