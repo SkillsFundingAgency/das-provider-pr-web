@@ -9,6 +9,7 @@ using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
 using SFA.DAS.Provider.PR.Web.Controllers.AddEmployer;
 using SFA.DAS.Provider.PR.Web.Infrastructure;
 using SFA.DAS.Provider.PR.Web.Infrastructure.Services;
+using SFA.DAS.Provider.PR.Web.Models.AddEmployer;
 using SFA.DAS.Provider.PR.Web.Models.Session;
 using SFA.DAS.Provider.PR_Web.UnitTests.TestHelpers;
 using SFA.DAS.Testing.AutoFixture;
