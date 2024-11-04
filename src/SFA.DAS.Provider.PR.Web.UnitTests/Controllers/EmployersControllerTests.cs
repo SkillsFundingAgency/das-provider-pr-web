@@ -125,23 +125,4 @@ public class EmployersControllerTests
         actual.As<ViewResult>().Model.As<EmployersViewModel>().Employers.First().EmployerDetailsUrl.Should().Be(employerDetailsLink);
         outerApiClientMock.Verify(x => x.GetRequestByRequestId((Guid)employer.RequestId, cancellationToken), Times.AtLeast(1));
     }
-
-    [Test, AutoData]
-    public async Task IndexWithUkprn_HasRelationships_BuildsEmployerDetailsLink(int ukprn, GetProviderRelationshipsResponse response, string employerDetailsLink, ApplicationSettings applicationSettings, ProviderRelationshipModel employer, CancellationToken cancellationToken)
-    {
-        Mock<IOuterApiClient> outerApiClientMock = new();
-        response.HasAnyRelationships = true;
-        response.Employers = new List<ProviderRelationshipModel> { employer };
-        outerApiClientMock.Setup(c => c.GetProviderRelationships(ukprn, It.IsAny<Dictionary<string, string>>(), cancellationToken)).ReturnsAsync(response);
-
-        Mock<IOptions<ApplicationSettings>> applicationSettingsMock = new();
-        applicationSettingsMock.Setup(a => a.Value).Returns(applicationSettings);
-
-        EmployersController sut = new(outerApiClientMock.Object, applicationSettingsMock.Object);
-        sut.AddDefaultContext().AddUrlHelperMock().AddUrlForRoute(RouteNames.EmployerDetails, employerDetailsLink);
-
-        var actual = await sut.Index(ukprn, new(), cancellationToken);
-
-        actual.As<ViewResult>().Model.As<EmployersViewModel>().Employers.First().EmployerDetailsUrl.Should().Be(employerDetailsLink);
-    }
 }
