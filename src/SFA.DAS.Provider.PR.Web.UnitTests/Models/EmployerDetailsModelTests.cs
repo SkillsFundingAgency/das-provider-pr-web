@@ -22,11 +22,11 @@ public class EmployerDetailsModelTests
         {
             Assert.That(actual.AccountLegalEntityId, Is.EqualTo(response.AccountLegalEntityId));
             Assert.That(actual.AccountLegalEntityPublicHashedId, Is.EqualTo(response.AccountLegalEntityPublicHashedId));
-            Assert.That(actual.AccountLegalEntityName, Is.EqualTo(response.AccountLegalEntityName));
+            Assert.That(actual.AccountLegalEntityName, Is.EqualTo(response.AccountLegalEntityName.ToUpper()));
             Assert.That(actual.Ukprn, Is.EqualTo(response.Ukprn));
             Assert.That(actual.LastAction, Is.EqualTo(response.LastAction));
-            Assert.That(actual.LastActionDate, Is.EqualTo(response.LastActionTime?.Date.ToShortDateString()));
-            Assert.That(actual.ProviderName, Is.EqualTo(response.ProviderName));
+            Assert.That(actual.LastActionDate, Is.EqualTo(response.LastActionTime?.ToString("d MMM yyyy")));
+            Assert.That(actual.ProviderName, Is.EqualTo(response.ProviderName.ToUpper()));
             Assert.That(actual.Operations, Is.EqualTo(response.Operations));
             Assert.That(actual.LastRequestOperations, Is.EqualTo(Array.Empty<Operation>()));
             Assert.That(actual.HasPermissionsRequest, Is.False);
@@ -45,6 +45,7 @@ public class EmployerDetailsModelTests
     }
 
     [Test]
+    [InlineAutoData(RequestStatus.Sent, PermissionAction.PermissionCreated, PermissionRequestType, EmployerDetailsViewModel.PendingAddTrainingProviderAndPermissionsRequestText)]
     [InlineAutoData(RequestStatus.Sent, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsViewModel.PendingPermissionRequestUpdatedText)]
     [InlineAutoData(RequestStatus.Accepted, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsViewModel.PermissionUpdateAcceptedText)]
     [InlineAutoData(RequestStatus.Declined, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsViewModel.PermissionUpdateDeclinedText)]
