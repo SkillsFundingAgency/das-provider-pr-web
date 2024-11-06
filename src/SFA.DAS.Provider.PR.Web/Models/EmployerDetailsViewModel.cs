@@ -71,10 +71,10 @@ public class EmployerDetailsViewModel
     {
         return new EmployerDetailsViewModel
         {
-            AccountLegalEntityName = response.EmployerOrganisationName!,
+            AccountLegalEntityName = response.EmployerOrganisationName!.ToUpper(),
             Ukprn = response.Ukprn,
-            LastActionDate = response.RequestedDate.ToShortDateString(),
-            ProviderName = response.ProviderName,
+            LastActionDate = response.RequestedDate.ToString("d MMM yyyy"),
+            ProviderName = response.ProviderName.ToUpper(),
             Operations = Array.Empty<Operation>(),
             LastRequestOperations = response.Operations,
             LastActionText = SetLastActionText(response),
@@ -152,7 +152,7 @@ public class EmployerDetailsViewModel
         }
 
         return lastActionText;
-        }
+    }
 
     private static string SetLastActionText(GetRequestsByRequestIdResponse response)
     {

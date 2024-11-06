@@ -11,7 +11,7 @@ public class EmployerDetailsModelTests
     public const string AddAccountRequestType = "AddAccount";
 
     [Test, AutoData]
-    public void ModelIsCreatedCorrectly_FromApiResponseObject(GetProviderRelationshipResponse response)
+    public void ModelIsCreatedCorrectly_FromGetProviderRelationshipResponseObject(GetProviderRelationshipResponse response)
     {
         response.LastRequestOperations = Array.Empty<Operation>();
         response.LastRequestStatus = RequestStatus.Declined;
@@ -30,6 +30,27 @@ public class EmployerDetailsModelTests
             Assert.That(actual.Operations, Is.EqualTo(response.Operations));
             Assert.That(actual.LastRequestOperations, Is.EqualTo(Array.Empty<Operation>()));
             Assert.That(actual.HasPermissionsRequest, Is.False);
+        });
+    }
+
+    [Test, AutoData]
+    public void ModelIsCreatedCorrectly_FromGetRequestsByRequestIdResponseObject(GetRequestsByRequestIdResponse response)
+    {
+        response.AccountLegalEntityId = null;
+
+        var actual = (EmployerDetailsViewModel)response;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(actual.AccountLegalEntityName, Is.EqualTo(response.EmployerOrganisationName!.ToUpper()));
+            Assert.That(actual.Ukprn, Is.EqualTo(response.Ukprn));
+            Assert.That(actual.LastActionDate, Is.EqualTo(response.RequestedDate.ToString("d MMM yyyy")));
+            Assert.That(actual.ProviderName, Is.EqualTo(response.ProviderName.ToUpper()));
+            Assert.That(actual.Operations, Is.EqualTo(Array.Empty<Operation>()));
+            Assert.That(actual.LastRequestOperations, Is.EqualTo(response.Operations));
+            Assert.That(actual.HasPermissionsRequest, Is.True);
+            Assert.That(actual.HasExistingPermissions, Is.False);
+            Assert.That(actual.ShowAgreementId, Is.False);
         });
     }
 
