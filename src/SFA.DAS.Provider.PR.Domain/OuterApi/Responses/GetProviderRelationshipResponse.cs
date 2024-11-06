@@ -1,5 +1,4 @@
-﻿
-using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
+﻿using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
 
 public class GetProviderRelationshipResponse
 {
