@@ -15,6 +15,7 @@ public class EmployerDetailsModelTests
     {
         response.LastRequestOperations = Array.Empty<Operation>();
         response.LastRequestStatus = RequestStatus.Declined;
+        response.LastAction = PermissionAction.RecruitRelationship;
 
         var actual = (EmployerDetailsViewModel)response;
 
@@ -25,12 +26,34 @@ public class EmployerDetailsModelTests
             Assert.That(actual.AccountLegalEntityName, Is.EqualTo(response.AccountLegalEntityName.ToUpper()));
             Assert.That(actual.Ukprn, Is.EqualTo(response.Ukprn));
             Assert.That(actual.LastAction, Is.EqualTo(response.LastAction));
-            Assert.That(actual.LastActionDate, Is.EqualTo(response.LastActionTime?.ToString("d MMM yyyy")));
+            Assert.That(actual.LastActionDate, Is.EqualTo(response.LastRequestTime?.ToString("d MMM yyyy")));
             Assert.That(actual.ProviderName, Is.EqualTo(response.ProviderName.ToUpper()));
             Assert.That(actual.Operations, Is.EqualTo(response.Operations));
             Assert.That(actual.LastRequestOperations, Is.EqualTo(Array.Empty<Operation>()));
             Assert.That(actual.HasPermissionsRequest, Is.False);
         });
+    }
+
+    [Test, AutoData]
+    public void EmployerDetailsViewModel_LastActionText_ExistingRecruitRelationshipText(GetProviderRelationshipResponse response)
+    {
+        response.LastRequestOperations = Array.Empty<Operation>();
+        response.LastRequestStatus = RequestStatus.Declined;
+        response.LastAction = PermissionAction.RecruitRelationship;
+
+        var actual = (EmployerDetailsViewModel)response;
+        Assert.That(actual.LastActionText, Is.EqualTo(EmployerDetailsViewModel.ExistingRecruitRelationshipText));
+    }
+
+    [Test, AutoData]
+    public void EmployerDetailsViewModel_LastActionText_ExistingApprovalsRelationshipText(GetProviderRelationshipResponse response)
+    {
+        response.LastRequestOperations = Array.Empty<Operation>();
+        response.LastRequestStatus = RequestStatus.Declined;
+        response.LastAction = PermissionAction.ApprovalsRelationship;
+
+        var actual = (EmployerDetailsViewModel)response;
+        Assert.That(actual.LastActionText, Is.EqualTo(EmployerDetailsViewModel.ExistingApprovalsRelationshipText));
     }
 
     [Test, AutoData]

@@ -1,4 +1,5 @@
-﻿using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
+﻿
+using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
 using SFA.DAS.Provider.PR.Web.Constants;
 
 namespace SFA.DAS.Provider.PR.Web.Models;
@@ -86,9 +87,12 @@ public class EmployerDetailsViewModel
 
     private static string SetLastActionDate(GetProviderRelationshipResponse response)
     {
-        if (response.LastActionTime != null)
-            return response.LastActionTime.Value.Date.ToString("d MMM yyyy");
-        return "";
+        if (response.LastRequestTime.HasValue)
+        {
+            return response.LastRequestTime!.Value.Date.ToString("d MMM yyyy");
+        }
+
+        return response.LastActionTime is null ? string.Empty : response.LastActionTime!.Value.Date.ToString("d MMM yyyy");
     }
     private static Operation[] SetLastRequestOperations(GetProviderRelationshipResponse response)
     {
@@ -135,8 +139,8 @@ public class EmployerDetailsViewModel
                     break;
             }
         }
-
-        if (String.Equals(response.LastRequestType, "AddAccount", StringComparison.CurrentCultureIgnoreCase))
+        var statuses = new List<PermissionAction>() { PermissionAction.RecruitRelationship, PermissionAction.ApprovalsRelationship };
+        if(response.LastAction is not null && statuses.Contains(response.LastAction.Value))
         {
             switch (response.LastAction)
             {
@@ -147,8 +151,6 @@ public class EmployerDetailsViewModel
                     lastActionText = ExistingApprovalsRelationshipText;
                     break;
             }
-
-
         }
 
         return lastActionText;
