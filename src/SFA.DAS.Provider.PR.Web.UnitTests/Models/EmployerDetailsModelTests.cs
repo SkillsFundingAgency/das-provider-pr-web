@@ -57,6 +57,34 @@ public class EmployerDetailsModelTests
     }
 
     [Test, AutoData]
+    public void EmployerDetailsViewModel_SetLastActionDate_LastRequestTimeHasValue(GetProviderRelationshipResponse response)
+    {
+        response.LastRequestTime = DateTime.UtcNow;
+        var actual = (EmployerDetailsViewModel)response;
+        Assert.That(actual.LastActionDate, Is.EqualTo(DateTime.UtcNow.Date.ToString("d MMM yyyy")));
+    }
+
+    [Test, AutoData]
+    public void EmployerDetailsViewModel_SetLastActionDate_LastRequestTimeNull_ReturnsLastActionTime(GetProviderRelationshipResponse response)
+    {
+        response.LastRequestTime = null;
+        response.LastActionTime = DateTime.UtcNow.AddDays(-1);
+
+        var actual = (EmployerDetailsViewModel)response;
+        Assert.That(actual.LastActionDate, Is.EqualTo(DateTime.UtcNow.AddDays(-1).Date.ToString("d MMM yyyy")));
+    }
+
+    [Test, AutoData]
+    public void EmployerDetailsViewModel_SetLastActionDate_LastRequestTimeNull_ReturnsEmptyString(GetProviderRelationshipResponse response)
+    {
+        response.LastRequestTime = null;
+        response.LastActionTime = null;
+
+        var actual = (EmployerDetailsViewModel)response;
+        Assert.That(actual.LastActionDate, Is.EqualTo(string.Empty));
+    }
+
+    [Test, AutoData]
     public void ModelIsCreatedCorrectly_FromGetRequestsByRequestIdResponseObject(GetRequestsByRequestIdResponse response)
     {
         response.AccountLegalEntityId = null;
