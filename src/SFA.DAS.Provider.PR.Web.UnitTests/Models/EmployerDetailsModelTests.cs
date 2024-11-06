@@ -75,7 +75,7 @@ public class EmployerDetailsModelTests
     }
 
     [Test, AutoData]
-    public void EmployerDetailsViewModel_SetLastActionDate_LastRequestTimeNull_ReturnsEmptyString(GetProviderRelationshipResponse response)
+    public void EmployerDetailsViewModel_SetLastActionDate_LastActionTimeNull_ReturnsEmptyString(GetProviderRelationshipResponse response)
     {
         response.LastRequestTime = null;
         response.LastActionTime = null;
