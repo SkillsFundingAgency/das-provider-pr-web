@@ -143,9 +143,12 @@
             </p>
         </div>
     </div>
-    <form asp-route="@RouteNames.RequestPermissions" method="GET">
-        @Html.HiddenFor(x=> x.AccountLegalEntityName)
-        @Html.HiddenFor(x => x.Operations)
+    <form asp-route="@RouteNames.RequestPermissions"
+          asp-route-ukprn="@Model.Ukprn"
+          asp-route-accountLegalEntityId="@Model.AccountLegalEntityPublicHashedId"
+          method="GET">
+@*         @Html.HiddenFor(x => x.AccountLegalEntityName)
+        @Html.HiddenFor(x => x.Operations) *@
         <div class="govuk-grid-column-two-thirds">
             <div class="govuk-button-group">
                 <button type="submit" id="continue" class="govuk-button" data-disable-on-submit="true">

@@ -2,8 +2,7 @@
 @using SFA.DAS.Provider.PR.Web.TagHelpers
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @model SFA.DAS.Provider.PR.Web.Models.AddEmployer.PermissionDescriptionsViewModel
-<br />
-<br />
+
 <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
     Add apprentice records
 </legend>
@@ -32,7 +31,7 @@
     Recruit apprentices
 </legend>
 <div id="recruitApprentices-hint" class="govuk-hint">
-    This allows you to advertise apprenticeships and review applications on the employer's behalf.
+    This allows you to advertise apprenticeships and review applications on the employer’s behalf.
 </div>
 <div esfa-validation-marker-for="@Model.PermissionToRecruit" class="govuk-form-group">
     <span asp-validation-for="PermissionToRecruit" class="govuk-error-message"></span>
