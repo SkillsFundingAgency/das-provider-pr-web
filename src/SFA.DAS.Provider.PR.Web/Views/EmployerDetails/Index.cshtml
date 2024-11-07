@@ -9,7 +9,7 @@
         <div class="govuk-!-width">
             <h1 class="govuk-heading-l govuk-!-margin-bottom-6">Employer account details</h1>
             <h2 class="govuk-heading-m govuk-!-margin-bottom-1">@Model.AccountLegalEntityName</h2>
-            <p class="govuk-body govuk-!-margin-bottom-8"><strong>Agreement ID: </strong>@Model.AccountLegalEntityPublicHashedId</p>
+            <p asp-show="@Model.ShowAgreementId" class="govuk-body"><strong>Agreement ID: </strong>@Model.AccountLegalEntityPublicHashedId</p>
         </div>
     </div>
 </div>
@@ -17,7 +17,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <div class="govuk-!-width">
-            <table class="govuk-table govuk-!-margin-bottom-8">
+            <table class="govuk-table govuk-!-margin-bottom-8 govuk-!-margin-top-8">
                 <caption class="govuk-table__caption govuk-table__caption--m">Last action on account</caption>
                 <thead class="govuk-table__head">
                 <tr class="govuk-table__row">

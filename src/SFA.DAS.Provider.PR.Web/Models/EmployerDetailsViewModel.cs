@@ -5,6 +5,7 @@ namespace SFA.DAS.Provider.PR.Web.Models;
 public class EmployerDetailsViewModel
 {
     public const string PendingAddTrainingProviderAndPermissionsRequestText = "Add training provider and permissions request sent";
+    public const string PendingCreateAccountInvitationText = "Create apprenticeship service account invitation sent";
     public const string AccountCreatedPermissionsSetText = "Apprenticeship service account created";
     public const string PendingPermissionRequestUpdatedText = "Permissions request sent";
     public const string PermissionUpdateAcceptedText = "Permissions set";
@@ -44,7 +45,7 @@ public class EmployerDetailsViewModel
 
     public string LastActionText { get; set; } = null!;
 
-    public string LastRequestType { get; set; } = null!;
+    public bool ShowAgreementId { get; set; } = true;
 
 
     public static implicit operator EmployerDetailsViewModel(GetProviderRelationshipResponse response)
@@ -60,17 +61,37 @@ public class EmployerDetailsViewModel
             ProviderName = response.ProviderName.ToUpper(),
             Operations = response.Operations,
             LastRequestOperations = SetLastRequestOperations(response),
-            HasPermissionsRequest = SetHasPermissionsRequest(response),
             LastActionText = SetLastActionText(response),
+            HasPermissionsRequest = SetHasPermissionsRequest(response),
             HasExistingPermissions = SetHasExistingPermissions(response)
+        };
+    }
+
+    public static implicit operator EmployerDetailsViewModel(GetRequestsByRequestIdResponse response)
+    {
+        return new EmployerDetailsViewModel
+        {
+            AccountLegalEntityName = response.EmployerOrganisationName!.ToUpper(),
+            Ukprn = response.Ukprn,
+            LastActionDate = response.RequestedDate.ToString("d MMM yyyy"),
+            ProviderName = response.ProviderName.ToUpper(),
+            Operations = Array.Empty<Operation>(),
+            LastRequestOperations = response.Operations,
+            LastActionText = SetLastActionText(response),
+            HasPermissionsRequest = true,
+            HasExistingPermissions = false,
+            ShowAgreementId = SetShowAgreementId(response)
         };
     }
 
     private static string SetLastActionDate(GetProviderRelationshipResponse response)
     {
-        if (response.LastActionTime != null)
-            return response.LastActionTime.Value.Date.ToString("d MMM yyyy");
-        return "";
+        if (response.LastRequestTime.HasValue)
+        {
+            return response.LastRequestTime!.Value.Date.ToString("d MMM yyyy");
+        }
+
+        return response.LastActionTime is null ? string.Empty : response.LastActionTime!.Value.Date.ToString("d MMM yyyy");
     }
     private static Operation[] SetLastRequestOperations(GetProviderRelationshipResponse response)
     {
@@ -117,8 +138,8 @@ public class EmployerDetailsViewModel
                     break;
             }
         }
-
-        if (String.Equals(response.LastRequestType, "AddAccount", StringComparison.CurrentCultureIgnoreCase))
+        var statuses = new List<PermissionAction>() { PermissionAction.RecruitRelationship, PermissionAction.ApprovalsRelationship };
+        if(response.LastAction is not null && statuses.Contains(response.LastAction.Value))
         {
             switch (response.LastAction)
             {
@@ -134,10 +155,32 @@ public class EmployerDetailsViewModel
         return lastActionText;
     }
 
+    private static string SetLastActionText(GetRequestsByRequestIdResponse response)
+    {
+        string lastActionText = "";
+
+        if (String.Equals(response.RequestType, "AddAccount", StringComparison.CurrentCultureIgnoreCase))
+            lastActionText = PendingAddTrainingProviderAndPermissionsRequestText;
+        if (String.Equals(response.RequestType, "CreateAccount", StringComparison.CurrentCultureIgnoreCase))
+            lastActionText = PendingCreateAccountInvitationText;
+        return lastActionText;
+    }
+
     private static bool SetHasExistingPermissions(GetProviderRelationshipResponse response)
     {
-        if (response.Operations.Length == 0 && response.LastRequestOperations != null && response.LastRequestOperations.Length != 0)
+        if (response.LastAction == PermissionAction.RecruitRelationship ||
+            response.LastAction == PermissionAction.ApprovalsRelationship)
+        {
+            return true;
+        }
+
+        if (response.Operations.Length == 0 && 
+            response.LastRequestOperations != null && 
+            response.LastRequestOperations.Length != 0)
+        {
             return false;
+        }
+            
         return true;
     }
 
@@ -156,5 +199,10 @@ public class EmployerDetailsViewModel
             permissionsText[1] = SetPermissionsText.RecruitmentWithReviewPermissionText;
 
         return permissionsText;
+    }
+
+    private static bool SetShowAgreementId(GetRequestsByRequestIdResponse response)
+    {
+        return response.AccountLegalEntityId != null;
     }
 }
