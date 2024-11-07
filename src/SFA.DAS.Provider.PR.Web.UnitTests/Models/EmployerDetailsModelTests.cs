@@ -106,6 +106,48 @@ public class EmployerDetailsModelTests
     }
 
     [Test, AutoData]
+    public void EmployerDetailsViewModel_SetHasExistingPermissions_ApprovalsRelationshipReturnsTrue(GetProviderRelationshipResponse response)
+    {
+        response.LastAction = PermissionAction.ApprovalsRelationship;
+        var actual = (EmployerDetailsViewModel)response;
+
+        Assert.That(actual.HasPermissionsRequest, Is.True);
+    }
+
+    [Test, AutoData]
+    public void EmployerDetailsViewModel_SetHasExistingPermissions_RecruitRelationshipReturnsTrue(GetProviderRelationshipResponse response)
+    {
+        response.LastAction = PermissionAction.RecruitRelationship;
+        var actual = (EmployerDetailsViewModel)response;
+
+        Assert.That(actual.HasPermissionsRequest, Is.True);
+    }
+
+    [Test, AutoData]
+    public void EmployerDetailsViewModel_SetHasExistingPermissions_HasExistingOperations_ReturnsTrue(GetProviderRelationshipResponse response)
+    {
+        response.LastAction = PermissionAction.PermissionUpdated;
+        response.Operations = [Operation.Recruitment];
+        response.LastRequestOperations = [Operation.Recruitment];
+
+        var actual = (EmployerDetailsViewModel)response;
+
+        Assert.That(actual.HasPermissionsRequest, Is.True);
+    }
+
+    [Test, AutoData]
+    public void EmployerDetailsViewModel_SetHasExistingPermissions_HasNoExistingOperations_ReturnsFalse(GetProviderRelationshipResponse response)
+    {
+        response.LastAction = PermissionAction.PermissionUpdated;
+        response.Operations = [];
+        response.LastRequestOperations = [];
+
+        var actual = (EmployerDetailsViewModel)response;
+
+        Assert.That(actual.HasPermissionsRequest, Is.False);
+    }
+
+    [Test, AutoData]
     public void ResponseContainsLastRequestOperations_ModelBuildsLastRequestOperationsCorrectly(
         GetProviderRelationshipResponse response)
     {
@@ -173,6 +215,7 @@ public class EmployerDetailsModelTests
         bool expected, GetProviderRelationshipResponse response)
     {
         response.Operations = operations;
+        response.LastAction = PermissionAction.PermissionUpdated;
         response.LastRequestOperations = lastRequestOperations;
 
         var actual = (EmployerDetailsViewModel)response;

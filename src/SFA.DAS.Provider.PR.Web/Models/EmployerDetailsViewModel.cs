@@ -168,8 +168,19 @@ public class EmployerDetailsViewModel
 
     private static bool SetHasExistingPermissions(GetProviderRelationshipResponse response)
     {
-        if (response.Operations.Length == 0 && response.LastRequestOperations != null && response.LastRequestOperations.Length != 0)
+        if (response.LastAction == PermissionAction.RecruitRelationship ||
+            response.LastAction == PermissionAction.ApprovalsRelationship)
+        {
+            return true;
+        }
+
+        if (response.Operations.Length == 0 && 
+            response.LastRequestOperations != null && 
+            response.LastRequestOperations.Length != 0)
+        {
             return false;
+        }
+            
         return true;
     }
 
