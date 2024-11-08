@@ -14,7 +14,6 @@ public class EmployerDetailsViewModel
     public const string ExistingRecruitRelationshipText = "Added you as training provider for new apprentice vacancy";
     public const string ExistingApprovalsRelationshipText = "Added you as training provider for new apprentice";
 
-
     public long AccountLegalEntityId { get; set; }
 
     public string AccountLegalEntityPublicHashedId { get; set; } = null!;
@@ -32,8 +31,6 @@ public class EmployerDetailsViewModel
     public string ProviderName { get; set; } = null!;
 
     public bool HasExistingPermissions { get; set; } = true;
-
-    public Operation[] Operations { get; set; } = [];
 
     public Operation[]? LastRequestOperations { get; set; } = [];
 
