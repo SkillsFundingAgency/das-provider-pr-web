@@ -46,8 +46,6 @@ public class RequestPermissionsController(IOuterApiClient _outerApiclient, IEnco
         requestPermissionsSubmitModel.ExistingPermissionToRecruit = existingPermissions.PermissionToRecruit!;
         requestPermissionsSubmitModel.ExistingPermissionToAddCohorts = existingPermissions.PermissionToAddCohorts!;
 
-        var result = _validator.Validate(requestPermissionsSubmitModel);
-
         if (!IsModelValid(requestPermissionsSubmitModel))
         { 
             var model = await CreateRequestPermissionsViewModel(ukprn, accountLegalEntityId, cancellationToken);
@@ -91,12 +89,8 @@ public class RequestPermissionsController(IOuterApiClient _outerApiclient, IEnco
 
     private string GetRequestId()
     {
-        string requestId = string.Empty;
-        if (TempData.ContainsKey(TempDataKeys.PermissionsRequestId))
-        {
-            requestId = TempData[TempDataKeys.PermissionsRequestId]!.ToString()!;
-        }
-
-        return requestId;
+        return TempData.TryGetValue(TempDataKeys.PermissionsRequestId, out var value) && value is not null
+        ? value.ToString() ?? string.Empty
+        : string.Empty;
     }
 }

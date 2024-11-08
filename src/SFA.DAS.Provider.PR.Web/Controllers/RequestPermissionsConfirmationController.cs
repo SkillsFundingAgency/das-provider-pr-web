@@ -26,12 +26,8 @@ public class RequestPermissionsConfirmationController : Controller
 
     private string GetAccountLegalEntityName()
     {
-        string accountLegalEntityName = string.Empty;
-        if (TempData.ContainsKey(TempDataKeys.AccountLegalEntityName))
-        {
-            accountLegalEntityName = TempData[TempDataKeys.AccountLegalEntityName]!.ToString()!;
-        }
-
-        return accountLegalEntityName;
+        return TempData.TryGetValue(TempDataKeys.AccountLegalEntityName, out var value) && value is not null
+        ? value.ToString() ?? string.Empty
+        : string.Empty;
     }
 }

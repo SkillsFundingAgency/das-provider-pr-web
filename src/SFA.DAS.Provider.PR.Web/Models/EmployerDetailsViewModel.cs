@@ -46,7 +46,6 @@ public class EmployerDetailsViewModel
 
     public bool ShowAgreementId { get; set; } = true;
 
-
     public static implicit operator EmployerDetailsViewModel(GetProviderRelationshipResponse response)
     {
         return new EmployerDetailsViewModel
@@ -92,6 +91,7 @@ public class EmployerDetailsViewModel
 
         return response.LastActionTime is null ? string.Empty : response.LastActionTime!.Value.Date.ToString("d MMM yyyy");
     }
+
     private static Operation[] SetLastRequestOperations(GetProviderRelationshipResponse response)
     {
         if (response.LastRequestOperations != null && response.LastRequestOperations.Length != 0)
@@ -149,8 +149,6 @@ public class EmployerDetailsViewModel
                     lastActionText = ExistingApprovalsRelationshipText;
                     break;
             }
-
-
         }
 
         return lastActionText;

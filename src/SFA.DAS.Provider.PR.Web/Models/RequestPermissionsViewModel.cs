@@ -9,7 +9,6 @@ public class RequestPermissionsViewModel : RequestPermissionsSubmitModel
 
     public string BackLink { get; set; } = null!;
 
-
     public static implicit operator RequestPermissionsViewModel(GetProviderRelationshipResponse response)
     {
         return new RequestPermissionsViewModel

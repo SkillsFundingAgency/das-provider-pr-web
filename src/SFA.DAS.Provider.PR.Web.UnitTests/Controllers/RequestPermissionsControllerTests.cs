@@ -64,7 +64,7 @@ public class RequestPermissionsControllerTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsInstanceOf<RedirectToRouteResult>(result);
+            Assert.That(result, Is.InstanceOf<RedirectToRouteResult>());
             Assert.That(redirectResult.RouteName, Is.EqualTo(RouteNames.Employers));
             Assert.That((bool)redirectResult?.RouteValues!["HasPendingRequest"]!, Is.True);
         });
@@ -87,7 +87,7 @@ public class RequestPermissionsControllerTests
 
         Assert.Multiple(() =>
         {
-            Assert.IsInstanceOf<ViewResult>(result);
+            Assert.That(result, Is.InstanceOf<ViewResult>());
             var viewResult = (ViewResult)result;
             Assert.IsInstanceOf<RequestPermissionsViewModel>(viewResult.Model);
             Assert.That(((RequestPermissionsViewModel)viewResult.Model!)!.AccountLegalEntityName, Is.EqualTo("ACCOUNTLEGALENTITYNAME"));
@@ -122,9 +122,9 @@ public class RequestPermissionsControllerTests
         
         Assert.Multiple(() =>
         {
-            Assert.IsInstanceOf<ViewResult>(result);
+            Assert.That(result, Is.InstanceOf<ViewResult>());
             var viewResult = (ViewResult)result;
-            Assert.IsInstanceOf<RequestPermissionsViewModel>(viewResult.Model);
+            Assert.That(viewResult.Model, Is.InstanceOf<RequestPermissionsViewModel>());
         });
     }
 
@@ -175,7 +175,7 @@ public class RequestPermissionsControllerTests
             Assert.That(sut.TempData[TempDataKeys.AccountLegalEntityName], Is.EqualTo("ACCOUNTLEGALENTITYNAME"));
             Assert.That(sut.TempData.ContainsKey(TempDataKeys.PermissionsRequestId), Is.True);
             Assert.That(sut.TempData[TempDataKeys.PermissionsRequestId], Is.EqualTo(requestId));
-            Assert.IsInstanceOf<RedirectToRouteResult>(result);
+            Assert.That(result, Is.InstanceOf<RedirectToRouteResult>());
             var redirectResult = (RedirectToRouteResult)result;
             Assert.That(redirectResult.RouteName, Is.EqualTo(RouteNames.RequestPermissionsConfirmation));
         });
