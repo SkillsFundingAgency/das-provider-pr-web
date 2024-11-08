@@ -89,7 +89,7 @@ public class RequestPermissionsControllerTests
         {
             Assert.That(result, Is.InstanceOf<ViewResult>());
             var viewResult = (ViewResult)result;
-            Assert.IsInstanceOf<RequestPermissionsViewModel>(viewResult.Model);
+            Assert.That(viewResult.Model, Is.InstanceOf<RequestPermissionsViewModel>());
             Assert.That(((RequestPermissionsViewModel)viewResult.Model!)!.AccountLegalEntityName, Is.EqualTo("ACCOUNTLEGALENTITYNAME"));
         });
     }
