@@ -110,8 +110,9 @@ public class EmployerDetailsViewModel
     {
         string lastActionText = "";
 
-        if (String.Equals(response.LastRequestType, "CreateAccount", StringComparison.CurrentCultureIgnoreCase)
-            && response.LastRequestStatus == RequestStatus.Accepted)
+        if ((String.Equals(response.LastRequestType, "CreateAccount", StringComparison.CurrentCultureIgnoreCase)
+            && response.LastRequestStatus == RequestStatus.Accepted) || response.LastAction == PermissionAction.AccountAdded
+            || response.LastAction == PermissionAction.AccountCreated)
             lastActionText = AccountCreatedPermissionsSetText;
 
         if (String.Equals(response.LastRequestType, "Permission", StringComparison.CurrentCultureIgnoreCase))
@@ -139,7 +140,7 @@ public class EmployerDetailsViewModel
             }
         }
         var statuses = new List<PermissionAction>() { PermissionAction.RecruitRelationship, PermissionAction.ApprovalsRelationship };
-        if(response.LastAction is not null && statuses.Contains(response.LastAction.Value))
+        if (response.LastAction is not null && statuses.Contains(response.LastAction.Value))
         {
             switch (response.LastAction)
             {
@@ -174,13 +175,13 @@ public class EmployerDetailsViewModel
             return true;
         }
 
-        if (response.Operations.Length == 0 && 
-            response.LastRequestOperations != null && 
+        if (response.Operations.Length == 0 &&
+            response.LastRequestOperations != null &&
             response.LastRequestOperations.Length != 0)
         {
             return false;
         }
-            
+
         return true;
     }
 
