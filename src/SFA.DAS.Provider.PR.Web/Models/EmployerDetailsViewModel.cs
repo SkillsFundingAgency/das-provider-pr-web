@@ -33,6 +33,8 @@ public class EmployerDetailsViewModel
 
     public bool HasExistingPermissions { get; set; } = true;
 
+    public Operation[] Operations { get; set; } = [];
+
     public Operation[]? LastRequestOperations { get; set; } = [];
 
     public string[] CurrentPermissions => SetPermissionText(Operations);
@@ -54,11 +56,11 @@ public class EmployerDetailsViewModel
         {
             AccountLegalEntityId = response.AccountLegalEntityId,
             AccountLegalEntityPublicHashedId = response.AccountLegalEntityPublicHashedId,
-            AccountLegalEntityName = response.AccountLegalEntityName,
+            AccountLegalEntityName = response.AccountLegalEntityName.ToUpper(),
             Ukprn = response.Ukprn,
             LastAction = response.LastAction,
             LastActionDate = SetLastActionDate(response),
-            ProviderName = response.ProviderName,
+            ProviderName = response.ProviderName.ToUpper(),
             Operations = response.Operations,
             LastRequestOperations = SetLastRequestOperations(response),
             LastActionText = SetLastActionText(response),
@@ -71,10 +73,10 @@ public class EmployerDetailsViewModel
     {
         return new EmployerDetailsViewModel
         {
-            AccountLegalEntityName = response.EmployerOrganisationName!,
+            AccountLegalEntityName = response.EmployerOrganisationName!.ToUpper(),
             Ukprn = response.Ukprn,
-            LastActionDate = response.RequestedDate.ToShortDateString(),
-            ProviderName = response.ProviderName,
+            LastActionDate = response.RequestedDate.ToString("d MMM yyyy"),
+            ProviderName = response.ProviderName.ToUpper(),
             Operations = Array.Empty<Operation>(),
             LastRequestOperations = response.Operations,
             LastActionText = SetLastActionText(response),
@@ -86,9 +88,12 @@ public class EmployerDetailsViewModel
 
     private static string SetLastActionDate(GetProviderRelationshipResponse response)
     {
-        if (response.LastActionTime != null)
-            return response.LastActionTime.Value.ToShortDateString();
-        return "";
+        if (response.LastRequestTime.HasValue)
+        {
+            return response.LastRequestTime!.Value.Date.ToString("d MMM yyyy");
+        }
+
+        return response.LastActionTime is null ? string.Empty : response.LastActionTime!.Value.Date.ToString("d MMM yyyy");
     }
     private static Operation[] SetLastRequestOperations(GetProviderRelationshipResponse response)
     {
@@ -135,8 +140,8 @@ public class EmployerDetailsViewModel
                     break;
             }
         }
-
-        if (String.Equals(response.LastRequestType, "AddAccount", StringComparison.CurrentCultureIgnoreCase))
+        var statuses = new List<PermissionAction>() { PermissionAction.RecruitRelationship, PermissionAction.ApprovalsRelationship };
+        if(response.LastAction is not null && statuses.Contains(response.LastAction.Value))
         {
             switch (response.LastAction)
             {
@@ -167,8 +172,19 @@ public class EmployerDetailsViewModel
 
     private static bool SetHasExistingPermissions(GetProviderRelationshipResponse response)
     {
-        if (response.Operations.Length == 0 && response.LastRequestOperations != null && response.LastRequestOperations.Length != 0)
+        if (response.LastAction == PermissionAction.RecruitRelationship ||
+            response.LastAction == PermissionAction.ApprovalsRelationship)
+        {
+            return true;
+        }
+
+        if (response.Operations.Length == 0 && 
+            response.LastRequestOperations != null && 
+            response.LastRequestOperations.Length != 0)
+        {
             return false;
+        }
+            
         return true;
     }
 

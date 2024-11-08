@@ -11,10 +11,11 @@ public class EmployerDetailsModelTests
     public const string AddAccountRequestType = "AddAccount";
 
     [Test, AutoData]
-    public void ModelIsCreatedCorrectly_FromApiResponseObject(GetProviderRelationshipResponse response)
+    public void ModelIsCreatedCorrectly_FromGetProviderRelationshipResponseObject(GetProviderRelationshipResponse response)
     {
         response.LastRequestOperations = Array.Empty<Operation>();
         response.LastRequestStatus = RequestStatus.Declined;
+        response.LastAction = PermissionAction.RecruitRelationship;
 
         var actual = (EmployerDetailsViewModel)response;
 
@@ -22,15 +23,128 @@ public class EmployerDetailsModelTests
         {
             Assert.That(actual.AccountLegalEntityId, Is.EqualTo(response.AccountLegalEntityId));
             Assert.That(actual.AccountLegalEntityPublicHashedId, Is.EqualTo(response.AccountLegalEntityPublicHashedId));
-            Assert.That(actual.AccountLegalEntityName, Is.EqualTo(response.AccountLegalEntityName));
+            Assert.That(actual.AccountLegalEntityName, Is.EqualTo(response.AccountLegalEntityName.ToUpper()));
             Assert.That(actual.Ukprn, Is.EqualTo(response.Ukprn));
             Assert.That(actual.LastAction, Is.EqualTo(response.LastAction));
-            Assert.That(actual.LastActionDate, Is.EqualTo(response.LastActionTime?.Date.ToShortDateString()));
-            Assert.That(actual.ProviderName, Is.EqualTo(response.ProviderName));
+            Assert.That(actual.LastActionDate, Is.EqualTo(response.LastRequestTime?.ToString("d MMM yyyy")));
+            Assert.That(actual.ProviderName, Is.EqualTo(response.ProviderName.ToUpper()));
             Assert.That(actual.Operations, Is.EqualTo(response.Operations));
             Assert.That(actual.LastRequestOperations, Is.EqualTo(Array.Empty<Operation>()));
             Assert.That(actual.HasPermissionsRequest, Is.False);
         });
+    }
+
+    [Test, AutoData]
+    public void EmployerDetailsViewModel_LastActionText_ExistingRecruitRelationshipText(GetProviderRelationshipResponse response)
+    {
+        response.LastRequestOperations = Array.Empty<Operation>();
+        response.LastRequestStatus = RequestStatus.Declined;
+        response.LastAction = PermissionAction.RecruitRelationship;
+
+        var actual = (EmployerDetailsViewModel)response;
+        Assert.That(actual.LastActionText, Is.EqualTo(EmployerDetailsViewModel.ExistingRecruitRelationshipText));
+    }
+
+    [Test, AutoData]
+    public void EmployerDetailsViewModel_LastActionText_ExistingApprovalsRelationshipText(GetProviderRelationshipResponse response)
+    {
+        response.LastRequestOperations = Array.Empty<Operation>();
+        response.LastRequestStatus = RequestStatus.Declined;
+        response.LastAction = PermissionAction.ApprovalsRelationship;
+
+        var actual = (EmployerDetailsViewModel)response;
+        Assert.That(actual.LastActionText, Is.EqualTo(EmployerDetailsViewModel.ExistingApprovalsRelationshipText));
+    }
+
+    [Test, AutoData]
+    public void EmployerDetailsViewModel_SetLastActionDate_LastRequestTimeHasValue(GetProviderRelationshipResponse response)
+    {
+        response.LastRequestTime = DateTime.UtcNow;
+        var actual = (EmployerDetailsViewModel)response;
+        Assert.That(actual.LastActionDate, Is.EqualTo(DateTime.UtcNow.Date.ToString("d MMM yyyy")));
+    }
+
+    [Test, AutoData]
+    public void EmployerDetailsViewModel_SetLastActionDate_LastRequestTimeNull_ReturnsLastActionTime(GetProviderRelationshipResponse response)
+    {
+        response.LastRequestTime = null;
+        response.LastActionTime = DateTime.UtcNow.AddDays(-1);
+
+        var actual = (EmployerDetailsViewModel)response;
+        Assert.That(actual.LastActionDate, Is.EqualTo(DateTime.UtcNow.AddDays(-1).Date.ToString("d MMM yyyy")));
+    }
+
+    [Test, AutoData]
+    public void EmployerDetailsViewModel_SetLastActionDate_LastActionTimeNull_ReturnsEmptyString(GetProviderRelationshipResponse response)
+    {
+        response.LastRequestTime = null;
+        response.LastActionTime = null;
+
+        var actual = (EmployerDetailsViewModel)response;
+        Assert.That(actual.LastActionDate, Is.EqualTo(string.Empty));
+    }
+
+    [Test, AutoData]
+    public void ModelIsCreatedCorrectly_FromGetRequestsByRequestIdResponseObject(GetRequestsByRequestIdResponse response)
+    {
+        response.AccountLegalEntityId = null;
+
+        var actual = (EmployerDetailsViewModel)response;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(actual.AccountLegalEntityName, Is.EqualTo(response.EmployerOrganisationName!.ToUpper()));
+            Assert.That(actual.Ukprn, Is.EqualTo(response.Ukprn));
+            Assert.That(actual.LastActionDate, Is.EqualTo(response.RequestedDate.ToString("d MMM yyyy")));
+            Assert.That(actual.ProviderName, Is.EqualTo(response.ProviderName.ToUpper()));
+            Assert.That(actual.Operations, Is.EqualTo(Array.Empty<Operation>()));
+            Assert.That(actual.LastRequestOperations, Is.EqualTo(response.Operations));
+            Assert.That(actual.HasPermissionsRequest, Is.True);
+            Assert.That(actual.HasExistingPermissions, Is.False);
+            Assert.That(actual.ShowAgreementId, Is.False);
+        });
+    }
+
+    [Test, AutoData]
+    public void EmployerDetailsViewModel_SetHasExistingPermissions_ApprovalsRelationshipReturnsTrue(GetProviderRelationshipResponse response)
+    {
+        response.LastAction = PermissionAction.ApprovalsRelationship;
+        var actual = (EmployerDetailsViewModel)response;
+
+        Assert.That(actual.HasPermissionsRequest, Is.True);
+    }
+
+    [Test, AutoData]
+    public void EmployerDetailsViewModel_SetHasExistingPermissions_RecruitRelationshipReturnsTrue(GetProviderRelationshipResponse response)
+    {
+        response.LastAction = PermissionAction.RecruitRelationship;
+        var actual = (EmployerDetailsViewModel)response;
+
+        Assert.That(actual.HasPermissionsRequest, Is.True);
+    }
+
+    [Test, AutoData]
+    public void EmployerDetailsViewModel_SetHasExistingPermissions_HasExistingOperations_ReturnsTrue(GetProviderRelationshipResponse response)
+    {
+        response.LastAction = PermissionAction.PermissionUpdated;
+        response.Operations = [Operation.Recruitment];
+        response.LastRequestOperations = [Operation.Recruitment];
+
+        var actual = (EmployerDetailsViewModel)response;
+
+        Assert.That(actual.HasPermissionsRequest, Is.True);
+    }
+
+    [Test, AutoData]
+    public void EmployerDetailsViewModel_SetHasExistingPermissions_HasNoExistingOperations_ReturnsFalse(GetProviderRelationshipResponse response)
+    {
+        response.LastAction = PermissionAction.PermissionUpdated;
+        response.Operations = [];
+        response.LastRequestOperations = [];
+
+        var actual = (EmployerDetailsViewModel)response;
+
+        Assert.That(actual.HasPermissionsRequest, Is.False);
     }
 
     [Test, AutoData]
@@ -45,6 +159,7 @@ public class EmployerDetailsModelTests
     }
 
     [Test]
+    [InlineAutoData(RequestStatus.Sent, PermissionAction.PermissionCreated, PermissionRequestType, EmployerDetailsViewModel.PendingAddTrainingProviderAndPermissionsRequestText)]
     [InlineAutoData(RequestStatus.Sent, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsViewModel.PendingPermissionRequestUpdatedText)]
     [InlineAutoData(RequestStatus.Accepted, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsViewModel.PermissionUpdateAcceptedText)]
     [InlineAutoData(RequestStatus.Declined, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsViewModel.PermissionUpdateDeclinedText)]
@@ -100,6 +215,7 @@ public class EmployerDetailsModelTests
         bool expected, GetProviderRelationshipResponse response)
     {
         response.Operations = operations;
+        response.LastAction = PermissionAction.PermissionUpdated;
         response.LastRequestOperations = lastRequestOperations;
 
         var actual = (EmployerDetailsViewModel)response;

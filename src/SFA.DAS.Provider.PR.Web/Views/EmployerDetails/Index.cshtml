@@ -78,8 +78,8 @@
             <table class="govuk-table govuk-!-margin-bottom-8">
                 <thead class="govuk-table__head">
                 <tr class="govuk-table__row">
-                    <th scope="col" class="govuk-table__header"></th>
-                    <th scope="col" class="govuk-table__header">Current permissions</th>
+                        <th scope="col" class="govuk-table__header das-table-cell-width-50"></th>
+                        <th scope="col" class="govuk-table__header das-table-cell-width-50">Current permissions</th>
                 </tr>
                 </thead>
                 <tbody class="govuk-table__body">
@@ -103,9 +103,9 @@
             <table class="govuk-table govuk-!-margin-bottom-8">
                 <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
-                        <th scope="col" class="govuk-table__header"></th>
-                        <th scope="col" class="govuk-table__header">Current permissions</th>
-                        <th scope="col" class="govuk-table__header">Requested permissions</th>
+                        <th scope="col" class="govuk-table__header govuk-!-width-one-third"></th>
+                        <th scope="col" class="govuk-table__header govuk-!-width-one-third">Current permissions</th>
+                        <th scope="col" class="govuk-table__header govuk-!-width-one-third">Requested permissions</th>
                     </tr>
                 </thead>
                 <tbody class="govuk-table__body">
@@ -149,13 +149,14 @@
           method="GET">
 @*         @Html.HiddenFor(x => x.AccountLegalEntityName)
         @Html.HiddenFor(x => x.Operations) *@
-        <div class="govuk-grid-column-two-thirds">
-            <div class="govuk-button-group">
-                <button type="submit" id="continue" class="govuk-button" data-disable-on-submit="true">
-                    Request permissions
-                </button>
-                <a class="govuk-link govuk-body" href="@Model.EmployersLink">View current employers and permissions</a>
-            </div>
+    <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-button-group">
+            <button type="submit" class="govuk-button" data-module="govuk-button" data-disable-on-submit="true">
+                Request permissions
+            </button>
+            <a class="govuk-link govuk-body" href="@Model.EmployersLink">View current employers and permissions</a>
         </div>
+    </div>
     </form>
 </div>
+
