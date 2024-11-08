@@ -2,13 +2,15 @@
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RestEase;
 using SFA.DAS.Encoding;
 using SFA.DAS.Provider.PR.Domain.Interfaces;
+using SFA.DAS.Provider.PR.Domain.OuterApi.Requests.Commands;
 using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
 using SFA.DAS.Provider.PR.Web.Authorization;
 using SFA.DAS.Provider.PR.Web.Infrastructure;
 using SFA.DAS.Provider.PR.Web.Models;
+using SFA.DAS.Provider.PR.Web.Models.AddEmployer;
+using SFA.DAS.Provider.PR.Web.Services;
 
 namespace SFA.DAS.Provider.PR.Web.Controllers;
 
@@ -33,6 +35,10 @@ public class RequestPermissionsController(IOuterApiClient _outerApiclient, IEnco
 
         GetProviderRelationshipResponse response = await _outerApiclient.GetProviderRelationship(ukprn, accountLegalEntityIdDecoded, cancellationToken);
 
+        PermissionDescriptionsViewModel existingPermissions = OperationsMappingService.MapOperationsToDescriptions(response.Operations.ToList());
+        requestPermissionsSubmitModel.ExistingPermissionToRecruit = existingPermissions.PermissionToRecruit!;
+        requestPermissionsSubmitModel.ExistingPermissionToAddCohorts = existingPermissions.PermissionToAddCohorts!;
+
         var result = _validator.Validate(requestPermissionsSubmitModel);
 
         if (!IsModelValid(requestPermissionsSubmitModel))
@@ -41,8 +47,17 @@ public class RequestPermissionsController(IOuterApiClient _outerApiclient, IEnco
             return View(model);
         }
 
-        return View();
-        //return RedirectToAction("Index", new { model.Ukprn, model.AccountLegalEntityId });
+        await _outerApiclient.AddRequest(new AddAccountRequestCommand()
+        {
+            Ukprn = ukprn,
+            AccountLegalEntityId = accountLegalEntityIdDecoded,
+            RequestedBy = "",
+            Operations = OperationsMappingService.MapDescriptionsToOperations(requestPermissionsSubmitModel),
+            AccountId = response.AccountId
+        }, cancellationToken);
+
+        return;
+        ////RedirectToAction("Index", new { Ukprn, AccountLegalEntityId });
     }
 
     private async Task<RequestPermissionsViewModel> CreateRequestPermissionsViewModel(long ukprn, string accountLegalEntityId, CancellationToken cancellationToken)

@@ -21,6 +21,6 @@ public class RequestPermissionsViewModel : RequestPermissionsSubmitModel
 
 public class RequestPermissionsSubmitModel : PermissionDescriptionsViewModel
 {
-    public Operation[] ExistingOperations { get; set; } = [];
-    public Operation[] UpdatedOperations { get; set; } = [];
+    public string? ExistingPermissionToAddCohorts { get; set; }
+    public string? ExistingPermissionToRecruit { get; set; }
 }

@@ -1,4 +1,6 @@
-﻿namespace SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
+﻿using SFA.DAS.Provider.PR.Domain.Interfaces;
+
+namespace SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
 public class GetProviderRelationshipResponse
 {
     public long AccountLegalEntityId { get; set; }
