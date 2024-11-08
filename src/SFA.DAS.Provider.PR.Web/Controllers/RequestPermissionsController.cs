@@ -42,12 +42,18 @@ public class RequestPermissionsController(IOuterApiClient _outerApiclient, IEnco
         var result = _validator.Validate(requestPermissionsSubmitModel);
 
         if (!IsModelValid(requestPermissionsSubmitModel))
-        {
+    [Route("{ukprn:int}/employers/{accountlegalentityid}/permissionsRequested", Name = RouteNames.RequestPermissionsConfirmation)]
+    public async Task<IActionResult> PermissionsRequested([FromRoute] int ukprn, CancellationToken cancellationToken)
+    {
             var model = await CreateRequestPermissionsViewModel(ukprn, accountLegalEntityId, cancellationToken);
             return View(model);
         }
+        //Get session model for employer name (plus whatever is needed for the api call)
+        //API call goes here
+        var employerName = "TEMP NAME";
 
         await _outerApiclient.AddRequest(new AddAccountRequestCommand()
+        var viewModel = new RequestPermissionsConfirmationViewModel
         {
             Ukprn = ukprn,
             AccountLegalEntityId = accountLegalEntityIdDecoded,
@@ -68,15 +74,10 @@ public class RequestPermissionsController(IOuterApiClient _outerApiclient, IEnco
 
         return (RequestPermissionsViewModel)response;
     }
+            AccountLegalEntityName = employerName,
+            EmployersLink = Url.RouteUrl(RouteNames.Employers, new { ukprn })!
+        };
 
-    private bool IsModelValid(RequestPermissionsSubmitModel requestPermissionsSubmitModel)
-    {
-        var result = _validator.Validate(requestPermissionsSubmitModel);
-        if (!result.IsValid)
-        {
-            result.AddToModelState(ModelState);
-            return false;
-        }
-        return true;
+        return View(viewModel);
     }
 }
