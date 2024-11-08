@@ -18,7 +18,7 @@ namespace SFA.DAS.Provider.PR.Web.Controllers;
 
 [Authorize(Policy = nameof(PolicyNames.HasProviderAccount))]
 [Route("{ukprn:int}/employers/{accountlegalentityid}/requestpermissions", Name = RouteNames.RequestPermissions)]
-public class RequestPermissionsConfirmation(IOuterApiClient _outerApiclient, IEncodingService encodingService, IValidator<RequestPermissionsSubmitModel> _validator) : Controller
+public class RequestPermissionsController(IOuterApiClient _outerApiclient, IEncodingService encodingService, IValidator<RequestPermissionsSubmitModel> _validator) : Controller
 {
     [HttpGet]
     public async Task<IActionResult> Index([FromRoute] int ukprn, [FromRoute] string accountLegalEntityId, CancellationToken cancellationToken)
