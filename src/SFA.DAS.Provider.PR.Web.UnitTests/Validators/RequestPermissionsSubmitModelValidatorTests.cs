@@ -25,23 +25,20 @@ public sealed class RequestPermissionsSubmitModelValidatorTests
     }
 
     [Test]
-    public void RequestPermissionsSubmitModelValidator_EmptySelections_ReturnInvalid()
+    public void RequestPermissionsSubmitModelValidator_NoSelections_ReturnsInvalid()
     {
         var model = new RequestPermissionsSubmitModel()
         {
-            PermissionToAddCohorts = string.Empty,
-            PermissionToRecruit = string.Empty,
-            ExistingPermissionToAddCohorts = SetPermissions.AddRecords.Yes,
-            ExistingPermissionToRecruit = SetPermissions.RecruitApprentices.Yes
+            PermissionToAddCohorts = SetPermissions.AddRecords.No,
+            PermissionToRecruit = SetPermissions.RecruitApprentices.No,
+            ExistingPermissionToAddCohorts = SetPermissions.AddRecords.No,
+            ExistingPermissionToRecruit = SetPermissions.RecruitApprentices.No
         };
         var sut = new RequestPermissionsSubmitModelValidator();
         var result = sut.TestValidate(model);
 
-        result.ShouldHaveValidationErrorFor(a => a.PermissionToRecruit)
-            .WithErrorMessage(RequestPermissionsSubmitModelValidator.RequestPermissionsRecruitApprenticesErrorMessage);
-
         result.ShouldHaveValidationErrorFor(a => a.PermissionToAddCohorts)
-            .WithErrorMessage(RequestPermissionsSubmitModelValidator.RequestPermissionsAddRecordsErrorMessage);
+            .WithErrorMessage(RequestPermissionsSubmitModelValidator.BothSelectionsAreNoErrorMessage);
     }
 
     [Test]

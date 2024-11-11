@@ -73,7 +73,13 @@ public class RequestPermissionsController(IOuterApiClient _outerApiclient, IEnco
 
         GetProviderRelationshipResponse response = await _outerApiclient.GetProviderRelationship(ukprn, accountLegalEntityIdDecoded, cancellationToken);
 
-        return (RequestPermissionsViewModel)response;
+        RequestPermissionsViewModel viewModel = (RequestPermissionsViewModel)response;
+
+        PermissionDescriptionsViewModel existingPermissions = OperationsMappingService.MapOperationsToDescriptions(response.Operations.ToList());
+        viewModel.ExistingPermissionToRecruit = viewModel.PermissionToRecruit = existingPermissions.PermissionToRecruit!;
+        viewModel.ExistingPermissionToAddCohorts = viewModel.PermissionToAddCohorts = existingPermissions.PermissionToAddCohorts!;
+
+        return viewModel;
     }
 
     private bool IsModelValid(RequestPermissionsSubmitModel requestPermissionsSubmitModel)
