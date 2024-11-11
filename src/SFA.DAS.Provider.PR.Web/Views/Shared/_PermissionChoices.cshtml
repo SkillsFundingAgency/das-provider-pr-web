@@ -7,7 +7,8 @@
     Add apprentice records
 </legend>
 <div id="addRecords-hint" class="govuk-hint">
-    This allows you to add apprentice records. If the employer does not pay the levy (they have an annual pay bill of under £3 million), you can also reserve funding for apprentices.
+    You can add details about new apprentices and reserve funding for them if
+    needed. The employer will have final review of apprentice records.
 </div>
 <div esfa-validation-marker-for="@Model.PermissionToAddCohorts" class="govuk-form-group">
     <span asp-validation-for="PermissionToAddCohorts" class="govuk-error-message"></span>
@@ -31,7 +32,7 @@
     Recruit apprentices
 </legend>
 <div id="recruitApprentices-hint" class="govuk-hint">
-    This allows you to advertise apprenticeships and review applications on the employer’s behalf.
+    You can advertise apprenticeships and review applications on the employer's behalf.
 </div>
 <div esfa-validation-marker-for="@Model.PermissionToRecruit" class="govuk-form-group">
     <span asp-validation-for="PermissionToRecruit" class="govuk-error-message"></span>
