@@ -38,6 +38,7 @@ public class EmployersControllerTests
 
         EmployersController sut = new(outerApiClientMock.Object, applicationSettingsMock.Object);
         sut.AddDefaultContext().AddUrlHelperMock();
+        sut.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
 
         var actual = await sut.Index(ukprn, new(), cancellationToken);
 
@@ -62,6 +63,7 @@ public class EmployersControllerTests
 
         EmployersController sut = new(outerApiClientMock.Object, applicationSettingsMock.Object);
         sut.AddDefaultContext().AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, addEmployerUrl);
+        sut.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
 
         var actual = await sut.Index(ukprn, new(), cancellationToken);
 
@@ -114,6 +116,7 @@ public class EmployersControllerTests
 
         EmployersController sut = new(outerApiClientMock.Object, applicationSettingsMock.Object);
         sut.AddDefaultContext().AddUrlHelperMock().AddUrlForRoute(RouteNames.EmployerDetails, employerDetailsLink);
+        sut.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
 
         var actual = await sut.Index(ukprn, new(), cancellationToken);
 
@@ -143,6 +146,7 @@ public class EmployersControllerTests
 
         EmployersController sut = new(outerApiClientMock.Object, applicationSettingsMock.Object);
         sut.AddDefaultContext().AddUrlHelperMock().AddUrlForRoute(RouteNames.EmployerDetails, employerDetailsLink);
+        sut.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
 
         var actual = await sut.Index(ukprn, new(), cancellationToken);
 
