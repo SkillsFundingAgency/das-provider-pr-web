@@ -9,6 +9,7 @@ using SFA.DAS.Provider.PR.Application.Constants;
 using SFA.DAS.Provider.PR.Domain.Interfaces;
 using SFA.DAS.Provider.PR.Domain.OuterApi.Requests.Commands;
 using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
+using SFA.DAS.Provider.PR.Web.Constants;
 using SFA.DAS.Provider.PR.Web.Controllers;
 using SFA.DAS.Provider.PR.Web.Infrastructure;
 using SFA.DAS.Provider.PR.Web.Models;
@@ -34,7 +35,8 @@ public class RequestPermissionsControllerTests
             )
         ).ReturnsAsync(
             new GetProviderRelationshipResponse() { 
-                AccountLegalEntityName = "AccountLegalEntityName" 
+                AccountLegalEntityName = "AccountLegalEntityName" ,
+                Operations = new[] { Operation.Recruitment, Operation.CreateCohort }
             }
         );
 
@@ -90,7 +92,13 @@ public class RequestPermissionsControllerTests
             Assert.That(result, Is.InstanceOf<ViewResult>());
             var viewResult = (ViewResult)result;
             Assert.That(viewResult.Model, Is.InstanceOf<RequestPermissionsViewModel>());
-            Assert.That(((RequestPermissionsViewModel)viewResult.Model!)!.AccountLegalEntityName, Is.EqualTo("ACCOUNTLEGALENTITYNAME"));
+
+            var viewModel = ((RequestPermissionsViewModel)viewResult.Model!)!;
+            Assert.That(viewModel.AccountLegalEntityName, Is.EqualTo("ACCOUNTLEGALENTITYNAME"));
+            Assert.That(viewModel.ExistingPermissionToAddCohorts, Is.EqualTo(nameof(SetPermissions.AddRecords.Yes)));
+            Assert.That(viewModel.ExistingPermissionToRecruit, Is.EqualTo(nameof(SetPermissions.RecruitApprentices.Yes)));
+            Assert.That(viewModel.PermissionToAddCohorts, Is.EqualTo(nameof(SetPermissions.AddRecords.Yes)));
+            Assert.That(viewModel.PermissionToRecruit, Is.EqualTo(nameof(SetPermissions.RecruitApprentices.Yes)));
         });
     }
 
