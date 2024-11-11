@@ -169,6 +169,7 @@ public class EmployerDetailsModelTests
     [InlineAutoData(RequestStatus.Sent, PermissionAction.AccountCreated, CreateAccountRequestType, EmployerDetailsViewModel.AccountCreatedPermissionsSetText)]
     [InlineAutoData(RequestStatus.Accepted, PermissionAction.RecruitRelationship, AddAccountRequestType, EmployerDetailsViewModel.ExistingRecruitRelationshipText)]
     [InlineAutoData(RequestStatus.Accepted, PermissionAction.ApprovalsRelationship, AddAccountRequestType, EmployerDetailsViewModel.ExistingApprovalsRelationshipText)]
+    [InlineAutoData(RequestStatus.Accepted, PermissionAction.AccountAdded, AddAccountRequestType, EmployerDetailsViewModel.PermissionUpdateAcceptedText)]
 
     public void LastActionTextIsSetCorrectly_WhenExistingRelationshipExists(RequestStatus status, PermissionAction action, string lastRequestType, string expected,
         GetProviderRelationshipResponse response)

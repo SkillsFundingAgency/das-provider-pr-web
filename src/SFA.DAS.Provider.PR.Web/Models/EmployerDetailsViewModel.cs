@@ -108,63 +108,62 @@ public class EmployerDetailsViewModel
 
     private static string SetLastActionText(GetProviderRelationshipResponse response)
     {
-        string lastActionText = "";
-
-        if ((String.Equals(response.LastRequestType, "CreateAccount", StringComparison.CurrentCultureIgnoreCase)
-            && response.LastRequestStatus == RequestStatus.Accepted) || response.LastAction == PermissionAction.AccountAdded
-            || response.LastAction == PermissionAction.AccountCreated)
-            lastActionText = AccountCreatedPermissionsSetText;
+        if (String.Equals(response.LastRequestType, "CreateAccount", StringComparison.CurrentCultureIgnoreCase)
+            && (response.LastRequestStatus == RequestStatus.Accepted || response.LastAction == PermissionAction.AccountAdded
+            || response.LastAction == PermissionAction.AccountCreated))
+            return AccountCreatedPermissionsSetText;
 
         if (String.Equals(response.LastRequestType, "Permission", StringComparison.CurrentCultureIgnoreCase))
         {
             if (response.LastRequestStatus == RequestStatus.Sent || response.LastRequestStatus == RequestStatus.New)
             {
                 if (response.LastAction == PermissionAction.PermissionCreated)
-                    lastActionText = PendingAddTrainingProviderAndPermissionsRequestText;
+                    return PendingAddTrainingProviderAndPermissionsRequestText;
                 else
                 {
-                    lastActionText = PendingPermissionRequestUpdatedText;
+                    return PendingPermissionRequestUpdatedText;
                 }
             }
             switch (response.LastRequestStatus)
             {
                 case RequestStatus.Accepted:
-                    lastActionText = PermissionUpdateAcceptedText;
-                    break;
+                    return PermissionUpdateAcceptedText;
                 case RequestStatus.Declined:
-                    lastActionText = PermissionUpdateDeclinedText;
-                    break;
+                    return PermissionUpdateDeclinedText;
                 case RequestStatus.Expired:
-                    lastActionText = PermissionUpdateExpiredText;
-                    break;
+                    return PermissionUpdateExpiredText;
             }
         }
         var statuses = new List<PermissionAction>() { PermissionAction.RecruitRelationship, PermissionAction.ApprovalsRelationship };
+
+        if (String.Equals(response.LastRequestType, "AddAccount") &&
+            response.LastRequestStatus == RequestStatus.Accepted
+            && !statuses.Contains(response.LastAction!.Value))
+        {
+            return PermissionUpdateAcceptedText;
+        }
+
         if (response.LastAction is not null && statuses.Contains(response.LastAction.Value))
         {
             switch (response.LastAction)
             {
                 case PermissionAction.RecruitRelationship:
-                    lastActionText = ExistingRecruitRelationshipText;
-                    break;
+                    return ExistingRecruitRelationshipText;
                 case PermissionAction.ApprovalsRelationship:
-                    lastActionText = ExistingApprovalsRelationshipText;
-                    break;
+                    return ExistingApprovalsRelationshipText;
             }
         }
 
-        return lastActionText;
+        return string.Empty;
     }
 
     private static string SetLastActionText(GetRequestsByRequestIdResponse response)
     {
-        string lastActionText = "";
-
         if (String.Equals(response.RequestType, "AddAccount", StringComparison.CurrentCultureIgnoreCase))
-            lastActionText = PendingAddTrainingProviderAndPermissionsRequestText;
+            return PendingAddTrainingProviderAndPermissionsRequestText;
         if (String.Equals(response.RequestType, "CreateAccount", StringComparison.CurrentCultureIgnoreCase))
-            lastActionText = PendingCreateAccountInvitationText;
-        return lastActionText;
+            return PendingCreateAccountInvitationText;
+        return string.Empty;
     }
 
     private static bool SetHasExistingPermissions(GetProviderRelationshipResponse response)
