@@ -103,4 +103,69 @@ public class OperationsMappingServiceDescriptionsToOperationsTests
         operations.Contains(addRecordsOperation!.Value).Should().BeTrue();
         operations.Contains(addRecruitmentOperation!.Value).Should().BeTrue();
     }
+
+    [Test]
+    public void MapOperationsToDescriptions_ShouldReturnNoPermissions_WhenOperationsListIsEmpty()
+    {
+        var operations = new List<Operation>();
+        var result = OperationsMappingService.MapOperationsToDescriptions(operations);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.PermissionToAddCohorts, Is.EqualTo(SetPermissions.AddRecords.No));
+            Assert.That(result.PermissionToRecruit, Is.EqualTo(SetPermissions.RecruitApprentices.No));
+        });
+    }
+
+    [Test]
+    public void MapOperationsToDescriptions_ShouldReturnAddRecordsYes_WhenOperationsContainCreateCohort()
+    {
+        var operations = new List<Operation> { Operation.CreateCohort };
+        var result = OperationsMappingService.MapOperationsToDescriptions(operations);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.PermissionToAddCohorts, Is.EqualTo(SetPermissions.AddRecords.Yes));
+            Assert.That(result.PermissionToRecruit, Is.EqualTo(SetPermissions.RecruitApprentices.No));
+        });
+    }
+
+    [Test]
+    public void MapOperationsToDescriptions_ShouldReturnRecruitApprenticesYes_WhenOperationsContainRecruitment()
+    {
+        var operations = new List<Operation> { Operation.Recruitment };
+        var result = OperationsMappingService.MapOperationsToDescriptions(operations);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.PermissionToAddCohorts, Is.EqualTo(SetPermissions.AddRecords.No));
+            Assert.That(result.PermissionToRecruit, Is.EqualTo(SetPermissions.RecruitApprentices.Yes));
+        });
+    }
+
+    [Test]
+    public void MapOperationsToDescriptions_ShouldReturnRecruitApprenticesYesWithReview_WhenOperationsContainRecruitmentRequiresReview()
+    {
+        var operations = new List<Operation> { Operation.RecruitmentRequiresReview };
+        var result = OperationsMappingService.MapOperationsToDescriptions(operations);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.PermissionToAddCohorts, Is.EqualTo(SetPermissions.AddRecords.No));
+            Assert.That(result.PermissionToRecruit, Is.EqualTo(SetPermissions.RecruitApprentices.YesWithReview));
+        });
+    }
+
+    [Test]
+    public void MapOperationsToDescriptions_ShouldReturnAllPermissions_WhenOperationsContainAllRelevantOperations()
+    {
+        var operations = new List<Operation> { Operation.CreateCohort, Operation.Recruitment, Operation.RecruitmentRequiresReview };
+        var result = OperationsMappingService.MapOperationsToDescriptions(operations);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.PermissionToAddCohorts, Is.EqualTo(SetPermissions.AddRecords.Yes));
+            Assert.That(result.PermissionToRecruit, Is.EqualTo(SetPermissions.RecruitApprentices.Yes));
+        });
+    }
 }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using RestEase;
+using SFA.DAS.Provider.PR.Application.Constants;
 using SFA.DAS.Provider.PR.Domain.Interfaces;
 using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
 using SFA.DAS.Provider.PR.Web.Authorization;
@@ -21,8 +22,13 @@ public class EmployersController(IOuterApiClient _outerApiclient, IOptions<Appli
 
     [Route("{ukprn:int}/employers", Name = RouteNames.Employers)]
     [HttpGet]
-    public async Task<IActionResult> Index([FromRoute] int ukprn, [FromQuery] EmployersSubmitModel submitModel, CancellationToken cancellationToken)
+    public async Task<IActionResult> Index([FromRoute] long ukprn, [FromQuery] EmployersSubmitModel submitModel, CancellationToken cancellationToken)
     {
+        if(TempData.ContainsKey(TempDataKeys.PermissionsRequestId))
+        {
+            TempData.Remove(TempDataKeys.PermissionsRequestId);
+        }
+
         var queryParams = submitModel.ToQueryString();
         var pageSize = _applicationSettingsOption.Value.EmployersPageSize;
         queryParams.Add("PageSize", pageSize.ToString());
@@ -46,7 +52,7 @@ public class EmployersController(IOuterApiClient _outerApiclient, IOptions<Appli
         return View(NoRelationshipsHomePage, new NoRelationshipsHomeViewModel(Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn })!));
     }
 
-    private async Task<List<EmployerPermissionViewModel>> BuildEmployers(List<ProviderRelationshipModel> employers, int ukprn, CancellationToken cancellationToken)
+    private async Task<List<EmployerPermissionViewModel>> BuildEmployers(List<ProviderRelationshipModel> employers, long ukprn, CancellationToken cancellationToken)
     {
         var employerList = new List<EmployerPermissionViewModel>();
         foreach (var employer in employers)

@@ -1,4 +1,5 @@
-﻿using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
+﻿using RestEase;
+using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
 using SFA.DAS.Provider.PR.Web.Constants;
 
 namespace SFA.DAS.Provider.PR.Web.Models;
@@ -14,7 +15,6 @@ public class EmployerDetailsViewModel
     public const string ExistingRecruitRelationshipText = "Added you as training provider for new apprentice vacancy";
     public const string ExistingApprovalsRelationshipText = "Added you as training provider for new apprentice";
 
-
     public long AccountLegalEntityId { get; set; }
 
     public string AccountLegalEntityPublicHashedId { get; set; } = null!;
@@ -23,6 +23,8 @@ public class EmployerDetailsViewModel
 
     public long Ukprn { get; set; }
 
+    public Operation[] Operations { get; set; } = [];
+
     public PermissionAction? LastAction { get; set; }
 
     public string LastActionDate { get; set; } = null!;
@@ -30,8 +32,6 @@ public class EmployerDetailsViewModel
     public string ProviderName { get; set; } = null!;
 
     public bool HasExistingPermissions { get; set; } = true;
-
-    public Operation[] Operations { get; set; } = [];
 
     public Operation[]? LastRequestOperations { get; set; } = [];
 
@@ -46,7 +46,6 @@ public class EmployerDetailsViewModel
     public string LastActionText { get; set; } = null!;
 
     public bool ShowAgreementId { get; set; } = true;
-
 
     public static implicit operator EmployerDetailsViewModel(GetProviderRelationshipResponse response)
     {
@@ -93,6 +92,7 @@ public class EmployerDetailsViewModel
 
         return response.LastActionTime is null ? string.Empty : response.LastActionTime!.Value.Date.ToString("d MMM yyyy");
     }
+
     private static Operation[] SetLastRequestOperations(GetProviderRelationshipResponse response)
     {
         if (response.LastRequestOperations != null && response.LastRequestOperations.Length != 0)
@@ -106,53 +106,53 @@ public class EmployerDetailsViewModel
             && (response.LastRequestStatus == RequestStatus.Sent || response.LastRequestStatus == RequestStatus.New);
     }
 
+    private static bool LastActionIsCreateAccountAndAccepted(GetProviderRelationshipResponse response)
+    {
+        return String.Equals(response.LastRequestType, "CreateAccount", StringComparison.CurrentCultureIgnoreCase) && response.LastRequestStatus == RequestStatus.Accepted;
+    }
+
     private static string SetLastActionText(GetProviderRelationshipResponse response)
     {
-        string lastActionText = "";
-
-        if (String.Equals(response.LastRequestType, "CreateAccount", StringComparison.CurrentCultureIgnoreCase)
-            && response.LastRequestStatus == RequestStatus.Accepted)
-            lastActionText = AccountCreatedPermissionsSetText;
+        if (LastActionIsCreateAccountAndAccepted(response))
+        {
+            return AccountCreatedPermissionsSetText;
+        }
 
         if (String.Equals(response.LastRequestType, "Permission", StringComparison.CurrentCultureIgnoreCase))
         {
             if (response.LastRequestStatus == RequestStatus.Sent || response.LastRequestStatus == RequestStatus.New)
             {
-                if (response.LastAction == PermissionAction.PermissionCreated)
-                    lastActionText = PendingAddTrainingProviderAndPermissionsRequestText;
-                else
-                {
-                    lastActionText = PendingPermissionRequestUpdatedText;
-                }
+                return response.LastAction == PermissionAction.PermissionCreated ? 
+                    PendingAddTrainingProviderAndPermissionsRequestText : 
+                    PendingPermissionRequestUpdatedText;
             }
-            switch (response.LastRequestStatus)
+
+            return response.LastRequestStatus switch
             {
-                case RequestStatus.Accepted:
-                    lastActionText = PermissionUpdateAcceptedText;
-                    break;
-                case RequestStatus.Declined:
-                    lastActionText = PermissionUpdateDeclinedText;
-                    break;
-                case RequestStatus.Expired:
-                    lastActionText = PermissionUpdateExpiredText;
-                    break;
-            }
+                RequestStatus.Accepted => PermissionUpdateAcceptedText,
+                RequestStatus.Declined => PermissionUpdateDeclinedText,
+                RequestStatus.Expired => PermissionUpdateExpiredText,
+                _ => string.Empty
+            };
         }
+
         var statuses = new List<PermissionAction>() { PermissionAction.RecruitRelationship, PermissionAction.ApprovalsRelationship };
         if(response.LastAction is not null && statuses.Contains(response.LastAction.Value))
         {
             switch (response.LastAction)
             {
                 case PermissionAction.RecruitRelationship:
-                    lastActionText = ExistingRecruitRelationshipText;
-                    break;
+                    {
+                        return ExistingRecruitRelationshipText;
+                    }
                 case PermissionAction.ApprovalsRelationship:
-                    lastActionText = ExistingApprovalsRelationshipText;
-                    break;
+                    {
+                        return ExistingApprovalsRelationshipText;
+                    }
             }
         }
 
-        return lastActionText;
+        return string.Empty;
     }
 
     private static string SetLastActionText(GetRequestsByRequestIdResponse response)
@@ -206,3 +206,4 @@ public class EmployerDetailsViewModel
         return response.AccountLegalEntityId != null;
     }
 }
+

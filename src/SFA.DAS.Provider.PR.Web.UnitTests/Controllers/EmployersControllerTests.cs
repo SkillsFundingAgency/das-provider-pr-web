@@ -2,10 +2,13 @@
 using AutoFixture.NUnit3;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Options;
 using Moq;
 using RestEase;
+using SFA.DAS.Provider.PR.Application.Constants;
 using SFA.DAS.Provider.PR.Domain.Interfaces;
 using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
 using SFA.DAS.Provider.PR.Web.Controllers;
@@ -35,6 +38,7 @@ public class EmployersControllerTests
 
         EmployersController sut = new(outerApiClientMock.Object, applicationSettingsMock.Object);
         sut.AddDefaultContext().AddUrlHelperMock();
+        sut.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
 
         var actual = await sut.Index(ukprn, new(), cancellationToken);
 
@@ -59,6 +63,7 @@ public class EmployersControllerTests
 
         EmployersController sut = new(outerApiClientMock.Object, applicationSettingsMock.Object);
         sut.AddDefaultContext().AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, addEmployerUrl);
+        sut.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
 
         var actual = await sut.Index(ukprn, new(), cancellationToken);
 
@@ -66,6 +71,27 @@ public class EmployersControllerTests
         actual.As<ViewResult>().ViewName.Should().Be(EmployersController.NoRelationshipsHomePage);
         actual.As<ViewResult>().Model.Should().BeOfType<NoRelationshipsHomeViewModel>();
         actual.As<ViewResult>().Model.As<NoRelationshipsHomeViewModel>().AddEmployerLink.Should().Be(addEmployerUrl);
+    }
+
+    [Test, AutoData]
+    public async Task Index_WithTemporaryRequestIdSet_ClearsValue(long ukprn, GetProviderRelationshipsResponse response, string addEmployerUrl, ApplicationSettings applicationSettings, CancellationToken cancellationToken)
+    {
+        Mock<IOuterApiClient> outerApiClientMock = new();
+        response.HasAnyRelationships = false;
+        outerApiClientMock.Setup(c => c.GetProviderRelationships(ukprn, It.IsAny<Dictionary<string, string>>(), cancellationToken)).ReturnsAsync(response);
+
+        Mock<IOptions<ApplicationSettings>> applicationSettingsMock = new();
+        applicationSettingsMock.Setup(a => a.Value).Returns(applicationSettings);
+
+        EmployersController sut = new(outerApiClientMock.Object, applicationSettingsMock.Object);
+        sut.AddDefaultContext().AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, addEmployerUrl);
+
+        sut.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
+        sut.TempData.Add(TempDataKeys.PermissionsRequestId, Guid.NewGuid().ToString());
+
+        var actual = await sut.Index(ukprn, new(), cancellationToken);
+
+        Assert.That(sut.TempData.ContainsKey(TempDataKeys.PermissionsRequestId), Is.False);
     }
 
     [Test, AutoData]
@@ -90,6 +116,7 @@ public class EmployersControllerTests
 
         EmployersController sut = new(outerApiClientMock.Object, applicationSettingsMock.Object);
         sut.AddDefaultContext().AddUrlHelperMock().AddUrlForRoute(RouteNames.EmployerDetails, employerDetailsLink);
+        sut.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
 
         var actual = await sut.Index(ukprn, new(), cancellationToken);
 
@@ -119,6 +146,7 @@ public class EmployersControllerTests
 
         EmployersController sut = new(outerApiClientMock.Object, applicationSettingsMock.Object);
         sut.AddDefaultContext().AddUrlHelperMock().AddUrlForRoute(RouteNames.EmployerDetails, employerDetailsLink);
+        sut.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
 
         var actual = await sut.Index(ukprn, new(), cancellationToken);
 

@@ -9,6 +9,7 @@ public static class RouteNames
     public const string Employers = nameof(Employers);
     public const string EmployerDetails = nameof(EmployerDetails);
     public const string EmployerDetailsByRequestId = nameof(EmployerDetailsByRequestId);
+    public const string RequestPermissionsConfirmation = nameof(RequestPermissionsConfirmation);
     public const string ProviderSignOut = "provider-signout";
     public const string AddEmployerStart = nameof(AddEmployerStart);
     public const string AddEmployerSearchByEmail = nameof(AddEmployerSearchByEmail);
@@ -28,4 +29,5 @@ public static class RouteNames
         nameof(PayeAornMatchedEmailNotLinkedHasRelationshipLink);
     public const string EmailLinkedToAccountWithRelationship = nameof(EmailLinkedToAccountWithRelationship);
     public const string EmailSearchInviteAlreadySent = nameof(EmailSearchInviteAlreadySent);
+    public const string RequestPermissions = nameof(RequestPermissions);
 }
