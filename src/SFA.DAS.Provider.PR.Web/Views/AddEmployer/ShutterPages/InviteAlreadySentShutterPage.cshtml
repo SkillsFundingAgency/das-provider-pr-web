@@ -16,7 +16,7 @@
     <div class="govuk-grid-column-two-thirds">
         <p class="govuk-body">
             <div class="govuk-inset-text">
-                @Model.EmployerName.ToUpper() <br/><br/>
+                <p class="govuk-!-font-size-24">@Model.EmployerName.ToUpper() </p>
                 Employer PAYE reference: @Model.PayeReference <br/>
                 Accounts Office reference: @Model.Aorn
 
@@ -27,7 +27,7 @@
         </p>
         <div class="govuk-button-group">
             <p class="govuk-body">
-                <a class="govuk-link" href="@Model.EmployerAccountLink">Employer account details to @Model.EmployerName.ToUpper()</a>
+                <a class="govuk-link" href="@Model.EmployerAccountLink">Employer account details for @Model.EmployerName.ToUpper()</a>
             </p>
         </div>
     </div>

@@ -12,7 +12,8 @@
         </h1>
         <p class="govuk-body">
             <div class="govuk-inset-text">
-                @Model.OrganisationName <br /><br />
+                <p class="govuk-!-font-size-24">
+                    @Model.OrganisationName </p>
                 Employer PAYE reference: @Model.Paye <br />
                 Accounts Office reference: @Model.Aorn<br />
                 Email address: @Model.Email
@@ -61,7 +62,8 @@
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key govuk-!-width-one-half">
                             Add apprentice records<br/><br/>
-                            <div class="govuk-hint">This allows you to add apprentice records. If the employer does not pay the levy, you can also reserve funding for apprentices.</div>
+                            <div class="govuk-hint">You can add details about new apprentices and reserve funding for them if
+                                needed. The employer will have final review of apprentice records.</div>
                         </dt>
                         <dd class="govuk-summary-list__value">
                             @Model.PermissionToAddCohortsText
@@ -70,7 +72,8 @@
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">
                             Recruit apprentices<br/><br/>
-                            <div class="govuk-hint">This allows you to advertise apprenticeships and review applications on the employer's behalf.</div>
+                            <div class="govuk-hint">You can advertise apprenticeships and review applications on the employer’s
+                                behalf. </div>
                         </dt>
                         <dd class="govuk-summary-list__value">
                             @Model.PermissionToRecruitText
