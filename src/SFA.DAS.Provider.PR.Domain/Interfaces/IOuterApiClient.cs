@@ -16,8 +16,8 @@ public interface IOuterApiClient
     [Get("/relationships")]
     Task<GetProviderRelationshipResponse> GetProviderRelationship([Query] long ukprn, [Query] long accountLegalEntityId, CancellationToken cancellationToken);
 
-    [Get("relationships/employeraccount/email/{email}")]
-    Task<GetRelationshipByEmailResponse> GetRelationshipByEmail([Path] string email, [Query] long ukprn, CancellationToken cancellationToken);
+    [Get("relationships/employeraccount")]
+    Task<GetRelationshipByEmailResponse> GetRelationshipByEmail([Query] string email, [Query] long ukprn, CancellationToken cancellationToken);
 
     [Post("/requests/addaccount")]
     Task<AddAccountRequestCommandResponse> AddRequest([Body] AddAccountRequestCommand command, CancellationToken cancellationToken);
