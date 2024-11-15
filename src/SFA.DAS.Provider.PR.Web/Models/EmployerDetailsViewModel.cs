@@ -105,16 +105,26 @@ public class EmployerDetailsViewModel
             && (response.LastRequestStatus == RequestStatus.Sent || response.LastRequestStatus == RequestStatus.New);
     }
 
-    private static bool IsLastActionCreateAccountOrAccountAdded(GetProviderRelationshipResponse response)
+    private static bool IsLastActionCreateAccount(GetProviderRelationshipResponse response)
     {
-        return response.LastAction == PermissionAction.AccountAdded || response.LastAction == PermissionAction.AccountCreated;
+        return response.LastAction == PermissionAction.AccountCreated;
+    }
+
+    private static bool IsLastActionAccountAdded(GetProviderRelationshipResponse response)
+    {
+        return response.LastAction == PermissionAction.AccountAdded;
     }
 
     private static string SetLastActionText(GetProviderRelationshipResponse response)
     {
-        if (IsLastActionCreateAccountOrAccountAdded(response))
+        if (IsLastActionCreateAccount(response) && !string.Equals(response.LastRequestType, "Permission", StringComparison.CurrentCultureIgnoreCase))
         {
             return CreateOrAddAccountRequestAcceptedText;
+        }
+
+        if (IsLastActionAccountAdded(response) && !string.Equals(response.LastRequestType, "Permission", StringComparison.CurrentCultureIgnoreCase))
+        {
+            return PermissionSetText;
         }
 
         if (string.Equals(response.LastRequestType, "Permission", StringComparison.CurrentCultureIgnoreCase))
