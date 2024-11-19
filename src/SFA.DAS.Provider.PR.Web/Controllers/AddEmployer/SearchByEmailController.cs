@@ -118,7 +118,7 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
         }
 
         var employerAccountLink = string.Empty;
-        if (accountLegalEntityId != null)
+        if (accountLegalEntityId != null && response.RequestType == RequestType.Permission.ToString())
         {
             var accountLegalEntityIdEncoded = encodingService.Encode(accountLegalEntityId.Value, EncodingType.PublicAccountLegalEntityId);
             employerAccountLink = Url.RouteUrl(RouteNames.EmployerDetails, new { ukprn, accountLegalEntityId = accountLegalEntityIdEncoded })!;

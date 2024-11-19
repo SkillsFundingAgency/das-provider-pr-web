@@ -175,7 +175,7 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
         }
         else
         {
-            employerAccountLink = Url.RouteUrl(RouteNames.EmployerDetailsByRequestId, new { request.RequestId })!;
+            employerAccountLink = Url.RouteUrl(RouteNames.EmployerDetailsByRequestId, new { ukprn, request.RequestId })!;
         }
 
         var shutterViewModel = new InviteAlreadySentShutterPageViewModel(
