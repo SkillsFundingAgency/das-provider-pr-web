@@ -54,12 +54,12 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
         if (!result.IsValid)
         {
             var viewModel = GetViewModel(ukprn);
-            viewModel.Email = submitModel.Email;
+            viewModel.Email = submitModel.Email!.Trim();
             result.AddToModelState(ModelState);
             return View(ViewPath, viewModel);
         }
 
-        var sessionModel = new AddEmployerSessionModel { Email = submitModel.Email! };
+        var sessionModel = new AddEmployerSessionModel { Email = submitModel.Email!.Trim() };
         _sessionService.Set(sessionModel);
 
 
