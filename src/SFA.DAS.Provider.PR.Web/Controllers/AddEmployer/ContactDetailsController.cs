@@ -63,8 +63,8 @@ public class ContactDetailsController(ISessionService _sessionService, IValidato
         }
 
 
-        sessionModel.FirstName = submitModel.FirstName;
-        sessionModel.LastName = submitModel.LastName;
+        sessionModel.FirstName = submitModel.FirstName!.Trim();
+        sessionModel.LastName = submitModel.LastName!.Trim();
         _sessionService.Set(sessionModel);
 
         return RedirectToRoute(RouteNames.CheckEmployerDetails, new { ukprn });
