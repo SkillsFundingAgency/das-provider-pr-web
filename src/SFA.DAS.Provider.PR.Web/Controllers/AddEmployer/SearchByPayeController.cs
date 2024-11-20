@@ -65,8 +65,8 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
         {
             var viewModel = GetViewModel(ukprn);
             viewModel.Email = submitModel.Email;
-            viewModel.Paye = submitModel.Paye;
-            viewModel.Aorn = submitModel.Aorn;
+            viewModel.Paye = submitModel.Paye!.Trim();
+            viewModel.Aorn = submitModel.Aorn!.Trim();
             result.AddToModelState(ModelState);
             return View(ViewPath, viewModel);
         }
@@ -77,8 +77,8 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
             return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
         }
 
-        sessionModel.Paye = submitModel.Paye;
-        sessionModel.Aorn = submitModel.Aorn;
+        sessionModel.Paye = submitModel.Paye!.Trim();
+        sessionModel.Aorn = submitModel.Aorn!.Trim();
         sessionModel.IsCheckDetailsVisited = false;
         _sessionService.Set(sessionModel);
 
