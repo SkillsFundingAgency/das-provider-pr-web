@@ -150,7 +150,7 @@ public class SearchByPayeControllerPostTests
         ViewResult? viewResult = result.As<ViewResult>();
         SearchByPayeModel? viewModel = viewResult.Model as SearchByPayeModel;
 
-        viewModel.Paye.Should().Be(paye);
+        viewModel!.Paye.Should().Be(paye);
         viewModel.Aorn.Should().Be(aorn);
     }
 

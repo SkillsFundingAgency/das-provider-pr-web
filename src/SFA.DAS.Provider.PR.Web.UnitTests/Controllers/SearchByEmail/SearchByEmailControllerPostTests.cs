@@ -226,7 +226,7 @@ public class SearchByEmailControllerPostTests
 
         ViewResult? viewResult = result.As<ViewResult>();
         SearchByEmailModel? viewModel = viewResult.Model as SearchByEmailModel;
-        viewModel.Email.Should().Be(Email);
+        viewModel!.Email.Should().Be(Email);
     }
 
     [Test]
