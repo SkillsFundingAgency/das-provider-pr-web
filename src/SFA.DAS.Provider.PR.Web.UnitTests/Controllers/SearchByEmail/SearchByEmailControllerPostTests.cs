@@ -90,7 +90,7 @@ public class SearchByEmailControllerPostTests
     }
 
     [Test, MoqAutoData]
-    public async Task Post_HasActiveRequest_EmailIsTrimmed(
+    public async Task Post_HasActiveRequest_EmailIsTrimmedInSessionModel(
         [Frozen] Mock<IOuterApiClient> outerApiClientMock,
         [Frozen] Mock<IValidator<SearchByEmailSubmitModel>> validatorMock,
         [Frozen] Mock<ISessionService> sessionServiceMock,
