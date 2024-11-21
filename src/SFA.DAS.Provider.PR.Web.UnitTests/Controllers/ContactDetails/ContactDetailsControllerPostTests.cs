@@ -82,7 +82,10 @@ public class ContactDetailsControllerPostTests
         sessionModel.FirstName = firstName;
         sessionModel.LastName = lastName;
 
-        sessionServiceMock.Verify(x => x.Set(sessionModel), Times.Once);
+        sessionServiceMock.Verify(x => x.Set(It.Is<AddEmployerSessionModel>
+            (x => x.FirstName == firstName)), Times.Once);
+        sessionServiceMock.Verify(x => x.Set(It.Is<AddEmployerSessionModel>
+            (x => x.LastName == lastName)), Times.Once);
     }
 
     [Test, MoqAutoData]

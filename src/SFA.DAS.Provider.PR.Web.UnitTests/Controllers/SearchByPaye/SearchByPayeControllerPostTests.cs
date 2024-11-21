@@ -239,7 +239,10 @@ public class SearchByPayeControllerPostTests
 
         await sut.Index(ukprn, searchByPayeSubmitModel, cancellationToken);
 
-        sessionServiceMock.Verify(x => x.Set(sessionModel), Times.Exactly(2));
+        sessionServiceMock.Verify(x => x.Set(It.Is<AddEmployerSessionModel>
+            (x => x.Aorn == aorn)), Times.Exactly(2));
+        sessionServiceMock.Verify(x => x.Set(It.Is<AddEmployerSessionModel>
+            (x => x.Paye == paye)), Times.Exactly(2));
     }
 
     [Test, MoqAutoData]
