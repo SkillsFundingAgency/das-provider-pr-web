@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using RestEase;
 using SFA.DAS.Provider.PR.Application.Constants;
 using SFA.DAS.Provider.PR.Domain.Interfaces;
 using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
@@ -24,7 +23,7 @@ public class EmployersController(IOuterApiClient _outerApiclient, IOptions<Appli
     [HttpGet]
     public async Task<IActionResult> Index([FromRoute] long ukprn, [FromQuery] EmployersSubmitModel submitModel, CancellationToken cancellationToken)
     {
-        if(TempData.ContainsKey(TempDataKeys.PermissionsRequestId))
+        if (TempData.ContainsKey(TempDataKeys.PermissionsRequestId))
         {
             TempData.Remove(TempDataKeys.PermissionsRequestId);
         }
@@ -60,18 +59,10 @@ public class EmployersController(IOuterApiClient _outerApiclient, IOptions<Appli
             var newEmployer = (EmployerPermissionViewModel)employer;
             if (newEmployer.HasPendingRequest)
             {
-                Response<GetRequestsByRequestIdResponse> response = await
-                    _outerApiclient.GetRequestByRequestId((Guid)employer.RequestId!, cancellationToken);
-
-                if (string.Equals(response.GetContent().RequestType, RequestType.AddAccount.ToString(), StringComparison.CurrentCultureIgnoreCase) ||
-                    string.Equals(response.GetContent().RequestType, RequestType.CreateAccount.ToString(), StringComparison.CurrentCultureIgnoreCase))
-                {
-                    newEmployer.EmployerDetailsUrl = Url.RouteUrl(RouteNames.EmployerDetailsByRequestId,
-                        new { ukprn, response.GetContent().RequestId })!;
-                }
+                newEmployer.EmployerDetailsUrl = Url.RouteUrl(RouteNames.EmployerDetailsByRequestId,
+                    new { ukprn, employer.RequestId })!;
             }
-
-            if (newEmployer.EmployerDetailsUrl == null)
+            else
             {
                 newEmployer.EmployerDetailsUrl =
                     Url.RouteUrl(RouteNames.EmployerDetails,

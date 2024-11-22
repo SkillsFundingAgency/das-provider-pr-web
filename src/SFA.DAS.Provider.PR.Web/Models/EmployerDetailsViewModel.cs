@@ -4,16 +4,6 @@ using SFA.DAS.Provider.PR.Web.Constants;
 namespace SFA.DAS.Provider.PR.Web.Models;
 public class EmployerDetailsViewModel
 {
-    public const string PendingAddTrainingProviderAndPermissionsRequestText = "Add training provider and permissions request sent";
-    public const string PendingCreateAccountInvitationText = "Create apprenticeship service account invitation sent";
-    public const string CreateOrAddAccountRequestAcceptedText = "Apprenticeship service account created";
-    public const string UpdatePermissionRequestSentText = "Permissions request sent";
-    public const string PermissionSetText = "Permissions set";
-    public const string UpdatePermissionRequestDeclinedText = "Permissions request declined";
-    public const string UpdatePermissionRequestExpiredText = "Permissions request expired";
-    public const string RelationshipByRecruitText = "Added you as training provider for new apprentice vacancy";
-    public const string RelationshipByApprovalText = "Added you as training provider for new apprentice";
-
     public long AccountLegalEntityId { get; set; }
 
     public string AccountLegalEntityPublicHashedId { get; set; } = null!;
@@ -103,80 +93,6 @@ public class EmployerDetailsViewModel
     {
         return response.LastRequestOperations != null && response.LastRequestOperations.Length != 0
             && (response.LastRequestStatus == RequestStatus.Sent || response.LastRequestStatus == RequestStatus.New);
-    }
-
-    private static bool IsLastActionCreateAccount(GetProviderRelationshipResponse response)
-    {
-        return response.LastAction == PermissionAction.AccountCreated;
-    }
-
-    private static bool IsLastActionAccountAdded(GetProviderRelationshipResponse response)
-    {
-        return response.LastAction == PermissionAction.AccountAdded;
-    }
-
-    private static string SetLastActionText(GetProviderRelationshipResponse response)
-    {
-        if (IsLastActionCreateAccount(response) && !string.Equals(response.LastRequestType, "Permission", StringComparison.CurrentCultureIgnoreCase))
-        {
-            return CreateOrAddAccountRequestAcceptedText;
-        }
-
-        if (IsLastActionAccountAdded(response) && !string.Equals(response.LastRequestType, "Permission", StringComparison.CurrentCultureIgnoreCase))
-        {
-            return PermissionSetText;
-        }
-
-        if (string.Equals(response.LastRequestType, "Permission", StringComparison.CurrentCultureIgnoreCase))
-        {
-            if (response.LastRequestStatus == RequestStatus.Sent || response.LastRequestStatus == RequestStatus.New)
-            {
-                return response.LastAction == PermissionAction.PermissionCreated ?
-                    PendingAddTrainingProviderAndPermissionsRequestText :
-                    UpdatePermissionRequestSentText;
-            }
-
-            return response.LastRequestStatus switch
-            {
-                RequestStatus.Accepted => PermissionSetText,
-                RequestStatus.Declined => UpdatePermissionRequestDeclinedText,
-                RequestStatus.Expired => UpdatePermissionRequestExpiredText,
-                _ => string.Empty
-            };
-        }
-
-        var statuses = new List<PermissionAction>() { PermissionAction.RecruitRelationship, PermissionAction.ApprovalsRelationship };
-
-        if (string.Equals(response.LastRequestType, "AddAccount") && response.LastRequestStatus == RequestStatus.Accepted && !statuses.Contains(response.LastAction!.Value))
-        {
-            return PermissionSetText;
-        }
-
-        if (response.LastAction is not null && statuses.Contains(response.LastAction.Value))
-        {
-            switch (response.LastAction)
-            {
-                case PermissionAction.RecruitRelationship:
-                    {
-                        return RelationshipByRecruitText;
-                    }
-                case PermissionAction.ApprovalsRelationship:
-                    {
-                        return RelationshipByApprovalText;
-                    }
-            }
-        }
-
-        return string.Empty;
-    }
-
-    private static string SetLastActionText(GetRequestsByRequestIdResponse response)
-    {
-        if (String.Equals(response.RequestType, "AddAccount", StringComparison.CurrentCultureIgnoreCase))
-            return PendingAddTrainingProviderAndPermissionsRequestText;
-        if (String.Equals(response.RequestType, "CreateAccount", StringComparison.CurrentCultureIgnoreCase))
-            return PendingCreateAccountInvitationText;
-        return string.Empty;
     }
 
     private static bool SetHasExistingPermissions(GetProviderRelationshipResponse response)

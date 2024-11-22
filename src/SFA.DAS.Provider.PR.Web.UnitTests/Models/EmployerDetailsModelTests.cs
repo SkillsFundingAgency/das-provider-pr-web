@@ -2,6 +2,7 @@
 using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
 using SFA.DAS.Provider.PR.Web.Constants;
 using SFA.DAS.Provider.PR.Web.Models;
+using SFA.DAS.Provider.PR.Web.Services;
 
 namespace SFA.DAS.Provider.PR_Web.UnitTests.Models;
 public class EmployerDetailsModelTests
@@ -42,7 +43,7 @@ public class EmployerDetailsModelTests
         response.LastAction = PermissionAction.RecruitRelationship;
 
         var actual = (EmployerDetailsViewModel)response;
-        Assert.That(actual.LastActionText, Is.EqualTo(EmployerDetailsViewModel.RelationshipByRecruitText));
+        Assert.That(actual.LastActionText, Is.EqualTo(EmployerDetailsMappingService.RelationshipByRecruitText));
     }
 
     [Test, AutoData]
@@ -53,7 +54,7 @@ public class EmployerDetailsModelTests
         response.LastAction = PermissionAction.ApprovalsRelationship;
 
         var actual = (EmployerDetailsViewModel)response;
-        Assert.That(actual.LastActionText, Is.EqualTo(EmployerDetailsViewModel.RelationshipByApprovalText));
+        Assert.That(actual.LastActionText, Is.EqualTo(EmployerDetailsMappingService.RelationshipByApprovalText));
     }
 
     [Test, AutoData]
@@ -159,16 +160,16 @@ public class EmployerDetailsModelTests
     }
 
     [Test]
-    [InlineAutoData(RequestStatus.Sent, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsViewModel.UpdatePermissionRequestSentText)]
-    [InlineAutoData(RequestStatus.Sent, PermissionAction.AccountAdded, CreateAccountRequestType, EmployerDetailsViewModel.PermissionSetText)]
-    [InlineAutoData(RequestStatus.Sent, PermissionAction.AccountCreated, CreateAccountRequestType, EmployerDetailsViewModel.CreateOrAddAccountRequestAcceptedText)]
-    [InlineAutoData(RequestStatus.Accepted, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsViewModel.PermissionSetText)]
-    [InlineAutoData(RequestStatus.Declined, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsViewModel.UpdatePermissionRequestDeclinedText)]
-    [InlineAutoData(RequestStatus.Expired, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsViewModel.UpdatePermissionRequestExpiredText)]
-    [InlineAutoData(RequestStatus.Accepted, PermissionAction.AccountCreated, CreateAccountRequestType, EmployerDetailsViewModel.CreateOrAddAccountRequestAcceptedText)]
-    [InlineAutoData(RequestStatus.Accepted, PermissionAction.RecruitRelationship, AddAccountRequestType, EmployerDetailsViewModel.RelationshipByRecruitText)]
-    [InlineAutoData(RequestStatus.Accepted, PermissionAction.ApprovalsRelationship, AddAccountRequestType, EmployerDetailsViewModel.RelationshipByApprovalText)]
-    [InlineAutoData(RequestStatus.Accepted, PermissionAction.AccountAdded, AddAccountRequestType, EmployerDetailsViewModel.PermissionSetText)]
+    [InlineAutoData(RequestStatus.Sent, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsMappingService.UpdatePermissionRequestSentText)]
+    [InlineAutoData(RequestStatus.Sent, PermissionAction.AccountAdded, CreateAccountRequestType, EmployerDetailsMappingService.PermissionSetText)]
+    [InlineAutoData(RequestStatus.Sent, PermissionAction.AccountCreated, CreateAccountRequestType, EmployerDetailsMappingService.CreateOrAddAccountRequestAcceptedText)]
+    [InlineAutoData(RequestStatus.Accepted, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsMappingService.PermissionSetText)]
+    [InlineAutoData(RequestStatus.Declined, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsMappingService.UpdatePermissionRequestDeclinedText)]
+    [InlineAutoData(RequestStatus.Expired, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsMappingService.UpdatePermissionRequestExpiredText)]
+    [InlineAutoData(RequestStatus.Accepted, PermissionAction.AccountCreated, CreateAccountRequestType, EmployerDetailsMappingService.CreateOrAddAccountRequestAcceptedText)]
+    [InlineAutoData(RequestStatus.Accepted, PermissionAction.RecruitRelationship, AddAccountRequestType, EmployerDetailsMappingService.RelationshipByRecruitText)]
+    [InlineAutoData(RequestStatus.Accepted, PermissionAction.ApprovalsRelationship, AddAccountRequestType, EmployerDetailsMappingService.RelationshipByApprovalText)]
+    [InlineAutoData(RequestStatus.Accepted, PermissionAction.AccountAdded, AddAccountRequestType, EmployerDetailsMappingService.PermissionSetText)]
 
     public void LastActionTextIsSetCorrectly_WhenExistingRelationshipExists(RequestStatus status, PermissionAction action, string lastRequestType, string expected,
         GetProviderRelationshipResponse response)
@@ -183,8 +184,8 @@ public class EmployerDetailsModelTests
     }
 
     [Test]
-    [InlineAutoData("AddAccount", EmployerDetailsViewModel.PendingAddTrainingProviderAndPermissionsRequestText)]
-    [InlineAutoData("CreateAccount", EmployerDetailsViewModel.PendingCreateAccountInvitationText)]
+    [InlineAutoData("AddAccount", EmployerDetailsMappingService.PendingAddTrainingProviderAndPermissionsRequestText)]
+    [InlineAutoData("CreateAccount", EmployerDetailsMappingService.PendingCreateAccountInvitationText)]
     public void LastActionTextIsSetCorrectly_WhenExistingDoesNotRelationshipExist(string lastRequestType, string expected,
         GetRequestsByRequestIdResponse response)
     {
