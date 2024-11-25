@@ -14,27 +14,19 @@ public static class EmployerDetailsMappingService
     public const string RelationshipByRecruitText = "Added you as training provider for new apprentice vacancy";
     public const string RelationshipByApprovalText = "Added you as training provider for new apprentice";
 
+    public const string RequestTypeAddAccount = "AddAccount";
+    public const string RequestTypeCreateAccount = "CreateAccount";
+    public const string RequestTypePermission = "Permission";
+
     public static string MapLastActionTextByAccountLegalEntityId(GetProviderRelationshipResponse response)
     {
-        if (response.LastAction == PermissionAction.AccountAdded && !string.Equals(response.LastRequestType, "Permission", StringComparison.CurrentCultureIgnoreCase))
-        {
+        if (response.LastRequestType != RequestTypePermission && response.LastAction == PermissionAction.AccountCreated)
             return CreateOrAddAccountRequestAcceptedText;
-        }
-
-        if (response.LastAction == PermissionAction.AccountAdded && !string.Equals(response.LastRequestType, "Permission", StringComparison.CurrentCultureIgnoreCase))
-        {
+        if (response.LastRequestType != RequestTypePermission && response.LastAction == PermissionAction.AccountAdded)
             return PermissionSetText;
-        }
 
-        if (string.Equals(response.LastRequestType, "Permission", StringComparison.CurrentCultureIgnoreCase))
+        if (response.LastRequestType == RequestTypePermission)
         {
-            if (response.LastRequestStatus == RequestStatus.Sent || response.LastRequestStatus == RequestStatus.New)
-            {
-                return response.LastAction == PermissionAction.PermissionCreated ?
-                    PendingAddTrainingProviderAndPermissionsRequestText :
-                    UpdatePermissionRequestSentText;
-            }
-
             return response.LastRequestStatus switch
             {
                 RequestStatus.Accepted => PermissionSetText,
@@ -44,26 +36,20 @@ public static class EmployerDetailsMappingService
             };
         }
 
-        var statuses = new List<PermissionAction>() { PermissionAction.RecruitRelationship, PermissionAction.ApprovalsRelationship };
+        var existingRelationshipStatuses = new List<PermissionAction>() { PermissionAction.RecruitRelationship, PermissionAction.ApprovalsRelationship };
 
-        if (string.Equals(response.LastRequestType, "AddAccount") && response.LastRequestStatus == RequestStatus.Accepted && !statuses.Contains(response.LastAction!.Value))
+        if (response.LastRequestType == RequestTypeAddAccount && response.LastRequestStatus == RequestStatus.Accepted && !existingRelationshipStatuses.Contains(response.LastAction!.Value))
         {
             return PermissionSetText;
         }
 
-        if (response.LastAction is not null && statuses.Contains(response.LastAction.Value))
+        if (response.LastAction is not null && existingRelationshipStatuses.Contains(response.LastAction.Value))
         {
-            switch (response.LastAction)
+            return response.LastAction switch
             {
-                case PermissionAction.RecruitRelationship:
-                    {
-                        return RelationshipByRecruitText;
-                    }
-                case PermissionAction.ApprovalsRelationship:
-                    {
-                        return RelationshipByApprovalText;
-                    }
-            }
+                PermissionAction.RecruitRelationship => RelationshipByRecruitText,
+                PermissionAction.ApprovalsRelationship => RelationshipByApprovalText
+            };
         }
 
         return string.Empty;
@@ -71,10 +57,14 @@ public static class EmployerDetailsMappingService
 
     public static string MapLastActionTextByRequestId(GetRequestsByRequestIdResponse response)
     {
-        if (String.Equals(response.RequestType, "AddAccount", StringComparison.CurrentCultureIgnoreCase))
-            return PendingAddTrainingProviderAndPermissionsRequestText;
-        if (String.Equals(response.RequestType, "CreateAccount", StringComparison.CurrentCultureIgnoreCase))
-            return PendingCreateAccountInvitationText;
-        return string.Empty;
+        return response.RequestType switch
+        {
+            RequestTypeAddAccount => PendingAddTrainingProviderAndPermissionsRequestText,
+            RequestTypeCreateAccount => PendingCreateAccountInvitationText,
+            RequestTypePermission => response.Operations.Length == 0
+                ? PendingAddTrainingProviderAndPermissionsRequestText
+                : UpdatePermissionRequestSentText,
+            _ => string.Empty
+        };
     }
 }

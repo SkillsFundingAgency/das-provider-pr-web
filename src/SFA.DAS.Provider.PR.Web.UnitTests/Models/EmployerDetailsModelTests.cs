@@ -2,7 +2,6 @@
 using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
 using SFA.DAS.Provider.PR.Web.Constants;
 using SFA.DAS.Provider.PR.Web.Models;
-using SFA.DAS.Provider.PR.Web.Services;
 
 namespace SFA.DAS.Provider.PR_Web.UnitTests.Models;
 public class EmployerDetailsModelTests
@@ -33,28 +32,6 @@ public class EmployerDetailsModelTests
             Assert.That(actual.LastRequestOperations, Is.EqualTo(Array.Empty<Operation>()));
             Assert.That(actual.HasPermissionsRequest, Is.False);
         });
-    }
-
-    [Test, AutoData]
-    public void EmployerDetailsViewModel_LastActionText_ExistingRecruitRelationshipText(GetProviderRelationshipResponse response)
-    {
-        response.LastRequestOperations = Array.Empty<Operation>();
-        response.LastRequestStatus = RequestStatus.Declined;
-        response.LastAction = PermissionAction.RecruitRelationship;
-
-        var actual = (EmployerDetailsViewModel)response;
-        Assert.That(actual.LastActionText, Is.EqualTo(EmployerDetailsMappingService.RelationshipByRecruitText));
-    }
-
-    [Test, AutoData]
-    public void EmployerDetailsViewModel_LastActionText_ExistingApprovalsRelationshipText(GetProviderRelationshipResponse response)
-    {
-        response.LastRequestOperations = Array.Empty<Operation>();
-        response.LastRequestStatus = RequestStatus.Declined;
-        response.LastAction = PermissionAction.ApprovalsRelationship;
-
-        var actual = (EmployerDetailsViewModel)response;
-        Assert.That(actual.LastActionText, Is.EqualTo(EmployerDetailsMappingService.RelationshipByApprovalText));
     }
 
     [Test, AutoData]
@@ -157,43 +134,6 @@ public class EmployerDetailsModelTests
         var actual = (EmployerDetailsViewModel)response;
 
         Assert.That(actual.LastRequestOperations, Is.EqualTo(response.LastRequestOperations));
-    }
-
-    [Test]
-    [InlineAutoData(RequestStatus.Sent, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsMappingService.UpdatePermissionRequestSentText)]
-    [InlineAutoData(RequestStatus.Sent, PermissionAction.AccountAdded, CreateAccountRequestType, EmployerDetailsMappingService.PermissionSetText)]
-    [InlineAutoData(RequestStatus.Sent, PermissionAction.AccountCreated, CreateAccountRequestType, EmployerDetailsMappingService.CreateOrAddAccountRequestAcceptedText)]
-    [InlineAutoData(RequestStatus.Accepted, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsMappingService.PermissionSetText)]
-    [InlineAutoData(RequestStatus.Declined, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsMappingService.UpdatePermissionRequestDeclinedText)]
-    [InlineAutoData(RequestStatus.Expired, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsMappingService.UpdatePermissionRequestExpiredText)]
-    [InlineAutoData(RequestStatus.Accepted, PermissionAction.AccountCreated, CreateAccountRequestType, EmployerDetailsMappingService.CreateOrAddAccountRequestAcceptedText)]
-    [InlineAutoData(RequestStatus.Accepted, PermissionAction.RecruitRelationship, AddAccountRequestType, EmployerDetailsMappingService.RelationshipByRecruitText)]
-    [InlineAutoData(RequestStatus.Accepted, PermissionAction.ApprovalsRelationship, AddAccountRequestType, EmployerDetailsMappingService.RelationshipByApprovalText)]
-    [InlineAutoData(RequestStatus.Accepted, PermissionAction.AccountAdded, AddAccountRequestType, EmployerDetailsMappingService.PermissionSetText)]
-
-    public void LastActionTextIsSetCorrectly_WhenExistingRelationshipExists(RequestStatus status, PermissionAction action, string lastRequestType, string expected,
-        GetProviderRelationshipResponse response)
-    {
-        response.LastRequestStatus = status;
-        response.LastAction = action;
-        response.LastRequestType = lastRequestType;
-
-        var actual = (EmployerDetailsViewModel)response;
-
-        Assert.That(actual.LastActionText, Is.EqualTo(expected));
-    }
-
-    [Test]
-    [InlineAutoData("AddAccount", EmployerDetailsMappingService.PendingAddTrainingProviderAndPermissionsRequestText)]
-    [InlineAutoData("CreateAccount", EmployerDetailsMappingService.PendingCreateAccountInvitationText)]
-    public void LastActionTextIsSetCorrectly_WhenExistingDoesNotRelationshipExist(string lastRequestType, string expected,
-        GetRequestsByRequestIdResponse response)
-    {
-        response.RequestType = lastRequestType;
-
-        var actual = (EmployerDetailsViewModel)response;
-
-        Assert.That(actual.LastActionText, Is.EqualTo(expected));
     }
 
     [Test]

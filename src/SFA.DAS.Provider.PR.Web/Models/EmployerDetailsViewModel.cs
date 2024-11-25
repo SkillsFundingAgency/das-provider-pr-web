@@ -49,7 +49,6 @@ public class EmployerDetailsViewModel
             ProviderName = response.ProviderName.ToUpper(),
             Operations = response.Operations,
             LastRequestOperations = SetLastRequestOperations(response),
-            LastActionText = SetLastActionText(response),
             HasPermissionsRequest = SetHasPermissionsRequest(response),
             HasExistingPermissions = SetHasExistingPermissions(response)
         };
@@ -65,7 +64,6 @@ public class EmployerDetailsViewModel
             ProviderName = response.ProviderName.ToUpper(),
             Operations = Array.Empty<Operation>(),
             LastRequestOperations = response.Operations,
-            LastActionText = SetLastActionText(response),
             HasPermissionsRequest = true,
             HasExistingPermissions = false,
             ShowAgreementId = SetShowAgreementId(response)
