@@ -53,6 +53,42 @@ public class ContactDetailsControllerPostTests
     }
 
     [Test, MoqAutoData]
+    public void Post_NamesAreTrimmed(
+        Mock<IValidator<ContactDetailsSubmitModel>> validatorMock,
+        Mock<ISessionService> sessionServiceMock,
+        int ukprn,
+        string firstName,
+        string lastName,
+        CancellationToken cancellationToken)
+    {
+        ContactDetailsSubmitModel contactDetailsSubmitModel = new()
+        {
+            FirstName = $" {firstName}",
+            LastName = $"{lastName} "
+        };
+
+        var sessionModel = new AddEmployerSessionModel { Email = Email };
+
+        sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(sessionModel);
+
+        validatorMock.Setup(v => v.Validate(It.IsAny<ContactDetailsSubmitModel>())).Returns(new ValidationResult());
+
+        ContactDetailsController sut = new(sessionServiceMock.Object, validatorMock.Object);
+
+        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
+
+        sut.Index(ukprn, contactDetailsSubmitModel, cancellationToken);
+
+        sessionModel.FirstName = firstName;
+        sessionModel.LastName = lastName;
+
+        sessionServiceMock.Verify(x => x.Set(It.Is<AddEmployerSessionModel>
+            (x => x.FirstName == firstName)), Times.Once);
+        sessionServiceMock.Verify(x => x.Set(It.Is<AddEmployerSessionModel>
+            (x => x.LastName == lastName)), Times.Once);
+    }
+
+    [Test, MoqAutoData]
     public void Post_SessionModelNotFound_RedirectedToStart(
         Mock<IValidator<ContactDetailsSubmitModel>> validatorMock,
         Mock<ISessionService> sessionServiceMock,

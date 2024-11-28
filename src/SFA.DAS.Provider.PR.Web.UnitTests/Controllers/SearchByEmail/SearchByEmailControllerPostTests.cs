@@ -4,6 +4,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using SFA.DAS.Encoding;
 using SFA.DAS.Provider.PR.Domain.Interfaces;
 using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
 using SFA.DAS.Provider.PR.Web.Controllers.AddEmployer;
@@ -89,6 +90,35 @@ public class SearchByEmailControllerPostTests
     }
 
     [Test, MoqAutoData]
+    public async Task Post_HasActiveRequest_EmailIsTrimmedInSessionModel(
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<IValidator<SearchByEmailSubmitModel>> validatorMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Frozen] Mock<IEncodingService> encodingServiceMock,
+        int ukprn,
+        SearchByEmailSubmitModel searchByEmailSubmitModel,
+        GetRelationshipByEmailResponse getRelationshipByEmailResponse,
+        CancellationToken cancellationToken
+    )
+    {
+        searchByEmailSubmitModel.Email = $" {Email} ";
+        getRelationshipByEmailResponse.HasActiveRequest = true;
+
+        var sessionModel = new AddEmployerSessionModel { Email = Email };
+
+        outerApiClientMock.Setup(x => x.GetRelationshipByEmail(_emailCallingRelationships, ukprn, cancellationToken)).ReturnsAsync(getRelationshipByEmailResponse);
+
+        validatorMock.Setup(v => v.Validate(It.IsAny<SearchByEmailSubmitModel>())).Returns(new ValidationResult());
+
+        var sut = new SearchByEmailController(outerApiClientMock.Object, sessionServiceMock.Object,
+            encodingServiceMock.Object, validatorMock.Object);
+
+        await sut.Index(ukprn, searchByEmailSubmitModel, cancellationToken);
+
+        sessionServiceMock.Verify(x => x.Set(It.Is<AddEmployerSessionModel>(x => x.Email == Email)), Times.Once);
+    }
+
+    [Test, MoqAutoData]
     public async Task Post_SingleAccountsHasNoRelationship_ReturnsExpectedViewModelAndPath(
         [Frozen] Mock<IOuterApiClient> outerApiClientMock,
         [Frozen] Mock<IValidator<SearchByEmailSubmitModel>> validatorMock,
@@ -163,6 +193,40 @@ public class SearchByEmailControllerPostTests
         viewModel.BackLink.Should().Be(BackLink);
         viewModel.CancelLink.Should().Be(CancelLink);
         viewModel.Email.Should().Be(Email);
+    }
+
+    [Test, MoqAutoData]
+    public async Task Post_Invalid_EmailisTrimmed(
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<IValidator<SearchByEmailSubmitModel>> validatorMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Greedy] SearchByEmailController sut,
+        int ukprn,
+        SearchByEmailSubmitModel searchByEmailSubmitModel,
+        GetRelationshipByEmailResponse getRelationshipByEmailResponse,
+        CancellationToken cancellationToken
+    )
+    {
+        searchByEmailSubmitModel.Email = $" {Email} ";
+        getRelationshipByEmailResponse.HasActiveRequest = false;
+        getRelationshipByEmailResponse.HasUserAccount = true;
+        getRelationshipByEmailResponse.HasOneEmployerAccount = true;
+        getRelationshipByEmailResponse.HasOneLegalEntity = true;
+
+        outerApiClientMock.Setup(x => x.GetRelationshipByEmail(_emailCallingRelationships, ukprn, cancellationToken)).ReturnsAsync(getRelationshipByEmailResponse);
+
+        validatorMock.Setup(m => m.Validate(It.IsAny<SearchByEmailSubmitModel>())).Returns(new ValidationResult(new List<ValidationFailure>()
+        {
+            new("TestField","Test Message") { ErrorCode = "1001"}
+        }));
+
+        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
+
+        var result = await sut.Index(ukprn, searchByEmailSubmitModel, cancellationToken);
+
+        ViewResult? viewResult = result.As<ViewResult>();
+        SearchByEmailModel? viewModel = viewResult.Model as SearchByEmailModel;
+        viewModel!.Email.Should().Be(Email);
     }
 
     [Test]
