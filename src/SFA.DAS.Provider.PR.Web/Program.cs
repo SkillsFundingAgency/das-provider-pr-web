@@ -45,6 +45,7 @@ builder.Services
     })
     .AddSessionStateTempDataProvider()
     .SetDefaultNavigationSection(NavigationSection.Home)
+    .EnableGoogleAnalytics()
     .SetDfESignInConfiguration(true);
 
 #if DEBUG
