@@ -53,6 +53,8 @@ public class ContactDetailsController(ISessionService _sessionService, IValidato
             return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
         }
 
+        submitModel.FirstName = submitModel.FirstName!.Trim();
+        submitModel.LastName = submitModel.LastName!.Trim();
         var result = _validator.Validate(submitModel);
 
         if (!result.IsValid)
