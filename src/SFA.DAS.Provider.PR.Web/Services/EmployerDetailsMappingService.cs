@@ -48,7 +48,8 @@ public static class EmployerDetailsMappingService
             return response.LastAction switch
             {
                 PermissionAction.RecruitRelationship => RelationshipByRecruitText,
-                PermissionAction.ApprovalsRelationship => RelationshipByApprovalText
+                PermissionAction.ApprovalsRelationship => RelationshipByApprovalText,
+                _ => string.Empty
             };
         }
 

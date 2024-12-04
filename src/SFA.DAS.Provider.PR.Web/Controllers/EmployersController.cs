@@ -41,7 +41,7 @@ public class EmployersController(IOuterApiClient _outerApiclient, IOptions<Appli
                 Pagination = new(response.TotalCount, pageSize, Url, RouteNames.Employers, submitModel.ConvertToDictionary()),
                 ClearFiltersLink = Url.RouteUrl(RouteNames.Employers, new { ukprn })!,
                 AddEmployerLink = Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn })!,
-                Employers = await BuildEmployers(response.Employers.ToList(), ukprn, cancellationToken),
+                Employers = BuildEmployers(response.Employers.ToList(), ukprn),
                 TotalCount = "employer".ToQuantity(response.TotalCount)
             };
 
@@ -51,7 +51,7 @@ public class EmployersController(IOuterApiClient _outerApiclient, IOptions<Appli
         return View(NoRelationshipsHomePage, new NoRelationshipsHomeViewModel(Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn })!));
     }
 
-    private async Task<List<EmployerPermissionViewModel>> BuildEmployers(List<ProviderRelationshipModel> employers, long ukprn, CancellationToken cancellationToken)
+    private List<EmployerPermissionViewModel> BuildEmployers(List<ProviderRelationshipModel> employers, long ukprn)
     {
         var employerList = new List<EmployerPermissionViewModel>();
         foreach (var employer in employers)
