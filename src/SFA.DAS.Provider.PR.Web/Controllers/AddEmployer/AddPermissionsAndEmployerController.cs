@@ -83,6 +83,7 @@ public class AddPermissionsAndEmployerController(IOuterApiClient _outerApiClient
             AccountId = sessionModel.AccountId!.Value,
             AccountLegalEntityId = sessionModel.AccountLegalEntityId.Value,
             EmployerContactEmail = sessionModel.Email,
+            Paye = sessionModel.Paye,
             Operations = operations,
             RequestedBy = userRef!,
             Ukprn = ukprn
