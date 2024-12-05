@@ -90,11 +90,11 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
 
         bool? hasActiveRequest = relationshipsRequest.HasActiveRequest;
 
-        if (hasActiveRequest is true)
-        {
-            var requestResponse = await _outerApiClient.GetRequest(ukprn, sessionModel.Paye, cancellationToken);
+        var getRequestResponse = await _outerApiClient.GetRequest(ukprn, sessionModel.Paye!, cancellationToken);
 
-            var request = requestResponse.GetContent();
+        if (hasActiveRequest is true || getRequestResponse.ResponseMessage.IsSuccessStatusCode)
+        {
+            var request = getRequestResponse.GetContent();
             if (request.AccountLegalEntityId != null)
             {
                 sessionModel.AccountLegalEntityId = request.AccountLegalEntityId!.Value;
@@ -158,7 +158,7 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
 
         var request = requestResponse.GetContent();
 
-        if (!requestResponse.ResponseMessage.IsSuccessStatusCode || request.RequestType != createAccount)
+        if (!requestResponse.ResponseMessage.IsSuccessStatusCode)
         {
             return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
         }
@@ -170,7 +170,7 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
         long? accountLegalEntityId = sessionModel.AccountLegalEntityId;
 
         string employerAccountLink;
-        if (accountLegalEntityId != null)
+        if (accountLegalEntityId != null && request.RequestType == createAccount)
         {
             var accountLegalEntityIdEncoded = encodingService.Encode(accountLegalEntityId.Value, EncodingType.PublicAccountLegalEntityId);
             employerAccountLink = Url.RouteUrl(RouteNames.EmployerDetails, new { ukprn, accountLegalEntityId = accountLegalEntityIdEncoded })!;
