@@ -190,9 +190,8 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
 
     private SearchByEmailModel GetViewModel(int ukprn)
     {
-        var cancelLink = Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn });
         var backLink = Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn });
-        return new SearchByEmailModel { CancelLink = cancelLink!, BackLink = backLink!, Ukprn = ukprn };
+        return new SearchByEmailModel { BackLink = backLink!, Ukprn = ukprn };
     }
 
     private static bool HasMultipleAccounts(GetRelationshipByEmailResponse response)
