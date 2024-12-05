@@ -32,10 +32,10 @@
             <div esfa-validation-marker-for="@Model.Email" class="govuk-form-group">
                 <span asp-validation-for="Email" class="govuk-error-message"></span>
                 <div class="govuk-body" id="email">
-                    <label class="govuk-label" for="email">
+                    <label id="email-label" class="govuk-label" for="email-input">
                         <strong>Employer email address</strong>
                     </label>
-                    <input asp-for="Email" class="govuk-input"  name="email" type="text" spellcheck="false" aria-describedby="email-hint" autocomplete="email" sfa-validationerror-class="form-control-error" maxlength="254">
+                    <input id="email-input" asp-for="Email" class="govuk-input" name="email" type="text" spellcheck="false" aria-describedby="email-label" autocomplete="email" sfa-validationerror-class="form-control-error" maxlength="254">
                 </div>
             </div>
             <div class="govuk-button-group">
