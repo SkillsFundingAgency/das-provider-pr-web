@@ -65,6 +65,17 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
 
         var relationshipByEmail = await _outerApiClient.GetRelationshipByEmail(submitModel.Email!, ukprn, cancellationToken);
 
+        if (relationshipByEmail.Paye != null)
+        {
+            var getRequestResponse = await _outerApiClient.GetRequest(ukprn, relationshipByEmail.Paye, cancellationToken);
+            if (getRequestResponse.ResponseMessage.IsSuccessStatusCode)
+            {
+                sessionModel.Paye = relationshipByEmail.Paye;
+                _sessionService.Set(sessionModel);
+                return RedirectToRoute(RouteNames.AddEmployerInvitationAlreadySent, new { ukprn });
+            }
+        }
+
         if (relationshipByEmail.HasActiveRequest)
         {
             return RedirectToRoute(RouteNames.EmailSearchInviteAlreadySent, new { ukprn });
@@ -84,6 +95,7 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
 
         sessionModel.AccountLegalEntityId = relationshipByEmail.AccountLegalEntityId;
         sessionModel.AccountLegalEntityName = relationshipByEmail.AccountLegalEntityName;
+        sessionModel.Paye = relationshipByEmail.Paye;
         sessionModel.AccountId = relationshipByEmail.AccountId;
 
         _sessionService.Set(sessionModel);

@@ -140,6 +140,7 @@ public class AddPermissionsAndEmployerControllerGetSentControllerTests
         long accountId,
         long accountLegalEntityId,
         string accountLegalName,
+        string paye,
         CancellationToken cancellationToken)
     {
         var email = "test@test.com";
@@ -151,7 +152,8 @@ public class AddPermissionsAndEmployerControllerGetSentControllerTests
             AccountLegalEntityName = accountLegalName,
             AccountId = accountId,
             PermissionToAddCohorts = addRecordsOperation,
-            PermissionToRecruit = addRecruitmentOperation
+            PermissionToRecruit = addRecruitmentOperation,
+            Paye = paye
         };
 
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(addEmployerSessionModel);
@@ -173,6 +175,7 @@ public class AddPermissionsAndEmployerControllerGetSentControllerTests
             s => s.EmployerContactEmail == email
             && s.AccountLegalEntityId == accountLegalEntityId
             && s.Ukprn == ukprn
+            && s.Paye == paye
           && s.Operations.First() == expectedOperations.First()
         ), cancellationToken), Times.Once);
     }
@@ -190,6 +193,7 @@ public class AddPermissionsAndEmployerControllerGetSentControllerTests
         int ukprn, long accountId,
         long accountLegalEntityId,
         string accountLegalName,
+        string paye,
         CancellationToken cancellationToken)
     {
         var email = "test@test.com";
@@ -201,7 +205,8 @@ public class AddPermissionsAndEmployerControllerGetSentControllerTests
             AccountLegalEntityName = accountLegalName,
             AccountId = accountId,
             PermissionToAddCohorts = addRecordsOperation,
-            PermissionToRecruit = addRecruitmentOperation
+            PermissionToRecruit = addRecruitmentOperation,
+            Paye = paye
         };
 
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(addEmployerSessionModel);
@@ -222,6 +227,7 @@ public class AddPermissionsAndEmployerControllerGetSentControllerTests
             s => s.EmployerContactEmail == email
             && s.AccountLegalEntityId == accountLegalEntityId
             && s.Ukprn == ukprn
+            && s.Paye == paye
           && s.Operations.First() == expectedOperations.First()
         ), cancellationToken), Times.Once);
 

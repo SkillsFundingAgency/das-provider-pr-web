@@ -9,6 +9,7 @@ public class GetRelationshipByEmailResponse
     public string? AccountLegalEntityPublicHashedId { get; set; }
     public long? AccountLegalEntityId { get; set; }
     public string? AccountLegalEntityName { get; set; }
+    public string? Paye { get; set; }
     public bool? HasRelationship { get; set; }
     public List<Operation> Operations { get; set; } = new List<Operation>();
 }
