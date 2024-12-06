@@ -19,7 +19,6 @@ namespace SFA.DAS.Provider.PR_Web.UnitTests.Controllers.SearchByEmail;
 public class SearchByEmailControllerPostTests
 {
     private static readonly string BackLink = Guid.NewGuid().ToString();
-    private static readonly string CancelLink = BackLink;
     private static readonly string RedirectToMultipleAccountsShutterPage = Guid.NewGuid().ToString();
     private static readonly string EmailSearchInviteAlreadySentPage = Guid.NewGuid().ToString();
 
@@ -191,9 +190,50 @@ public class SearchByEmailControllerPostTests
         SearchByEmailModel? viewModel = viewResult.Model as SearchByEmailModel;
         viewModel!.Ukprn.Should().Be(ukprn);
         viewModel.BackLink.Should().Be(BackLink);
-        viewModel.CancelLink.Should().Be(CancelLink);
         viewModel.Email.Should().Be(Email);
     }
+
+    [Test, MoqAutoData]
+    public async Task Post_PostedEmailIsNull_ReturnsValidationErrorOnEmailProperty(
+    [Frozen] Mock<IValidator<SearchByEmailSubmitModel>> validatorMock,
+    [Frozen] Mock<ISessionService> sessionServiceMock,
+    [Greedy] SearchByEmailController sut,
+    int ukprn,
+    SearchByEmailSubmitModel searchByEmailSubmitModel,
+    CancellationToken cancellationToken
+)
+    {
+        searchByEmailSubmitModel.Email = null;
+
+        var validationFailures = new List<ValidationFailure>
+        {
+            new("Email", "Email field is invalid") { ErrorCode = "1001" }
+        };
+
+        validatorMock
+            .Setup(m => m.Validate(It.IsAny<SearchByEmailSubmitModel>()))
+            .Returns(new ValidationResult(validationFailures));
+
+        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
+
+        var result = await sut.Index(ukprn, searchByEmailSubmitModel, cancellationToken);
+
+        var viewResult = result.As<ViewResult>();
+        Assert.That(viewResult, Is.Not.Null);
+
+        var viewModel = viewResult.Model as SearchByEmailModel;
+        Assert.That(viewModel, Is.Not.Null);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(viewModel!.Email, Is.Null);
+
+            var emailError = viewResult.ViewData.ModelState["Email"]?.Errors.FirstOrDefault();
+            Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'Email' field.");
+            Assert.That(emailError!.ErrorMessage, Is.EqualTo("Email field is invalid"));
+        });
+    }
+
 
     [Test, MoqAutoData]
     public async Task Post_Invalid_EmailisTrimmed(
