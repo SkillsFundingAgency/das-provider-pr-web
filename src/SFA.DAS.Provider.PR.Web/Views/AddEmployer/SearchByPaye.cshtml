@@ -36,27 +36,27 @@
             <div esfa-validation-marker-for="@Model.Paye" class="govuk-form-group">
                 <span asp-validation-for="Paye" class="govuk-error-message"></span>
                 <div class="govuk-body" id="paye-container">
-                    <label id="paye-label" class="govuk-label govuk-label--s" for="paye-input">
+                    <label id="paye-label" class="govuk-label govuk-label--s" for="Paye">
                         Employer PAYE reference
                     </label>
-                    <div id="paye-hint" class="govuk-hint">
+                    <label id="PayeHint" class="govuk-hint" for="Paye">
                         This is a 3 digit tax office number, a forward slash, and a tax office employer reference, like 123/AB456.
-                    </div>
-                    <input id="paye-input" aria-labelledby="paye-label paye-hint" asp-for="Paye" class="govuk-input govuk-input--width-20" name="paye" type="text" spellcheck="false" autocomplete="off" sfa-validationerror-class="form-control-error" maxlength="14">
+                    </label>
+                    <input id="Paye" aria-labelledby="PayeLabel PayeHint" asp-for="Paye" class="govuk-input govuk-input--width-20 govuk-!-margin-top-1" name="paye" type="text" spellcheck="false" autocomplete="off" sfa-validationerror-class="form-control-error" maxlength="14">
                 </div>
             </div>
             
             <div esfa-validation-marker-for="@Model.Aorn" class="govuk-form-group">
                 <span asp-validation-for="Aorn" class="govuk-error-message"></span>
                 <div class="govuk-body" id="aorn-container">
-                    <label id="aorn-label" class="govuk-label govuk-label--s" for="aorn-input">
+                    <label id="AornLabel" class="govuk-label govuk-label--s" for="Aorn">
                         Accounts Office reference
                     </label>
-                    <div id="aorn-hint" class="govuk-hint">
+                    <label id="AornHint" class="govuk-hint" for="Aorn">
                         This is 13 characters, like 123PX00123456. The employer can find it on letters from HMRC about PAYE
                         and when they registered as an employer.
-                    </div>
-                    <input id="aorn-input" aria-labelledby="aorn-label aorn-hint" asp-for="Aorn" class="govuk-input govuk-input--width-20" name="aorn" type="text" spellcheck="false" autocomplete="off" sfa-validationerror-class="form-control-error" maxlength="13">
+                    </label>
+                    <input id="Aorn" aria-labelledby="AornLabel AornHint" asp-for="Aorn" class="govuk-input govuk-input--width-20 govuk-!-margin-top-1" name="aorn" type="text" spellcheck="false" autocomplete="off" sfa-validationerror-class="form-control-error" maxlength="13">
                 </div>
             </div>
 
