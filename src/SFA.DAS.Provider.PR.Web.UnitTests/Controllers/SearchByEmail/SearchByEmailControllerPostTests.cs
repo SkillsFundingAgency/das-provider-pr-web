@@ -219,17 +219,17 @@ public class SearchByEmailControllerPostTests
         var result = await sut.Index(ukprn, searchByEmailSubmitModel, cancellationToken);
 
         var viewResult = result.As<ViewResult>();
-        Assert.IsNotNull(viewResult);
+        Assert.That(viewResult, Is.Not.Null);
 
         var viewModel = viewResult.Model as SearchByEmailModel;
-        Assert.IsNotNull(viewModel);
+        Assert.That(viewModel, Is.Not.Null);
 
         Assert.Multiple(() =>
         {
             Assert.That(viewModel!.Email, Is.Null);
 
             var emailError = viewResult.ViewData.ModelState["Email"]?.Errors.FirstOrDefault();
-            Assert.IsNotNull(emailError, "Expected a validation error for the 'Email' field.");
+            Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'Email' field.");
             Assert.That(emailError!.ErrorMessage, Is.EqualTo("Email field is invalid"));
         });
     }
