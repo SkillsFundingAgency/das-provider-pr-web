@@ -194,6 +194,48 @@ public class SearchByEmailControllerPostTests
     }
 
     [Test, MoqAutoData]
+    public async Task Post_PostedEmailIsNull_ReturnsValidationErrorOnEmailProperty(
+    [Frozen] Mock<IValidator<SearchByEmailSubmitModel>> validatorMock,
+    [Frozen] Mock<ISessionService> sessionServiceMock,
+    [Greedy] SearchByEmailController sut,
+    int ukprn,
+    SearchByEmailSubmitModel searchByEmailSubmitModel,
+    CancellationToken cancellationToken
+)
+    {
+        searchByEmailSubmitModel.Email = null;
+
+        var validationFailures = new List<ValidationFailure>
+        {
+            new("Email", "Email field is invalid") { ErrorCode = "1001" }
+        };
+
+        validatorMock
+            .Setup(m => m.Validate(It.IsAny<SearchByEmailSubmitModel>()))
+            .Returns(new ValidationResult(validationFailures));
+
+        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
+
+        var result = await sut.Index(ukprn, searchByEmailSubmitModel, cancellationToken);
+
+        var viewResult = result.As<ViewResult>();
+        Assert.IsNotNull(viewResult);
+
+        var viewModel = viewResult.Model as SearchByEmailModel;
+        Assert.IsNotNull(viewModel);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(viewModel!.Email, Is.Null);
+
+            var emailError = viewResult.ViewData.ModelState["Email"]?.Errors.FirstOrDefault();
+            Assert.IsNotNull(emailError, "Expected a validation error for the 'Email' field.");
+            Assert.That(emailError!.ErrorMessage, Is.EqualTo("Email field is invalid"));
+        });
+    }
+
+
+    [Test, MoqAutoData]
     public async Task Post_Invalid_EmailisTrimmed(
         [Frozen] Mock<IOuterApiClient> outerApiClientMock,
         [Frozen] Mock<IValidator<SearchByEmailSubmitModel>> validatorMock,
