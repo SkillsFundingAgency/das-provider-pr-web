@@ -26,7 +26,7 @@ public class EmployerDetailsController(IOuterApiClient _outerApiclient, IEncodin
             await _outerApiclient.GetProviderRelationship(ukprn, accountLegalEntityIdDecoded, cancellationToken);
 
         EmployerDetailsViewModel model = response;
-        model.LastActionText = EmployerDetailsMappingService.MapLastActionTextByAccountLegalEntityId(response);
+        model.LastActionText = EmployerDetailsMappingService.MapLastActionText(response);
 
         model.EmployersLink = Url.RouteUrl(RouteNames.Employers, new { ukprn })!;
 
@@ -46,7 +46,7 @@ public class EmployerDetailsController(IOuterApiClient _outerApiclient, IEncodin
         }
 
         EmployerDetailsViewModel model = response.GetContent();
-        model.LastActionText = EmployerDetailsMappingService.MapLastActionTextByRequestId(response.GetContent());
+        model.LastActionText = EmployerDetailsMappingService.MapLastActionText(response.GetContent());
 
         model.AccountLegalEntityPublicHashedId =
             encodingService.Encode(model.AccountLegalEntityId, EncodingType.PublicAccountLegalEntityId);

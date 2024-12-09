@@ -18,7 +18,7 @@ public static class EmployerDetailsMappingService
     public const string RequestTypeCreateAccount = "CreateAccount";
     public const string RequestTypePermission = "Permission";
 
-    public static string MapLastActionTextByAccountLegalEntityId(GetProviderRelationshipResponse response)
+    public static string MapLastActionText(GetProviderRelationshipResponse response)
     {
         if (response.LastRequestType != RequestTypePermission && response.LastAction == PermissionAction.AccountCreated)
             return CreateOrAddAccountRequestAcceptedText;
@@ -56,7 +56,7 @@ public static class EmployerDetailsMappingService
         return string.Empty;
     }
 
-    public static string MapLastActionTextByRequestId(GetRequestsByRequestIdResponse response)
+    public static string MapLastActionText(GetRequestsByRequestIdResponse response)
     {
         return response.RequestType switch
         {

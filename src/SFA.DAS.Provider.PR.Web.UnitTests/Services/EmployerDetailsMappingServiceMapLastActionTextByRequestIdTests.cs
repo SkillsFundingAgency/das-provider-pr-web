@@ -21,7 +21,7 @@ public class EmployerDetailsMappingServiceMapLastActionTextByRequestIdTests
         response.Operations = operations;
         response.RequestType = requestType;
 
-        var result = EmployerDetailsMappingService.MapLastActionTextByRequestId(response);
+        var result = EmployerDetailsMappingService.MapLastActionText(response);
 
         Assert.That(result, Is.EqualTo(expected));
     }

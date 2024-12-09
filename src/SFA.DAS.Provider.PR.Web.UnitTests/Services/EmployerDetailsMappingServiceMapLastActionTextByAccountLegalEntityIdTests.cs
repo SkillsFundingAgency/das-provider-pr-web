@@ -33,7 +33,7 @@ public class EmployerDetailsMappingServiceMapLastActionTextByAccountLegalEntityI
         response.LastAction = lastAction;
         response.LastRequestStatus = lastRequestStatus;
 
-        var result = EmployerDetailsMappingService.MapLastActionTextByAccountLegalEntityId(response);
+        var result = EmployerDetailsMappingService.MapLastActionText(response);
 
         Assert.That(result, Is.EqualTo(expected));
     }
