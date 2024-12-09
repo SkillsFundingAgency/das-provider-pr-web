@@ -5,8 +5,9 @@ using SFA.DAS.Provider.PR.Web.Validators;
 namespace SFA.DAS.Provider.PR_Web.UnitTests.Validators;
 public class SearchByEmailSubmitModelValidatorTests
 {
-    [TestCase("test@account.com", "")]
-    [TestCase("test//@account.com", "")]
+    [TestCase("test@google.com", "")]
+    [TestCase("test@btconnect.com", "")]
+    [TestCase("test.test@google.com", "")]
     [TestCase("", SearchByEmailSubmitModelValidator.NoEmailErrorMessage)]
     [TestCase("test", SearchByEmailSubmitModelValidator.InvalidEmailErrorMessage)]
     [TestCase("test test@account.com", SearchByEmailSubmitModelValidator.InvalidEmailErrorMessage)]
