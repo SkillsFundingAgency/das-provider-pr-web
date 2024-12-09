@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using DnsClient;
+using DnsClient.Protocol;
 
 namespace SFA.DAS.Provider.PR.Application.Services;
 public static class EmailCheckingService
@@ -19,15 +20,10 @@ public static class EmailCheckingService
             return false;
         }
 
-        try
-        {
-            var hostEntry = Dns.GetHostEntry(domain);
+        var lookup = new LookupClient();
 
-            return hostEntry.AddressList.Length > 0;
-        }
-        catch
-        {
-            return false;
-        }
+        var results = lookup.Query(domain, QueryType.MX).Answers;
+
+        return results.Any(x => x.RecordType == ResourceRecordType.MX);
     }
 }
