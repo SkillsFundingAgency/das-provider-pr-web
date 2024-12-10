@@ -121,37 +121,167 @@ public class SearchByPayeControllerPostTests
     }
 
     [Test, MoqAutoData]
-    public async Task Post_Invalid_PayeAndAornTrimmed(
-        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
-        [Frozen] Mock<ISessionService> sessionServiceMock,
+    public async Task Post_PayeIsNull_ReturnsValidationError(
         [Frozen] Mock<IValidator<SearchByPayeSubmitModel>> validatorMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
         [Greedy] SearchByPayeController sut,
         int ukprn,
-        string paye,
-        string aorn,
         SearchByPayeSubmitModel searchByPayeSubmitModel,
-        GetRelationshipsByUkprnPayeAornResponse getRelationshipsByUkprnPayeAornResponse,
         CancellationToken cancellationToken
     )
     {
-        searchByPayeSubmitModel.Email = Email;
-        searchByPayeSubmitModel.Paye = $" {paye}";
-        searchByPayeSubmitModel.Aorn = $"{aorn} ";
+        searchByPayeSubmitModel.Paye = null;
 
-        validatorMock.Setup(m => m.Validate(It.IsAny<SearchByPayeSubmitModel>())).Returns(new ValidationResult(new List<ValidationFailure>()
+        var validationFailures = new List<ValidationFailure>
         {
-            new("TestField","Test Message") { ErrorCode = "1001"}
-        }));
+            new("Paye", "Paye field is invalid") { ErrorCode = "1001" }
+        };
 
-        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, CancelLink).AddUrlForRoute(RouteNames.AddEmployerSearchByEmail, BackLink);
+        validatorMock
+            .Setup(m => m.Validate(It.IsAny<SearchByPayeSubmitModel>()))
+            .Returns(new ValidationResult(validationFailures));
+
+        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
 
         var result = await sut.Index(ukprn, searchByPayeSubmitModel, cancellationToken);
 
-        ViewResult? viewResult = result.As<ViewResult>();
-        SearchByPayeModel? viewModel = viewResult.Model as SearchByPayeModel;
+        var viewResult = result.As<ViewResult>();
+        Assert.That(viewResult, Is.Not.Null);
 
-        viewModel!.Paye.Should().Be(paye);
-        viewModel.Aorn.Should().Be(aorn);
+        var viewModel = viewResult.Model as SearchByPayeModel;
+        Assert.That(viewModel, Is.Not.Null);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(viewModel!.Paye, Is.Null);
+
+            var emailError = viewResult.ViewData.ModelState["Paye"]?.Errors.FirstOrDefault();
+            Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'Paye' field.");
+            Assert.That(emailError!.ErrorMessage, Is.EqualTo("Paye field is invalid"));
+        });
+    }
+
+    [Test, MoqAutoData]
+    public async Task Post_PayeIsEmpty_ReturnsValidationError(
+        [Frozen] Mock<IValidator<SearchByPayeSubmitModel>> validatorMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Greedy] SearchByPayeController sut,
+        int ukprn,
+        SearchByPayeSubmitModel searchByPayeSubmitModel,
+        CancellationToken cancellationToken
+    )
+    {
+        searchByPayeSubmitModel.Paye = "  ";
+
+        var validationFailures = new List<ValidationFailure>
+        {
+            new("Paye", "Paye field is invalid") { ErrorCode = "1001" }
+        };
+
+        validatorMock
+            .Setup(m => m.Validate(It.IsAny<SearchByPayeSubmitModel>()))
+            .Returns(new ValidationResult(validationFailures));
+
+        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
+
+        var result = await sut.Index(ukprn, searchByPayeSubmitModel, cancellationToken);
+
+        var viewResult = result.As<ViewResult>();
+        Assert.That(viewResult, Is.Not.Null);
+
+        var viewModel = viewResult.Model as SearchByPayeModel;
+        Assert.That(viewModel, Is.Not.Null);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(viewModel!.Paye, Is.EqualTo(searchByPayeSubmitModel.Paye));
+
+            var emailError = viewResult.ViewData.ModelState["Paye"]?.Errors.FirstOrDefault();
+            Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'Paye' field.");
+            Assert.That(emailError!.ErrorMessage, Is.EqualTo("Paye field is invalid"));
+        });
+    }
+
+    [Test, MoqAutoData]
+    public async Task Post_AornIsNull_ReturnsValidationError(
+        [Frozen] Mock<IValidator<SearchByPayeSubmitModel>> validatorMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Greedy] SearchByPayeController sut,
+        int ukprn,
+        SearchByPayeSubmitModel searchByPayeSubmitModel,
+        CancellationToken cancellationToken
+    )
+    {
+        searchByPayeSubmitModel.Aorn = null;
+
+        var validationFailures = new List<ValidationFailure>
+        {
+            new("Aorn", "Aorn field is invalid") { ErrorCode = "1001" }
+        };
+
+        validatorMock
+            .Setup(m => m.Validate(It.IsAny<SearchByPayeSubmitModel>()))
+            .Returns(new ValidationResult(validationFailures));
+
+        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
+
+        var result = await sut.Index(ukprn, searchByPayeSubmitModel, cancellationToken);
+
+        var viewResult = result.As<ViewResult>();
+        Assert.That(viewResult, Is.Not.Null);
+
+        var viewModel = viewResult.Model as SearchByPayeModel;
+        Assert.That(viewModel, Is.Not.Null);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(viewModel!.Aorn, Is.Null);
+
+            var emailError = viewResult.ViewData.ModelState["Aorn"]?.Errors.FirstOrDefault();
+            Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'Aorn' field.");
+            Assert.That(emailError!.ErrorMessage, Is.EqualTo("Aorn field is invalid"));
+        });
+    }
+
+    [Test, MoqAutoData]
+    public async Task Post_AornIsEmpty_ReturnsValidationError(
+        [Frozen] Mock<IValidator<SearchByPayeSubmitModel>> validatorMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Greedy] SearchByPayeController sut,
+        int ukprn,
+        SearchByPayeSubmitModel searchByPayeSubmitModel,
+        CancellationToken cancellationToken
+    )
+    {
+        searchByPayeSubmitModel.Aorn = "  ";
+
+        var validationFailures = new List<ValidationFailure>
+        {
+            new("Aorn", "Aorn field is invalid") { ErrorCode = "1001" }
+        };
+
+        validatorMock
+            .Setup(m => m.Validate(It.IsAny<SearchByPayeSubmitModel>()))
+            .Returns(new ValidationResult(validationFailures));
+
+        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
+
+        var result = await sut.Index(ukprn, searchByPayeSubmitModel, cancellationToken);
+
+        var viewResult = result.As<ViewResult>();
+        Assert.That(viewResult, Is.Not.Null);
+
+        var viewModel = viewResult.Model as SearchByPayeModel;
+        Assert.That(viewModel, Is.Not.Null);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(viewModel!.Aorn, Is.EqualTo(searchByPayeSubmitModel.Aorn));
+
+            var emailError = viewResult.ViewData.ModelState["Aorn"]?.Errors.FirstOrDefault();
+            Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'Aorn' field.");
+            Assert.That(emailError!.ErrorMessage, Is.EqualTo("Aorn field is invalid"));
+        });
     }
 
     [Test, MoqAutoData]

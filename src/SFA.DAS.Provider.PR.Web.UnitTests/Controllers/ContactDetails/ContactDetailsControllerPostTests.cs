@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using AutoFixture.NUnit3;
+using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
@@ -86,6 +87,174 @@ public class ContactDetailsControllerPostTests
             (x => x.FirstName == firstName)), Times.Once);
         sessionServiceMock.Verify(x => x.Set(It.Is<AddEmployerSessionModel>
             (x => x.LastName == lastName)), Times.Once);
+    }
+
+    [Test, MoqAutoData]
+    public void Post_FirstNameIsNull_ReturnsValidationError(
+        [Frozen] Mock<IValidator<ContactDetailsSubmitModel>> validatorMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Greedy] ContactDetailsController sut,
+        int ukprn,
+        ContactDetailsSubmitModel contactDetailsSubmitModel,
+        CancellationToken cancellationToken
+    )
+    {
+        contactDetailsSubmitModel.FirstName = null;
+
+        sessionServiceMock.Setup(s => 
+            s.Get<AddEmployerSessionModel>()
+        ).Returns(
+            new AddEmployerSessionModel { Email = Email }
+        );
+
+        var validationFailures = new List<ValidationFailure>
+        {
+            new("FirstName", "FirstName field is invalid") { ErrorCode = "1001" }
+        };
+
+        validatorMock
+            .Setup(m => m.Validate(It.IsAny<ContactDetailsSubmitModel>()))
+            .Returns(new ValidationResult(validationFailures));
+
+        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
+
+        var result = sut.Index(ukprn, contactDetailsSubmitModel, cancellationToken);
+
+        var viewResult = result.As<ViewResult>();
+        Assert.That(viewResult, Is.Not.Null);
+
+        Assert.Multiple(() =>
+        {
+            var emailError = viewResult.ViewData.ModelState["FirstName"]?.Errors.FirstOrDefault();
+            Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'FirstName' field.");
+            Assert.That(emailError!.ErrorMessage, Is.EqualTo("FirstName field is invalid"));
+        });
+    }
+
+    [Test, MoqAutoData]
+    public void Post_FirstNameIsEmpty_ReturnsValidationError(
+        [Frozen] Mock<IValidator<ContactDetailsSubmitModel>> validatorMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Greedy] ContactDetailsController sut,
+        int ukprn,
+        ContactDetailsSubmitModel contactDetailsSubmitModel,
+        CancellationToken cancellationToken
+    )
+    {
+        contactDetailsSubmitModel.FirstName = "  ";
+
+        sessionServiceMock.Setup(s =>
+            s.Get<AddEmployerSessionModel>()
+        ).Returns(
+            new AddEmployerSessionModel { Email = Email }
+        );
+
+        var validationFailures = new List<ValidationFailure>
+        {
+            new("FirstName", "FirstName field is invalid") { ErrorCode = "1001" }
+        };
+
+        validatorMock
+            .Setup(m => m.Validate(It.IsAny<ContactDetailsSubmitModel>()))
+            .Returns(new ValidationResult(validationFailures));
+
+        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
+
+        var result = sut.Index(ukprn, contactDetailsSubmitModel, cancellationToken);
+
+        var viewResult = result.As<ViewResult>();
+        Assert.That(viewResult, Is.Not.Null);
+
+        Assert.Multiple(() =>
+        {
+            var emailError = viewResult.ViewData.ModelState["FirstName"]?.Errors.FirstOrDefault();
+            Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'FirstName' field.");
+            Assert.That(emailError!.ErrorMessage, Is.EqualTo("FirstName field is invalid"));
+        });
+    }
+
+    [Test, MoqAutoData]
+    public void Post_LastNameIsNull_ReturnsValidationError(
+        [Frozen] Mock<IValidator<ContactDetailsSubmitModel>> validatorMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Greedy] ContactDetailsController sut,
+        int ukprn,
+        ContactDetailsSubmitModel contactDetailsSubmitModel,
+        CancellationToken cancellationToken
+    )
+    {
+        contactDetailsSubmitModel.LastName = null;
+
+        sessionServiceMock.Setup(s =>
+            s.Get<AddEmployerSessionModel>()
+        ).Returns(
+            new AddEmployerSessionModel { Email = Email }
+        );
+
+        var validationFailures = new List<ValidationFailure>
+        {
+            new("LastName", "LastName field is invalid") { ErrorCode = "1001" }
+        };
+
+        validatorMock
+            .Setup(m => m.Validate(It.IsAny<ContactDetailsSubmitModel>()))
+            .Returns(new ValidationResult(validationFailures));
+
+        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
+
+        var result = sut.Index(ukprn, contactDetailsSubmitModel, cancellationToken);
+
+        var viewResult = result.As<ViewResult>();
+        Assert.That(viewResult, Is.Not.Null);
+
+        Assert.Multiple(() =>
+        {
+            var emailError = viewResult.ViewData.ModelState["LastName"]?.Errors.FirstOrDefault();
+            Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'LastName' field.");
+            Assert.That(emailError!.ErrorMessage, Is.EqualTo("LastName field is invalid"));
+        });
+    }
+
+    [Test, MoqAutoData]
+    public void Post_LastNameIsEmpty_ReturnsValidationError(
+        [Frozen] Mock<IValidator<ContactDetailsSubmitModel>> validatorMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Greedy] ContactDetailsController sut,
+        int ukprn,
+        ContactDetailsSubmitModel contactDetailsSubmitModel,
+        CancellationToken cancellationToken
+    )
+    {
+        contactDetailsSubmitModel.LastName = "  ";
+
+        sessionServiceMock.Setup(s =>
+            s.Get<AddEmployerSessionModel>()
+        ).Returns(
+            new AddEmployerSessionModel { Email = Email }
+        );
+
+        var validationFailures = new List<ValidationFailure>
+        {
+            new("LastName", "LastName field is invalid") { ErrorCode = "1001" }
+        };
+
+        validatorMock
+            .Setup(m => m.Validate(It.IsAny<ContactDetailsSubmitModel>()))
+            .Returns(new ValidationResult(validationFailures));
+
+        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
+
+        var result = sut.Index(ukprn, contactDetailsSubmitModel, cancellationToken);
+
+        var viewResult = result.As<ViewResult>();
+        Assert.That(viewResult, Is.Not.Null);
+
+        Assert.Multiple(() =>
+        {
+            var emailError = viewResult.ViewData.ModelState["LastName"]?.Errors.FirstOrDefault();
+            Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'LastName' field.");
+            Assert.That(emailError!.ErrorMessage, Is.EqualTo("LastName field is invalid"));
+        });
     }
 
     [Test, MoqAutoData]
