@@ -7,12 +7,13 @@ public class SearchByEmailSubmitModelValidatorTests
 {
     [TestCase("test@google.com", "")]
     [TestCase("test@btconnect.com", "")]
+    [TestCase("test@cplumbinguk.co.uk", "")]
     [TestCase("test.test@google.com", "")]
     [TestCase("", SearchByEmailSubmitModelValidator.NoEmailErrorMessage)]
     [TestCase("test", SearchByEmailSubmitModelValidator.InvalidEmailErrorMessage)]
     [TestCase("test test@account.com", SearchByEmailSubmitModelValidator.InvalidEmailErrorMessage)]
     [TestCase("aaaa@NonExistentDomain50c2413d-e8e4-4330-9859-222567ad0f64.co.uk", SearchByEmailSubmitModelValidator.InvalidDomainErrorMessage)]
-    public void ValidEmailInModel_IsValid(string email, string validationMessage)
+    public async Task ValidEmailInModel_IsValid(string email, string validationMessage)
     {
         var model = new SearchByEmailSubmitModel()
         {
@@ -20,7 +21,7 @@ public class SearchByEmailSubmitModelValidatorTests
         };
 
         var sut = new SearchByEmailSubmitModelValidator();
-        var result = sut.TestValidate(model);
+        var result = await sut.TestValidateAsync(model);
 
         if (validationMessage == string.Empty)
         {

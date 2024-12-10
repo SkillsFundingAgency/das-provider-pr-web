@@ -4,7 +4,7 @@ using DnsClient.Protocol;
 namespace SFA.DAS.Provider.PR.Application.Services;
 public static class EmailCheckingService
 {
-    public static bool IsValidDomain(string? email)
+    public static async Task<bool> IsValidDomain(string? email)
     {
         if (email == null)
         {
@@ -22,8 +22,8 @@ public static class EmailCheckingService
 
         var lookup = new LookupClient();
 
-        var results = lookup.Query(domain, QueryType.MX).Answers;
+        var results = await lookup.QueryAsync(domain, QueryType.MX);
 
-        return results.Any(x => x.RecordType == ResourceRecordType.MX);
+        return results.Answers.Any(x => x.RecordType == ResourceRecordType.MX);
     }
 }

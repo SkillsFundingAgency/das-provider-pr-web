@@ -50,7 +50,7 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
     public async Task<IActionResult> Index([FromRoute] int ukprn, SearchByEmailSubmitModel submitModel, CancellationToken cancellationToken)
     {
         submitModel.Email = submitModel.Email!.Trim();
-        var result = _validator.Validate(submitModel);
+        var result = await _validator.ValidateAsync(submitModel);
 
         if (!result.IsValid)
         {
