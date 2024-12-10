@@ -11,9 +11,11 @@ public class EmailCheckingServiceTests
     [TestCase("@aaaa", false)]
     [TestCase("aaaa@NonExistentDomain50c2413d-e8e4-4330-9859-222567ad0f64.co.uk", false)]
     [TestCase("aaaa@google.com", true)]
-    public void Email_IsValidDomain_ReturnedExpected(string? email, bool isValid)
+    [TestCase("aaaa@btconnect.com", true)]
+    [TestCase("aaaa@cplumbinguk.co.uk", true)]
+    public async Task Email_IsValidDomain_ReturnedExpected(string? email, bool isValid)
     {
-        var isEmailValid = EmailCheckingService.IsValidDomain(email);
+        var isEmailValid = await EmailCheckingService.IsValidDomain(email);
         isEmailValid.Should().Be(isValid);
     }
 }
