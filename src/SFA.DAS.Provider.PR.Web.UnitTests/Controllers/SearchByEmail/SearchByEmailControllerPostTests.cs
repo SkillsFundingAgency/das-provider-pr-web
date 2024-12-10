@@ -211,9 +211,7 @@ public class SearchByEmailControllerPostTests
             new("Email", "Email field is invalid") { ErrorCode = "1001" }
         };
 
-        validatorMock
-            .Setup(m => m.Validate(It.IsAny<SearchByEmailSubmitModel>()))
-            .Returns(new ValidationResult(validationFailures));
+        validatorMock.Setup(v => v.ValidateAsync(It.IsAny<SearchByEmailSubmitModel>(), It.IsAny<CancellationToken>())).ReturnsAsync(new ValidationResult(validationFailures));
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
 
@@ -252,9 +250,7 @@ public class SearchByEmailControllerPostTests
             new("Email", "Email field is invalid") { ErrorCode = "1001" }
         };
 
-        validatorMock
-            .Setup(m => m.Validate(It.IsAny<SearchByEmailSubmitModel>()))
-            .Returns(new ValidationResult(validationFailures));
+        validatorMock.Setup(v => v.ValidateAsync(It.IsAny<SearchByEmailSubmitModel>(), It.IsAny<CancellationToken>())).ReturnsAsync(new ValidationResult(validationFailures));
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
 
