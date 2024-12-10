@@ -1,6 +1,6 @@
 ﻿@model PaginationViewModel
 
-<span class="das-flex-space-around app-pagination-nav das-pagination-links">
+<nav class="das-flex-space-around app-pagination-nav das-pagination-links" role="navigation" aria-label="Pagination">
     @if (Model.Pages.Count > 1)
     {
         @foreach (var link in Model.Pages)
@@ -11,8 +11,8 @@
             }
             else
             {
-                <span class="govuk-body">@link.Title</span>
+                <span class="govuk-body" aria-current="page">@link.Title</span>
             }
         }
     }
-</span>
+</nav>
