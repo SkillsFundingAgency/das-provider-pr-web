@@ -63,11 +63,12 @@ public class SearchByEmailControllerPostTests
     }
 
     [Test, MoqAutoData]
-    public async Task Post_HasActiveRequest_ReturnsExpectedViewModelAndPath(
+    public async Task Post_HasActiveRequestAndHasUserAccountSet_ReturnsAddEmployerInvitationAlreadySent(
       [Frozen] Mock<IOuterApiClient> outerApiClientMock,
       [Frozen] Mock<IValidator<SearchByEmailSubmitModel>> validatorMock,
       [Frozen] Mock<ISessionService> sessionServiceMock,
       [Greedy] SearchByEmailController sut,
+      bool hasUserAccount,
       int ukprn,
       SearchByEmailSubmitModel searchByEmailSubmitModel,
       GetRelationshipByEmailResponse getRelationshipByEmailResponse,
@@ -77,6 +78,36 @@ public class SearchByEmailControllerPostTests
 
         searchByEmailSubmitModel.Email = Email;
         getRelationshipByEmailResponse.HasActiveRequest = true;
+        getRelationshipByEmailResponse.HasUserAccount = hasUserAccount;
+
+        outerApiClientMock.Setup(x => x.GetRelationshipByEmail(_emailCallingRelationships, ukprn, cancellationToken)).ReturnsAsync(getRelationshipByEmailResponse);
+
+        validatorMock.Setup(v => v.Validate(It.IsAny<SearchByEmailSubmitModel>())).Returns(new ValidationResult());
+
+        var result = await sut.Index(ukprn, searchByEmailSubmitModel, cancellationToken);
+
+        RedirectToRouteResult? redirectToRouteResult = result.As<RedirectToRouteResult>();
+        redirectToRouteResult.RouteName.Should().Be(RouteNames.AddEmployerInvitationAlreadySent);
+        redirectToRouteResult.RouteValues!.First().Value.Should().Be(ukprn);
+    }
+
+    [Test, MoqAutoData]
+    public async Task Post_HasActiveRequestUserAccountIsNull_ReturnsEmailSearchInviteAlreadySent(
+        [Frozen] Mock<IOuterApiClient> outerApiClientMock,
+        [Frozen] Mock<IValidator<SearchByEmailSubmitModel>> validatorMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Greedy] SearchByEmailController sut,
+        bool hasUserAccount,
+        int ukprn,
+        SearchByEmailSubmitModel searchByEmailSubmitModel,
+        GetRelationshipByEmailResponse getRelationshipByEmailResponse,
+        CancellationToken cancellationToken
+    )
+    {
+
+        searchByEmailSubmitModel.Email = Email;
+        getRelationshipByEmailResponse.HasActiveRequest = true;
+        getRelationshipByEmailResponse.HasUserAccount = null;
 
         outerApiClientMock.Setup(x => x.GetRelationshipByEmail(_emailCallingRelationships, ukprn, cancellationToken)).ReturnsAsync(getRelationshipByEmailResponse);
 
@@ -113,7 +144,7 @@ public class SearchByEmailControllerPostTests
 
         await sut.Index(ukprn, searchByEmailSubmitModel, cancellationToken);
 
-        sessionServiceMock.Verify(x => x.Set(It.Is<AddEmployerSessionModel>(x => x.Email == Email)), Times.Once);
+        sessionServiceMock.Verify(x => x.Set(It.Is<AddEmployerSessionModel>(x => x.Email == Email)), Times.Exactly(2));
     }
 
     [Test, MoqAutoData]
