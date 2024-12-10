@@ -10,6 +10,8 @@ public class EmployerDetailsMappingServiceMapLastActionTextByAccountLegalEntityI
         RequestStatus.Accepted, EmployerDetailsMappingService.CreateOrAddAccountRequestAcceptedText)]
     [InlineAutoData(EmployerDetailsMappingService.RequestTypeAddAccount, PermissionAction.AccountAdded,
         RequestStatus.Accepted, EmployerDetailsMappingService.PermissionSetText)]
+    [InlineAutoData(EmployerDetailsMappingService.RequestTypePermission, PermissionAction.PermissionUpdated,
+        RequestStatus.Accepted, EmployerDetailsMappingService.PermissionSetText)]
     [InlineAutoData(EmployerDetailsMappingService.RequestTypePermission, PermissionAction.AccountCreated,
         RequestStatus.Accepted, EmployerDetailsMappingService.PermissionSetText)]
     [InlineAutoData(EmployerDetailsMappingService.RequestTypePermission, PermissionAction.AccountCreated,

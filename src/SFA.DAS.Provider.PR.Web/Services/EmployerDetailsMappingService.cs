@@ -27,6 +27,9 @@ public static class EmployerDetailsMappingService
 
         if (response.LastRequestType == RequestTypePermission)
         {
+            if (response.LastAction == PermissionAction.PermissionUpdated)
+                return PermissionSetText;
+
             return response.LastRequestStatus switch
             {
                 RequestStatus.Accepted => PermissionSetText,
