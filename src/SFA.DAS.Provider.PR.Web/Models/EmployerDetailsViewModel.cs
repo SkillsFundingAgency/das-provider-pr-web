@@ -2,6 +2,7 @@
 using SFA.DAS.Provider.PR.Web.Constants;
 
 namespace SFA.DAS.Provider.PR.Web.Models;
+
 public class EmployerDetailsViewModel
 {
     public long AccountLegalEntityId { get; set; }
@@ -33,6 +34,8 @@ public class EmployerDetailsViewModel
     public bool HasPermissionsRequest { get; set; }
 
     public string LastActionText { get; set; } = null!;
+
+    public bool ShowLastActionText => !string.IsNullOrEmpty(LastActionText);
 
     public bool ShowAgreementId { get; set; } = true;
 
