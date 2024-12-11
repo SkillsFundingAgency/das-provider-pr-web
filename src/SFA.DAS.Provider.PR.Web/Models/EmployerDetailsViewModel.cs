@@ -35,7 +35,7 @@ public class EmployerDetailsViewModel
 
     public string LastActionText { get; set; } = null!;
 
-    public bool ShowLastActionText => !string.IsNullOrEmpty(LastActionText);
+    public bool ShowLastActionText => !string.IsNullOrWhiteSpace(LastActionText);
 
     public bool ShowAgreementId { get; set; } = true;
 
