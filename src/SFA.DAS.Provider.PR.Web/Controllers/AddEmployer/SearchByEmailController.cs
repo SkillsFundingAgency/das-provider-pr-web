@@ -68,15 +68,7 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
 
         if (relationshipByEmail.HasActiveRequest)
         {
-            if (relationshipByEmail.HasUserAccount == null) /// this means the request exists against the same email
-            {
-                return RedirectToRoute(RouteNames.EmailSearchInviteAlreadySent, new { ukprn });
-            }
-
-            sessionModel.Paye = relationshipByEmail.Paye;
-            _sessionService.Set(sessionModel);
-            return RedirectToRoute(RouteNames.AddEmployerInvitationAlreadySent, new { ukprn });
-
+            return RedirectToRoute(RouteNames.EmailSearchInviteAlreadySent, new { ukprn });
         }
 
         if (!relationshipByEmail.HasUserAccount!.Value)
@@ -138,7 +130,7 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
             employerAccountLink = Url.RouteUrl(RouteNames.EmployerDetailsByRequestId, new { ukprn, response!.RequestId });
         }
 
-        var shutterViewModel = new EmailSearchInviteAlreadySentShutterPageViewModel(email, employerName, employerAccountLink!);
+        var shutterViewModel = new EmailSearchInviteAlreadySentShutterPageViewModel(employerName, employerAccountLink!);
 
         return View(EmailSearchInviteAlreadySentShutterPageViewPath, shutterViewModel);
     }
