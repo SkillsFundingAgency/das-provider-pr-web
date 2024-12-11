@@ -60,22 +60,14 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
             return View(ViewPath, viewModel);
         }
 
-        var sessionModel = new AddEmployerSessionModel { Email = submitModel.Email! };
-        _sessionService.Set(sessionModel);
-
         var relationshipByEmail = await _outerApiClient.GetRelationshipByEmail(submitModel.Email!, ukprn, cancellationToken);
+
+        var sessionModel = new AddEmployerSessionModel { Email = submitModel.Email!, Paye = relationshipByEmail.Paye };
+        _sessionService.Set(sessionModel);
 
         if (relationshipByEmail.HasActiveRequest)
         {
-            if (relationshipByEmail.HasUserAccount == null) /// this means the request exists against the same email
-            {
-                return RedirectToRoute(RouteNames.EmailSearchInviteAlreadySent, new { ukprn });
-            }
-
-            sessionModel.Paye = relationshipByEmail.Paye;
-            _sessionService.Set(sessionModel);
-            return RedirectToRoute(RouteNames.AddEmployerInvitationAlreadySent, new { ukprn });
-
+            return RedirectToRoute(RouteNames.EmailSearchInviteAlreadySent, new { ukprn });
         }
 
         if (!relationshipByEmail.HasUserAccount!.Value)
@@ -114,30 +106,49 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
             return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
         }
 
-        var requestResponse = await _outerApiClient.GetRequestByUkprnAndEmail(ukprn, email, cancellationToken);
-        var response = requestResponse.GetContent();
+        string? employerName;
+        string employerAccountLink;
 
-        long? accountLegalEntityId = response?.AccountLegalEntityId;
+        if (sessionModel!.Paye != null) // the email has been linked to an organisation in EAS that has an active request with different email
+        {
+            var requestResponse = await _outerApiClient.GetRequest(ukprn, sessionModel.Paye, cancellationToken);
+            if (!requestResponse.ResponseMessage.IsSuccessStatusCode)
+            {
+                return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
+            }
+            var response = requestResponse.GetContent();
+            employerName = response.EmployerOrganisationName?.ToUpper();
+            employerAccountLink = Url.RouteUrl(RouteNames.EmployerDetailsByRequestId, new { ukprn, response.RequestId })!;
+        }
+        else
+        {
+            var requestResponse = await _outerApiClient.GetRequestByUkprnAndEmail(ukprn, email, cancellationToken);
 
-        string? employerName = response?.EmployerOrganisationName?.ToUpper();
+            if (!requestResponse.ResponseMessage.IsSuccessStatusCode)
+            {
+                return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
+            }
+
+            var response = requestResponse.GetContent();
+            employerName = response.EmployerOrganisationName?.ToUpper();
+            long? accountLegalEntityId = response.AccountLegalEntityId;
+            if (accountLegalEntityId != null && response.RequestType == RequestType.Permission.ToString())
+            {
+                var accountLegalEntityIdEncoded = encodingService.Encode(accountLegalEntityId.Value, EncodingType.PublicAccountLegalEntityId);
+                employerAccountLink = Url.RouteUrl(RouteNames.EmployerDetails, new { ukprn, accountLegalEntityId = accountLegalEntityIdEncoded })!;
+            }
+            else
+            {
+                employerAccountLink = Url.RouteUrl(RouteNames.EmployerDetailsByRequestId, new { ukprn, response!.RequestId })!;
+            }
+        }
 
         if (string.IsNullOrEmpty(employerName))
         {
             return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
         }
 
-        var employerAccountLink = string.Empty;
-        if (accountLegalEntityId != null && response.RequestType == RequestType.Permission.ToString())
-        {
-            var accountLegalEntityIdEncoded = encodingService.Encode(accountLegalEntityId.Value, EncodingType.PublicAccountLegalEntityId);
-            employerAccountLink = Url.RouteUrl(RouteNames.EmployerDetails, new { ukprn, accountLegalEntityId = accountLegalEntityIdEncoded })!;
-        }
-        else
-        {
-            employerAccountLink = Url.RouteUrl(RouteNames.EmployerDetailsByRequestId, new { ukprn, response!.RequestId });
-        }
-
-        var shutterViewModel = new EmailSearchInviteAlreadySentShutterPageViewModel(email, employerName, employerAccountLink!);
+        var shutterViewModel = new EmailSearchInviteAlreadySentShutterPageViewModel(employerName, employerAccountLink!);
 
         return View(EmailSearchInviteAlreadySentShutterPageViewPath, shutterViewModel);
     }
