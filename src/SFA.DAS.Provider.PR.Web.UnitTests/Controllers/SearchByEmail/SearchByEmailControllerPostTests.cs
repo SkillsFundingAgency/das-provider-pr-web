@@ -45,6 +45,7 @@ public class SearchByEmailControllerPostTests
         getRelationshipByEmailResponse.HasOneEmployerAccount = true;
         getRelationshipByEmailResponse.HasOneLegalEntity = true;
         getRelationshipByEmailResponse.HasRelationship = true;
+        getRelationshipByEmailResponse.Paye = null;
 
         outerApiClientMock.Setup(x => x.GetRelationshipByEmail(_emailCallingRelationships, ukprn, cancellationToken)).ReturnsAsync(getRelationshipByEmailResponse);
 
@@ -59,22 +60,23 @@ public class SearchByEmailControllerPostTests
         redirectToRouteResult.RouteValues!.First().Value.Should().Be(ukprn);
 
         outerApiClientMock.Verify(o => o.GetRelationshipByEmail(_emailCallingRelationships, ukprn, cancellationToken), Times.Once);
+        outerApiClientMock.Verify(o => o.GetRequest(It.IsAny<long>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
         sessionServiceMock.Verify(s => s.Set(It.Is<AddEmployerSessionModel>(x => x.Email == Email)), Times.Exactly(2));
     }
 
     [Test, MoqAutoData]
-    public async Task Post_HasActiveRequest_ReturnsExpectedViewModelAndPath(
+    public async Task Post_HasActiveRequest_ReturnsEmailSearchInviteAlreadySent(
       [Frozen] Mock<IOuterApiClient> outerApiClientMock,
       [Frozen] Mock<IValidator<SearchByEmailSubmitModel>> validatorMock,
       [Frozen] Mock<ISessionService> sessionServiceMock,
       [Greedy] SearchByEmailController sut,
+      bool hasUserAccount,
       int ukprn,
       SearchByEmailSubmitModel searchByEmailSubmitModel,
       GetRelationshipByEmailResponse getRelationshipByEmailResponse,
       CancellationToken cancellationToken
   )
     {
-
         searchByEmailSubmitModel.Email = Email;
         getRelationshipByEmailResponse.HasActiveRequest = true;
 
@@ -195,7 +197,7 @@ public class SearchByEmailControllerPostTests
     }
 
     [Test, MoqAutoData]
-    public async Task Post_Invalid_EmailisTrimmed(
+    public async Task Post_Invalid_EmailIsTrimmed(
         [Frozen] Mock<IOuterApiClient> outerApiClientMock,
         [Frozen] Mock<IValidator<SearchByEmailSubmitModel>> validatorMock,
         [Frozen] Mock<ISessionService> sessionServiceMock,

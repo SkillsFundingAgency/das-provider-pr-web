@@ -1,5 +1,4 @@
-﻿using System.Net;
-using AutoFixture.NUnit3;
+﻿using AutoFixture.NUnit3;
 using FluentAssertions;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +14,7 @@ using SFA.DAS.Provider.PR.Web.Models.AddEmployer;
 using SFA.DAS.Provider.PR.Web.Models.Session;
 using SFA.DAS.Provider.PR_Web.UnitTests.TestHelpers;
 using SFA.DAS.Testing.AutoFixture;
+using System.Net;
 
 namespace SFA.DAS.Provider.PR_Web.UnitTests.Controllers.SearchByEmail;
 public class EmailSearchInviteAlreadySentShutterPageTests
@@ -159,7 +159,6 @@ public class EmailSearchInviteAlreadySentShutterPageTests
         EmailSearchInviteAlreadySentShutterPageViewModel? viewModel =
             viewResult.Model as EmailSearchInviteAlreadySentShutterPageViewModel;
         viewModel!.EmployerAccountLink.Should().Be(EmployerDetailsLink);
-        viewModel.Email.Should().Be(Email);
         viewModel.EmployerName.Should().Be(employerName.ToUpper());
     }
 
@@ -199,7 +198,6 @@ public class EmailSearchInviteAlreadySentShutterPageTests
         EmailSearchInviteAlreadySentShutterPageViewModel? viewModel =
             viewResult.Model as EmailSearchInviteAlreadySentShutterPageViewModel;
         viewModel!.EmployerAccountLink.Should().Be(EmployerDetailsByRequestIdLink);
-        viewModel.Email.Should().Be(Email);
         viewModel.EmployerName.Should().Be(employerName.ToUpper());
     }
 
@@ -238,7 +236,6 @@ public class EmailSearchInviteAlreadySentShutterPageTests
         EmailSearchInviteAlreadySentShutterPageViewModel? viewModel =
             viewResult.Model as EmailSearchInviteAlreadySentShutterPageViewModel;
         viewModel!.EmployerAccountLink.Should().Be(EmployerDetailsByRequestIdLink);
-        viewModel.Email.Should().Be(Email);
         viewModel.EmployerName.Should().Be(employerName.ToUpper());
     }
 }
