@@ -17,7 +17,8 @@ public class ContactDetailsControllerPostTests
 {
     private static readonly string BackLink = Guid.NewGuid().ToString();
     private static readonly string CancelLink = Guid.NewGuid().ToString();
-
+    private const string ValidationError = "Validation Erorr";
+    private const string ValidationErrorCode = "1001";
     private static readonly string Email = "test@account.com";
 
     [Test, MoqAutoData]
@@ -109,7 +110,7 @@ public class ContactDetailsControllerPostTests
 
         var validationFailures = new List<ValidationFailure>
         {
-            new("FirstName", "FirstName field is invalid") { ErrorCode = "1001" }
+            new(nameof(contactDetailsSubmitModel.FirstName), ValidationError) { ErrorCode = ValidationErrorCode }
         };
 
         validatorMock
@@ -125,9 +126,9 @@ public class ContactDetailsControllerPostTests
 
         Assert.Multiple(() =>
         {
-            var emailError = viewResult.ViewData.ModelState["FirstName"]?.Errors.FirstOrDefault();
+            var emailError = viewResult.ViewData.ModelState[nameof(contactDetailsSubmitModel.FirstName)]?.Errors.FirstOrDefault();
             Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'FirstName' field.");
-            Assert.That(emailError!.ErrorMessage, Is.EqualTo("FirstName field is invalid"));
+            Assert.That(emailError!.ErrorMessage, Is.EqualTo(ValidationError));
         });
     }
 
@@ -151,7 +152,7 @@ public class ContactDetailsControllerPostTests
 
         var validationFailures = new List<ValidationFailure>
         {
-            new("FirstName", "FirstName field is invalid") { ErrorCode = "1001" }
+            new(nameof(contactDetailsSubmitModel.FirstName), ValidationError) { ErrorCode = ValidationErrorCode }
         };
 
         validatorMock
@@ -167,9 +168,9 @@ public class ContactDetailsControllerPostTests
 
         Assert.Multiple(() =>
         {
-            var emailError = viewResult.ViewData.ModelState["FirstName"]?.Errors.FirstOrDefault();
+            var emailError = viewResult.ViewData.ModelState[nameof(contactDetailsSubmitModel.FirstName)]?.Errors.FirstOrDefault();
             Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'FirstName' field.");
-            Assert.That(emailError!.ErrorMessage, Is.EqualTo("FirstName field is invalid"));
+            Assert.That(emailError!.ErrorMessage, Is.EqualTo(ValidationError));
         });
     }
 
@@ -193,7 +194,7 @@ public class ContactDetailsControllerPostTests
 
         var validationFailures = new List<ValidationFailure>
         {
-            new("LastName", "LastName field is invalid") { ErrorCode = "1001" }
+            new(nameof(contactDetailsSubmitModel.LastName), ValidationError) { ErrorCode = ValidationErrorCode }
         };
 
         validatorMock
@@ -209,9 +210,9 @@ public class ContactDetailsControllerPostTests
 
         Assert.Multiple(() =>
         {
-            var emailError = viewResult.ViewData.ModelState["LastName"]?.Errors.FirstOrDefault();
+            var emailError = viewResult.ViewData.ModelState[nameof(contactDetailsSubmitModel.LastName)]?.Errors.FirstOrDefault();
             Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'LastName' field.");
-            Assert.That(emailError!.ErrorMessage, Is.EqualTo("LastName field is invalid"));
+            Assert.That(emailError!.ErrorMessage, Is.EqualTo(ValidationError));
         });
     }
 
@@ -235,7 +236,7 @@ public class ContactDetailsControllerPostTests
 
         var validationFailures = new List<ValidationFailure>
         {
-            new("LastName", "LastName field is invalid") { ErrorCode = "1001" }
+            new(nameof(contactDetailsSubmitModel.LastName), ValidationError) { ErrorCode = ValidationErrorCode }
         };
 
         validatorMock
@@ -251,9 +252,9 @@ public class ContactDetailsControllerPostTests
 
         Assert.Multiple(() =>
         {
-            var emailError = viewResult.ViewData.ModelState["LastName"]?.Errors.FirstOrDefault();
+            var emailError = viewResult.ViewData.ModelState[nameof(contactDetailsSubmitModel.LastName)]?.Errors.FirstOrDefault();
             Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'LastName' field.");
-            Assert.That(emailError!.ErrorMessage, Is.EqualTo("LastName field is invalid"));
+            Assert.That(emailError!.ErrorMessage, Is.EqualTo(ValidationError));
         });
     }
 

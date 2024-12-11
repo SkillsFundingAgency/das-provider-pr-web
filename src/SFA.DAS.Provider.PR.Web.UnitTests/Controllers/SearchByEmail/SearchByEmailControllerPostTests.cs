@@ -22,7 +22,8 @@ public class SearchByEmailControllerPostTests
     private static readonly string CancelLink = BackLink;
     private static readonly string RedirectToMultipleAccountsShutterPage = Guid.NewGuid().ToString();
     private static readonly string EmailSearchInviteAlreadySentPage = Guid.NewGuid().ToString();
-
+    private const string ValidationError = "Validation Erorr";
+    private const string ValidationErrorCode = "1001";
     private static readonly string Email = "test@account.com";
     private readonly string _emailCallingRelationships = Email;
 
@@ -179,7 +180,7 @@ public class SearchByEmailControllerPostTests
 
         validatorMock.Setup(m => m.Validate(It.IsAny<SearchByEmailSubmitModel>())).Returns(new ValidationResult(new List<ValidationFailure>()
         {
-            new("TestField","Test Message") { ErrorCode = "1001"}
+            new("TestField", ValidationError) { ErrorCode = ValidationErrorCode }
         }));
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
@@ -208,7 +209,7 @@ public class SearchByEmailControllerPostTests
 
         var validationFailures = new List<ValidationFailure>
         {
-            new("Email", "Email field is invalid") { ErrorCode = "1001" }
+            new(nameof(searchByEmailSubmitModel.Email), ValidationError) { ErrorCode = ValidationErrorCode }
         };
 
         validatorMock.Setup(v => v.ValidateAsync(It.IsAny<SearchByEmailSubmitModel>(), It.IsAny<CancellationToken>())).ReturnsAsync(new ValidationResult(validationFailures));
@@ -227,9 +228,9 @@ public class SearchByEmailControllerPostTests
         {
             Assert.That(viewModel!.Email, Is.Null);
 
-            var emailError = viewResult.ViewData.ModelState["Email"]?.Errors.FirstOrDefault();
+            var emailError = viewResult.ViewData.ModelState[nameof(searchByEmailSubmitModel.Email)]?.Errors.FirstOrDefault();
             Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'Email' field.");
-            Assert.That(emailError!.ErrorMessage, Is.EqualTo("Email field is invalid"));
+            Assert.That(emailError!.ErrorMessage, Is.EqualTo(ValidationError));
         });
     }
 
@@ -247,7 +248,7 @@ public class SearchByEmailControllerPostTests
 
         var validationFailures = new List<ValidationFailure>
         {
-            new("Email", "Email field is invalid") { ErrorCode = "1001" }
+            new(nameof(searchByEmailSubmitModel.Email), ValidationError) { ErrorCode = "1001" }
         };
 
         validatorMock.Setup(v => v.ValidateAsync(It.IsAny<SearchByEmailSubmitModel>(), It.IsAny<CancellationToken>())).ReturnsAsync(new ValidationResult(validationFailures));
@@ -266,9 +267,9 @@ public class SearchByEmailControllerPostTests
         {
             Assert.That(viewModel!.Email, Is.EqualTo(searchByEmailSubmitModel.Email));
 
-            var emailError = viewResult.ViewData.ModelState["Email"]?.Errors.FirstOrDefault();
+            var emailError = viewResult.ViewData.ModelState[nameof(searchByEmailSubmitModel.Email)]?.Errors.FirstOrDefault();
             Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'Email' field.");
-            Assert.That(emailError!.ErrorMessage, Is.EqualTo("Email field is invalid"));
+            Assert.That(emailError!.ErrorMessage, Is.EqualTo(ValidationError));
         });
     }
 

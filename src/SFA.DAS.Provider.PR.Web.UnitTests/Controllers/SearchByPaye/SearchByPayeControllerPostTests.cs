@@ -20,7 +20,8 @@ public class SearchByPayeControllerPostTests
     private static readonly string BackLink = Guid.NewGuid().ToString();
     private static readonly string CancelLink = BackLink;
     private static readonly string AddEmployerContactDetails = Guid.NewGuid().ToString();
-
+    private const string ValidationError = "Validation Erorr";
+    private const string ValidationErrorCode = "1001";
     private static readonly string Email = "test@account.com";
 
     [Test, MoqAutoData]
@@ -134,7 +135,7 @@ public class SearchByPayeControllerPostTests
 
         var validationFailures = new List<ValidationFailure>
         {
-            new("Paye", "Paye field is invalid") { ErrorCode = "1001" }
+            new(nameof(searchByPayeSubmitModel.Paye), ValidationError) { ErrorCode = ValidationErrorCode }
         };
 
         validatorMock
@@ -155,9 +156,9 @@ public class SearchByPayeControllerPostTests
         {
             Assert.That(viewModel!.Paye, Is.Null);
 
-            var emailError = viewResult.ViewData.ModelState["Paye"]?.Errors.FirstOrDefault();
+            var emailError = viewResult.ViewData.ModelState[nameof(searchByPayeSubmitModel.Paye)]?.Errors.FirstOrDefault();
             Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'Paye' field.");
-            Assert.That(emailError!.ErrorMessage, Is.EqualTo("Paye field is invalid"));
+            Assert.That(emailError!.ErrorMessage, Is.EqualTo(ValidationError));
         });
     }
 
@@ -175,7 +176,7 @@ public class SearchByPayeControllerPostTests
 
         var validationFailures = new List<ValidationFailure>
         {
-            new("Paye", "Paye field is invalid") { ErrorCode = "1001" }
+            new(nameof(searchByPayeSubmitModel.Paye), ValidationError) { ErrorCode = ValidationErrorCode }
         };
 
         validatorMock
@@ -196,9 +197,9 @@ public class SearchByPayeControllerPostTests
         {
             Assert.That(viewModel!.Paye, Is.EqualTo(searchByPayeSubmitModel.Paye));
 
-            var emailError = viewResult.ViewData.ModelState["Paye"]?.Errors.FirstOrDefault();
+            var emailError = viewResult.ViewData.ModelState[nameof(searchByPayeSubmitModel.Paye)]?.Errors.FirstOrDefault();
             Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'Paye' field.");
-            Assert.That(emailError!.ErrorMessage, Is.EqualTo("Paye field is invalid"));
+            Assert.That(emailError!.ErrorMessage, Is.EqualTo(ValidationError));
         });
     }
 
@@ -216,7 +217,7 @@ public class SearchByPayeControllerPostTests
 
         var validationFailures = new List<ValidationFailure>
         {
-            new("Aorn", "Aorn field is invalid") { ErrorCode = "1001" }
+            new(nameof(searchByPayeSubmitModel.Aorn), ValidationError) { ErrorCode = ValidationErrorCode }
         };
 
         validatorMock
@@ -237,9 +238,9 @@ public class SearchByPayeControllerPostTests
         {
             Assert.That(viewModel!.Aorn, Is.Null);
 
-            var emailError = viewResult.ViewData.ModelState["Aorn"]?.Errors.FirstOrDefault();
+            var emailError = viewResult.ViewData.ModelState[nameof(searchByPayeSubmitModel.Aorn)]?.Errors.FirstOrDefault();
             Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'Aorn' field.");
-            Assert.That(emailError!.ErrorMessage, Is.EqualTo("Aorn field is invalid"));
+            Assert.That(emailError!.ErrorMessage, Is.EqualTo(ValidationError));
         });
     }
 
@@ -257,7 +258,7 @@ public class SearchByPayeControllerPostTests
 
         var validationFailures = new List<ValidationFailure>
         {
-            new("Aorn", "Aorn field is invalid") { ErrorCode = "1001" }
+            new(nameof(searchByPayeSubmitModel.Aorn), ValidationError) { ErrorCode = ValidationErrorCode }
         };
 
         validatorMock
@@ -278,9 +279,9 @@ public class SearchByPayeControllerPostTests
         {
             Assert.That(viewModel!.Aorn, Is.EqualTo(searchByPayeSubmitModel.Aorn));
 
-            var emailError = viewResult.ViewData.ModelState["Aorn"]?.Errors.FirstOrDefault();
+            var emailError = viewResult.ViewData.ModelState[nameof(searchByPayeSubmitModel.Aorn)]?.Errors.FirstOrDefault();
             Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'Aorn' field.");
-            Assert.That(emailError!.ErrorMessage, Is.EqualTo("Aorn field is invalid"));
+            Assert.That(emailError!.ErrorMessage, Is.EqualTo(ValidationError));
         });
     }
 
