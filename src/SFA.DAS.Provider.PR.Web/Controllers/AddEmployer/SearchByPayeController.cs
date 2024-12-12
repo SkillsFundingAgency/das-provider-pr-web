@@ -58,6 +58,9 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
     [HttpPost]
     public async Task<IActionResult> Index([FromRoute] int ukprn, SearchByPayeSubmitModel submitModel, CancellationToken cancellationToken)
     {
+        submitModel.Paye = submitModel.Paye?.Trim();
+        submitModel.Aorn = submitModel.Aorn?.Trim();
+
         var result = _validator.Validate(submitModel);
 
         if (!result.IsValid)
@@ -76,8 +79,8 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
             return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
         }
 
-        sessionModel.Paye = submitModel.Paye!.Trim();
-        sessionModel.Aorn = submitModel.Aorn!.Trim();
+        sessionModel.Paye = submitModel.Paye!;
+        sessionModel.Aorn = submitModel.Aorn!;
         sessionModel.IsCheckDetailsVisited = false;
         _sessionService.Set(sessionModel);
 

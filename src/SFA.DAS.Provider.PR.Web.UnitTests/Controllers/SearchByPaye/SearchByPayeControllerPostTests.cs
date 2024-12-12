@@ -204,6 +204,29 @@ public class SearchByPayeControllerPostTests
     }
 
     [Test, MoqAutoData]
+    public async Task Post_PayeIsContainsWhiteSpace_PayeIsTrimmed(
+        [Frozen] Mock<IValidator<SearchByPayeSubmitModel>> validatorMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Greedy] SearchByPayeController sut,
+        int ukprn,
+        SearchByPayeSubmitModel searchByPayeSubmitModel,
+        CancellationToken cancellationToken
+    )
+    {
+        string testPaye = " 123/AB456 ";
+        searchByPayeSubmitModel.Paye = testPaye;
+
+        sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel { Email = Email });
+        validatorMock.Setup(m => m.Validate(It.IsAny<SearchByPayeSubmitModel>())).Returns(new ValidationResult());
+
+        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
+
+        await sut.Index(ukprn, searchByPayeSubmitModel, cancellationToken);
+
+        sessionServiceMock.Verify(x => x.Set(It.Is<AddEmployerSessionModel>(x => x.Paye == testPaye.Trim())), Times.Once);
+    }
+
+    [Test, MoqAutoData]
     public async Task Post_AornIsNull_ReturnsValidationError(
         [Frozen] Mock<IValidator<SearchByPayeSubmitModel>> validatorMock,
         [Frozen] Mock<ISessionService> sessionServiceMock,
