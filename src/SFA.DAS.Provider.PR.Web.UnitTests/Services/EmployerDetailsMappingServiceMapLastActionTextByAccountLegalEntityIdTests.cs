@@ -6,7 +6,7 @@ namespace SFA.DAS.Provider.PR_Web.UnitTests.Services;
 public class EmployerDetailsMappingServiceMapLastActionTextByAccountLegalEntityIdTests
 {
     public const string TodayDateTime = "01/01/2020";
-    public const string YesterdayDateTime = "31/12/2019";
+    public const string PreviousDateTime = "01/01/2019";
 
     [Test]
     [InlineAutoData(EmployerDetailsMappingService.RequestTypeAddAccount, PermissionAction.AccountCreated,
@@ -16,7 +16,7 @@ public class EmployerDetailsMappingServiceMapLastActionTextByAccountLegalEntityI
         RequestStatus.Accepted, TodayDateTime, TodayDateTime,
         EmployerDetailsMappingService.PermissionSetText)]
     [InlineAutoData(EmployerDetailsMappingService.RequestTypePermission, PermissionAction.PermissionUpdated,
-        RequestStatus.Sent, TodayDateTime, YesterdayDateTime,
+        RequestStatus.Sent, TodayDateTime, PreviousDateTime,
         EmployerDetailsMappingService.PermissionSetText)]
     [InlineAutoData(EmployerDetailsMappingService.RequestTypePermission, PermissionAction.AccountCreated,
         RequestStatus.Accepted, TodayDateTime, TodayDateTime,
