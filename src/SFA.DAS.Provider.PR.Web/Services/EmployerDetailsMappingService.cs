@@ -27,16 +27,20 @@ public static class EmployerDetailsMappingService
 
         if (response.LastRequestType == RequestTypePermission)
         {
+            var providerRequestStatuses = new List<RequestStatus>() { RequestStatus.Accepted, RequestStatus.Declined, RequestStatus.Expired };
+            if (providerRequestStatuses.Contains((RequestStatus)response.LastRequestStatus!))
+            {
+                return response.LastRequestStatus switch
+                {
+                    RequestStatus.Accepted => PermissionSetText,
+                    RequestStatus.Declined => UpdatePermissionRequestDeclinedText,
+                    RequestStatus.Expired => UpdatePermissionRequestExpiredText,
+                    _ => string.Empty
+                };
+            }
+
             if (response.LastAction == PermissionAction.PermissionUpdated)
                 return PermissionSetText;
-
-            return response.LastRequestStatus switch
-            {
-                RequestStatus.Accepted => PermissionSetText,
-                RequestStatus.Declined => UpdatePermissionRequestDeclinedText,
-                RequestStatus.Expired => UpdatePermissionRequestExpiredText,
-                _ => string.Empty
-            };
         }
 
         var existingRelationshipStatuses = new List<PermissionAction>() { PermissionAction.RecruitRelationship, PermissionAction.ApprovalsRelationship };
