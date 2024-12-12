@@ -105,8 +105,6 @@ public class SearchByEmailControllerPostTests
         searchByEmailSubmitModel.Email = $" {Email} ";
         getRelationshipByEmailResponse.HasActiveRequest = true;
 
-        var sessionModel = new AddEmployerSessionModel { Email = Email };
-
         outerApiClientMock.Setup(x => x.GetRelationshipByEmail(_emailCallingRelationships, ukprn, cancellationToken)).ReturnsAsync(getRelationshipByEmailResponse);
 
         validatorMock.Setup(v => v.ValidateAsync(It.IsAny<SearchByEmailSubmitModel>(), It.IsAny<CancellationToken>())).ReturnsAsync(new ValidationResult());
@@ -271,6 +269,28 @@ public class SearchByEmailControllerPostTests
             Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'Email' field.");
             Assert.That(emailError!.ErrorMessage, Is.EqualTo(ValidationError));
         });
+    }
+
+    [Test, MoqAutoData]
+    public async Task Post_EmailContainsWhiteSpace_EmailIsTrimmed(
+        [Frozen] Mock<IValidator<SearchByEmailSubmitModel>> validatorMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Greedy] SearchByEmailController sut,
+        int ukprn,
+        SearchByEmailSubmitModel searchByEmailSubmitModel,
+        CancellationToken cancellationToken
+    )
+    {
+        string testEmail = " test@email.com ";
+        searchByEmailSubmitModel.Email = testEmail;
+
+        validatorMock.Setup(v => v.ValidateAsync(It.IsAny<SearchByEmailSubmitModel>(), It.IsAny<CancellationToken>())).ReturnsAsync(new ValidationResult());
+
+        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
+
+        await sut.Index(ukprn, searchByEmailSubmitModel, cancellationToken);
+
+        sessionServiceMock.Verify(x => x.Set(It.Is<AddEmployerSessionModel>(x => x.Email == testEmail.Trim())), Times.Once);
     }
 
     [Test]
