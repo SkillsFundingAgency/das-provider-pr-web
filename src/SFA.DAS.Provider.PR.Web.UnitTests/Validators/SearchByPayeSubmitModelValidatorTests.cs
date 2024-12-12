@@ -59,6 +59,8 @@ public class SearchByPayeSubmitModelValidatorTests
     [TestCase("A11/12345678")]
     [TestCase("A11/123456789")]
     [TestCase("A11/1234567890")]
+    [TestCase("A111234567890")]
+    [TestCase("A11/123456789")]
     public void InvalidPayeInModel(string payeRef)
     {
         var model = new SearchByPayeSubmitModel()
