@@ -50,19 +50,18 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
     public async Task<IActionResult> Index([FromRoute] int ukprn, SearchByEmailSubmitModel submitModel, CancellationToken cancellationToken)
     {
         submitModel.Email = submitModel.Email?.Trim();
-        var result = _validator.Validate(submitModel);
+        var result = await _validator.ValidateAsync(submitModel);
 
         if (!result.IsValid)
         {
             var viewModel = GetViewModel(ukprn);
-            viewModel.Email = submitModel.Email?.Trim();
+            viewModel.Email = submitModel.Email;
             result.AddToModelState(ModelState);
             return View(ViewPath, viewModel);
         }
 
         var sessionModel = new AddEmployerSessionModel { Email = submitModel.Email! };
         _sessionService.Set(sessionModel);
-
 
         var relationshipByEmail = await _outerApiClient.GetRelationshipByEmail(submitModel.Email!, ukprn, cancellationToken);
 
