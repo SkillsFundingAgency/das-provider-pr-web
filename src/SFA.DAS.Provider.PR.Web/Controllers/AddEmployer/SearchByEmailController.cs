@@ -50,7 +50,6 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
     public async Task<IActionResult> Index([FromRoute] int ukprn, SearchByEmailSubmitModel submitModel, CancellationToken cancellationToken)
     {
         submitModel.Email = submitModel.Email?.Trim();
-
         var result = await _validator.ValidateAsync(submitModel);
 
         if (!result.IsValid)
@@ -190,9 +189,8 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
 
     private SearchByEmailModel GetViewModel(int ukprn)
     {
-        var cancelLink = Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn });
         var backLink = Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn });
-        return new SearchByEmailModel { CancelLink = cancelLink!, BackLink = backLink!, Ukprn = ukprn };
+        return new SearchByEmailModel { BackLink = backLink!, Ukprn = ukprn };
     }
 
     private static bool HasMultipleAccounts(GetRelationshipByEmailResponse response)

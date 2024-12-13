@@ -19,7 +19,6 @@ namespace SFA.DAS.Provider.PR_Web.UnitTests.Controllers.SearchByEmail;
 public class SearchByEmailControllerPostTests
 {
     private static readonly string BackLink = Guid.NewGuid().ToString();
-    private static readonly string CancelLink = BackLink;
     private static readonly string RedirectToMultipleAccountsShutterPage = Guid.NewGuid().ToString();
     private static readonly string EmailSearchInviteAlreadySentPage = Guid.NewGuid().ToString();
     private const string ValidationError = "Validation Erorr";
@@ -189,7 +188,6 @@ public class SearchByEmailControllerPostTests
         SearchByEmailModel? viewModel = viewResult.Model as SearchByEmailModel;
         viewModel!.Ukprn.Should().Be(ukprn);
         viewModel.BackLink.Should().Be(BackLink);
-        viewModel.CancelLink.Should().Be(CancelLink);
         viewModel.Email.Should().Be(Email);
     }
 

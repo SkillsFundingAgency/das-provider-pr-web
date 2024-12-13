@@ -15,7 +15,6 @@ namespace SFA.DAS.Provider.PR_Web.UnitTests.Controllers.SearchByEmail;
 public class SearchByEmailControllerGetTests
 {
     private static readonly string BackLink = Guid.NewGuid().ToString();
-    private static readonly string CancelLink = BackLink;
     private static readonly string CheckDetailsLink = Guid.NewGuid().ToString();
 
     [Test, MoqAutoData]
@@ -33,7 +32,6 @@ public class SearchByEmailControllerGetTests
         SearchByEmailModel? viewModel = viewResult.Model as SearchByEmailModel;
         viewModel!.Ukprn.Should().Be(ukprn);
         viewModel.BackLink.Should().Be(BackLink);
-        viewModel.CancelLink.Should().Be(CancelLink);
         viewModel.Email.Should().BeNull();
     }
 
@@ -56,7 +54,6 @@ public class SearchByEmailControllerGetTests
         SearchByEmailModel? viewModel = viewResult.Model as SearchByEmailModel;
         viewModel!.Ukprn.Should().Be(ukprn);
         viewModel.BackLink.Should().Be(BackLink);
-        viewModel.CancelLink.Should().Be(CancelLink);
         viewModel.Email.Should().Be(email);
     }
 
