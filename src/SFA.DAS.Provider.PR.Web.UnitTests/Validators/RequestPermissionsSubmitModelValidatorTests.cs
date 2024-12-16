@@ -46,13 +46,14 @@ public sealed class RequestPermissionsSubmitModelValidatorTests
         result.ShouldNotHaveValidationErrorFor(a => a.PermissionToAddCohorts);
     }
 
+    [Test]
     public void RequestPermissionsSubmitModelValidator_NoSelections_ReturnsInvalid()
     {
         var model = new RequestPermissionsSubmitModel()
         {
             PermissionToAddCohorts = SetPermissions.AddRecords.No,
             PermissionToRecruit = SetPermissions.RecruitApprentices.No,
-            ExistingPermissionToAddCohorts = SetPermissions.AddRecords.No,
+            ExistingPermissionToAddCohorts = SetPermissions.AddRecords.Yes,
             ExistingPermissionToRecruit = SetPermissions.RecruitApprentices.No
         };
         var sut = new RequestPermissionsSubmitModelValidator();
