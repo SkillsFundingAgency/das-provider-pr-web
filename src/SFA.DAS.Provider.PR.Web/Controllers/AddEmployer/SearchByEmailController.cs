@@ -49,20 +49,19 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
     [HttpPost]
     public async Task<IActionResult> Index([FromRoute] int ukprn, SearchByEmailSubmitModel submitModel, CancellationToken cancellationToken)
     {
-        submitModel.Email = submitModel.Email!.Trim();
-        var result = _validator.Validate(submitModel);
+        submitModel.Email = submitModel.Email?.Trim();
+        var result = await _validator.ValidateAsync(submitModel);
 
         if (!result.IsValid)
         {
             var viewModel = GetViewModel(ukprn);
-            viewModel.Email = submitModel.Email!.Trim();
+            viewModel.Email = submitModel.Email;
             result.AddToModelState(ModelState);
             return View(ViewPath, viewModel);
         }
 
-        var sessionModel = new AddEmployerSessionModel { Email = submitModel.Email };
+        var sessionModel = new AddEmployerSessionModel { Email = submitModel.Email! };
         _sessionService.Set(sessionModel);
-
 
         var relationshipByEmail = await _outerApiClient.GetRelationshipByEmail(submitModel.Email!, ukprn, cancellationToken);
 
@@ -190,9 +189,8 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
 
     private SearchByEmailModel GetViewModel(int ukprn)
     {
-        var cancelLink = Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn });
         var backLink = Url.RouteUrl(RouteNames.AddEmployerStart, new { ukprn });
-        return new SearchByEmailModel { CancelLink = cancelLink!, BackLink = backLink!, Ukprn = ukprn };
+        return new SearchByEmailModel { BackLink = backLink!, Ukprn = ukprn };
     }
 
     private static bool HasMultipleAccounts(GetRelationshipByEmailResponse response)
