@@ -30,8 +30,6 @@ public class RequestPermissionsController(IOuterApiClient _outerApiclient, IEnco
 
         RequestPermissionsViewModel model = await CreateRequestPermissionsViewModel(ukprn, accountLegalEntityId, cancellationToken);
 
-        model.BackLink = Url.RouteUrl(RouteNames.EmployerDetails, new { ukprn, accountLegalEntityId })!;
-
         return View(model);
     }
 
@@ -78,6 +76,8 @@ public class RequestPermissionsController(IOuterApiClient _outerApiclient, IEnco
         PermissionDescriptionsViewModel existingPermissions = OperationsMappingService.MapOperationsToDescriptions(response.Operations.ToList());
         viewModel.ExistingPermissionToRecruit = viewModel.PermissionToRecruit = existingPermissions.PermissionToRecruit!;
         viewModel.ExistingPermissionToAddCohorts = viewModel.PermissionToAddCohorts = existingPermissions.PermissionToAddCohorts!;
+
+        viewModel.BackLink = Url.RouteUrl(RouteNames.EmployerDetails, new { ukprn, accountLegalEntityId })!;
 
         return viewModel;
     }
