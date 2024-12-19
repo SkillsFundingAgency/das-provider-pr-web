@@ -84,6 +84,7 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
 
         sessionModel.AccountLegalEntityId = relationshipByEmail.AccountLegalEntityId;
         sessionModel.AccountLegalEntityName = relationshipByEmail.AccountLegalEntityName;
+        sessionModel.Paye = relationshipByEmail.Paye;
         sessionModel.AccountId = relationshipByEmail.AccountId;
 
         _sessionService.Set(sessionModel);
@@ -128,7 +129,7 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
             employerAccountLink = Url.RouteUrl(RouteNames.EmployerDetailsByRequestId, new { ukprn, response!.RequestId });
         }
 
-        var shutterViewModel = new EmailSearchInviteAlreadySentShutterPageViewModel(email, employerName, employerAccountLink!);
+        var shutterViewModel = new EmailSearchInviteAlreadySentShutterPageViewModel(employerName, employerAccountLink!);
 
         return View(EmailSearchInviteAlreadySentShutterPageViewPath, shutterViewModel);
     }
