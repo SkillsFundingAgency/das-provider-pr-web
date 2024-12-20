@@ -119,12 +119,12 @@
 
             <thead class="govuk-table__head">
                 <tr class="govuk-table__row">
-                    <th scope="col" class="govuk-table__header govuk-!-width-one-third">Employer name</th>
-                    <th scope="col" class="govuk-table__header govuk-!-width-one-third">
+                    <th id="employer-name-header" scope="col" class="govuk-table__header govuk-!-width-one-third">Employer name</th>
+                    <th id="add-records-header" scope="col" class="govuk-table__header govuk-!-width-one-third">
                         Permission to add apprentice
                         records
                     </th>
-                    <th scope="col" class="govuk-table__header govuk-!-width-one-third">
+                    <th id="recruit-permission-header" scope="col" class="govuk-table__header govuk-!-width-one-third">
                         Permission to recruit
                         apprentices
                     </th>
@@ -135,7 +135,7 @@
                 @foreach (var employer in Model.Employers)
                 {
                     <tr class="govuk-table__row">
-                        <td class="govuk-table__cell">
+                        <td headers="employer-name-header" class="govuk-table__cell">
                             <div asp-show="employer.HasPendingRequest">
                                 <strong class="govuk-tag govuk-tag--orange govuk-!-margin-bottom-2">Request pending</strong>
                                 <br />
@@ -143,8 +143,8 @@
                             <a href="@employer.EmployerDetailsUrl" class="govuk-link app-search-result-link">@employer.Name</a><br />
                             <span asp-show="employer.HasAgreementId" class="govuk-!-font-size-16 das-!-color-dark-grey">Agreement ID: @employer.AgreementId</span>
                         </td>
-                        <td class="govuk-table__cell">@employer.CohortPermission</td>
-                        <td class="govuk-table__cell">@employer.RecruitmentPermision</td>
+                        <td headers="add-records-header" class="govuk-table__cell">@employer.CohortPermission</td>
+                        <td headers="recruit-permission-header" class="govuk-table__cell">@employer.RecruitmentPermision</td>
                     </tr>
                 }
             </tbody>
