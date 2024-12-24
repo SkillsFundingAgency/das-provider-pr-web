@@ -55,6 +55,7 @@ public class SearchByEmailControllerGetTests
         viewModel!.Ukprn.Should().Be(ukprn);
         viewModel.BackLink.Should().Be(BackLink);
         viewModel.Email.Should().Be(email);
+        sessionServiceMock.Verify(s => s.Set(It.Is<AddEmployerSessionModel>(x => x.Email == email)), Times.Once);
     }
 
     [Test, MoqAutoData]
@@ -74,5 +75,27 @@ public class SearchByEmailControllerGetTests
         actual.Should().BeOfType<RedirectToRouteResult>();
         actual.As<RedirectToRouteResult>().RouteName.Should().Be(RouteNames.CheckEmployerDetails);
         actual.As<RedirectToRouteResult>().RouteValues.Should().ContainKey("ukprn");
+    }
+
+    [Test, MoqAutoData]
+    public void Get_NotVistied_NoSessionEmail_ViewModelEmailNotSet(
+        [Frozen] Mock<IOuterApiClient> outerApiMock,
+        [Frozen] Mock<ISessionService> sessionServiceMock,
+        [Greedy] SearchByEmailController sut,
+        int ukprn)
+    {
+
+        sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel { Email = string.Empty });
+
+        sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
+
+        var result = sut.Index(ukprn);
+
+        ViewResult? viewResult = result.As<ViewResult>();
+        SearchByEmailModel? viewModel = viewResult.Model as SearchByEmailModel;
+        viewModel!.Ukprn.Should().Be(ukprn);
+        viewModel.BackLink.Should().Be(BackLink);
+        viewModel.Email.Should().Be(null);
+        sessionServiceMock.Verify(s => s.Set(It.IsAny<AddEmployerSessionModel>()), Times.Never);
     }
 }
