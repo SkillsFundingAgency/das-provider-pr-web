@@ -4,12 +4,8 @@ using SFA.DAS.Provider.PR.Web.Constants;
 using SFA.DAS.Provider.PR.Web.Models;
 
 namespace SFA.DAS.Provider.PR_Web.UnitTests.Models;
-public class EmployerDetailsModelTests
+public class EmployerDetailsViewModelTests
 {
-    public const string CreateAccountRequestType = "CreateAccount";
-    public const string PermissionRequestType = "Permission";
-    public const string AddAccountRequestType = "AddAccount";
-
     [Test, AutoData]
     public void ModelIsCreatedCorrectly_FromGetProviderRelationshipResponseObject(GetProviderRelationshipResponse response)
     {
@@ -181,5 +177,15 @@ public class EmployerDetailsModelTests
         var actual = (EmployerDetailsViewModel)response;
 
         Assert.That(actual.HasPermissionsRequest, Is.EqualTo(expected));
+    }
+
+
+    [TestCase(null, false)]
+    [TestCase("", false)]
+    [TestCase("action text", true)]
+    public void EmployerDetailsViewModel_SetLastActionText_SetShowLastActionText(string? lastActionText, bool expectedShowLastActionText)
+    {
+        var actual = new EmployerDetailsViewModel { LastActionText = lastActionText };
+        Assert.That(actual.ShowLastActionText, Is.EqualTo(expectedShowLastActionText));
     }
 }
