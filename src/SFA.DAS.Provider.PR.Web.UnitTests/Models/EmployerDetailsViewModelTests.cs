@@ -143,13 +143,13 @@ public class EmployerDetailsViewModelTests
 
         var actual = (EmployerDetailsViewModel)response;
 
-        Assert.That(actual.CurrentPermissions.Contains(expected));
+        Assert.That(actual.CurrentPermissions, Does.Contain(expected));
     }
 
     [Test]
-    [InlineAutoData(new Operation[] { }, new Operation[] { Operation.CreateCohort }, false)]
-    [InlineAutoData(new Operation[] { Operation.CreateCohort }, new Operation[] { }, true)]
-    [InlineAutoData(new Operation[] { Operation.CreateCohort }, new Operation[] { Operation.CreateCohort }, true)]
+    [InlineAutoData(new Operation[] { }, new[] { Operation.CreateCohort }, false)]
+    [InlineAutoData(new[] { Operation.CreateCohort }, new Operation[] { }, true)]
+    [InlineAutoData(new[] { Operation.CreateCohort }, new[] { Operation.CreateCohort }, true)]
     public void HasExistingPermissionsSetCorrectly(Operation[] operations, Operation[] lastRequestOperations,
         bool expected, GetProviderRelationshipResponse response)
     {
@@ -185,7 +185,7 @@ public class EmployerDetailsViewModelTests
     [TestCase("action text", true)]
     public void EmployerDetailsViewModel_SetLastActionText_SetShowLastActionText(string? lastActionText, bool expectedShowLastActionText)
     {
-        var actual = new EmployerDetailsViewModel { LastActionText = lastActionText };
+        var actual = new EmployerDetailsViewModel { LastActionText = lastActionText! };
         Assert.That(actual.ShowLastActionText, Is.EqualTo(expectedShowLastActionText));
     }
 }
