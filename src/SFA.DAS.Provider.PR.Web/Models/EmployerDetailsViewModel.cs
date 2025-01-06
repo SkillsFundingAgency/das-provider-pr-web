@@ -36,6 +36,8 @@ public class EmployerDetailsViewModel
 
     public bool ShowAgreementId { get; set; } = true;
 
+    public bool ShowLastActionText => !string.IsNullOrWhiteSpace(LastActionText);
+
     public static implicit operator EmployerDetailsViewModel(GetProviderRelationshipResponse response)
     {
         return new EmployerDetailsViewModel
