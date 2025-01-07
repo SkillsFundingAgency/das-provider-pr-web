@@ -1,4 +1,6 @@
-﻿using FluentValidation;
+﻿using FluentAssertions;
+using FluentAssertions.Execution;
+using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -119,21 +121,14 @@ public class RequestPermissionsControllerTests
             )
         );
 
-        _encodingServiceMock.Setup(x => 
-            x.Decode(
-                It.IsAny<string>(), 
-                EncodingType.PublicAccountLegalEntityId
-            )
-        ).Returns(123);
+        _encodingServiceMock.Setup(x => x.Decode(It.IsAny<string>(), EncodingType.PublicAccountLegalEntityId)).Returns(123);
 
         var result = await sut.Index(12345, "accountLegalEntityId", submitModel, CancellationToken.None);
         
-        Assert.Multiple(() =>
+        using (new AssertionScope())
         {
-            Assert.That(result, Is.InstanceOf<ViewResult>());
-            var viewResult = (ViewResult)result;
-            Assert.That(viewResult.Model, Is.InstanceOf<RequestPermissionsViewModel>());
-        });
+            result.As<ViewResult>().Model.As<RequestPermissionsViewModel>().BackLink.Should().NotBeNull();
+        };
     }
 
     [Test]

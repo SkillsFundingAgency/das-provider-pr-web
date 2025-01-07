@@ -12,7 +12,7 @@ namespace SFA.DAS.Provider.PR.Web.Controllers;
 public class RequestPermissionsConfirmationController : Controller
 {
     [HttpGet]
-    public IActionResult Index([FromRoute] long ukprn, [FromRoute]string accountLegalEntityId, CancellationToken cancellationToken)
+    public IActionResult Index([FromRoute] long ukprn, [FromRoute] string accountLegalEntityId, CancellationToken cancellationToken)
     {
         var viewModel = new RequestPermissionsConfirmationViewModel
         {

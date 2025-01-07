@@ -60,6 +60,7 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
     {
         submitModel.Paye = submitModel.Paye?.Trim();
         submitModel.Aorn = submitModel.Aorn?.Trim();
+
         var result = _validator.Validate(submitModel);
 
         if (!result.IsValid)
@@ -78,20 +79,20 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
             return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
         }
 
-        sessionModel.Paye = submitModel.Paye;
-        sessionModel.Aorn = submitModel.Aorn;
+        sessionModel.Paye = submitModel.Paye!;
+        sessionModel.Aorn = submitModel.Aorn!;
         sessionModel.IsCheckDetailsVisited = false;
         _sessionService.Set(sessionModel);
 
-        var encodedPaye = Uri.EscapeDataString(sessionModel.Paye!);
+        var encodedPaye = Uri.EscapeDataString(sessionModel.Paye);
 
-        var relationshipsRequest = await _outerApiClient.GetProviderRelationshipsByUkprnPayeAorn(ukprn, sessionModel.Aorn!, encodedPaye, cancellationToken);
+        var relationshipsRequest = await _outerApiClient.GetProviderRelationshipsByUkprnPayeAorn(ukprn, sessionModel.Aorn, encodedPaye, cancellationToken);
 
         bool? hasActiveRequest = relationshipsRequest.HasActiveRequest;
 
         if (hasActiveRequest is true)
         {
-            var requestResponse = await _outerApiClient.GetRequest(ukprn, sessionModel.Paye!, cancellationToken);
+            var requestResponse = await _outerApiClient.GetRequest(ukprn, sessionModel.Paye, cancellationToken);
 
             var request = requestResponse.GetContent();
             if (request.AccountLegalEntityId != null)
@@ -122,7 +123,7 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
         /// If you get here, there is definitely one or more legal entities, as 'accountDoesNotExist' is false
         bool hasOneLegalEntity = relationshipsRequest.HasOneLegalEntity!.Value;
 
-        if (hasOneLegalEntity is false)
+        if (!hasOneLegalEntity)
         {
             return RedirectToRoute(RouteNames.AddEmployerMultipleAccounts, new { ukprn });
         }

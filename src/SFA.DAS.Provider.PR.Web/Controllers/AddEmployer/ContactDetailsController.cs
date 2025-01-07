@@ -53,8 +53,6 @@ public class ContactDetailsController(ISessionService _sessionService, IValidato
             return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
         }
 
-        submitModel.FirstName = submitModel.FirstName!.Trim();
-        submitModel.LastName = submitModel.LastName!.Trim();
         var result = _validator.Validate(submitModel);
 
         if (!result.IsValid)
@@ -64,9 +62,8 @@ public class ContactDetailsController(ISessionService _sessionService, IValidato
             return View(ViewPath, viewModel);
         }
 
-
-        sessionModel.FirstName = submitModel.FirstName;
-        sessionModel.LastName = submitModel.LastName;
+        sessionModel.FirstName = submitModel.FirstName!.Trim();
+        sessionModel.LastName = submitModel.LastName!.Trim();
         _sessionService.Set(sessionModel);
 
         return RedirectToRoute(RouteNames.CheckEmployerDetails, new { ukprn });
