@@ -14,4 +14,5 @@ public class AddEmployerSessionModel : PermissionDescriptionsViewModel
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
     public bool IsCheckDetailsVisited { get; set; }
+    public Guid? RequestId { get; set; }
 }

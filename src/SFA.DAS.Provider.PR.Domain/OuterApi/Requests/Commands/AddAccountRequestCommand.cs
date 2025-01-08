@@ -16,4 +16,5 @@ public class AddAccountRequestCommand
     public string? EmployerContactEmail { get; set; }
 
     public required List<Operation> Operations { get; set; } = [];
+    public string? Paye { get; set; }
 }

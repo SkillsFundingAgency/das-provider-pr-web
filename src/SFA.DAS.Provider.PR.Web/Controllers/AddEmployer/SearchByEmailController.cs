@@ -60,10 +60,10 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
             return View(ViewPath, viewModel);
         }
 
-        var sessionModel = new AddEmployerSessionModel { Email = submitModel.Email! };
-        _sessionService.Set(sessionModel);
-
         var relationshipByEmail = await _outerApiClient.GetRelationshipByEmail(submitModel.Email!, ukprn, cancellationToken);
+
+        var sessionModel = new AddEmployerSessionModel { Email = submitModel.Email!, RequestId = relationshipByEmail.RequestId };
+        _sessionService.Set(sessionModel);
 
         if (relationshipByEmail.HasActiveRequest)
         {
@@ -98,14 +98,14 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
     public async Task<IActionResult> EmailSearchInviteAlreadySent([FromRoute] int ukprn, CancellationToken cancellationToken)
     {
         var sessionModel = _sessionService.Get<AddEmployerSessionModel>();
-        var email = sessionModel?.Email;
+        var requestId = sessionModel?.RequestId;
 
-        if (string.IsNullOrEmpty(email))
+        if (requestId == null)
         {
             return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
         }
 
-        var requestResponse = await _outerApiClient.GetRequestByUkprnAndEmail(ukprn, email, cancellationToken);
+        var requestResponse = await _outerApiClient.GetRequestByRequestId((Guid)requestId, cancellationToken);
         var response = requestResponse.GetContent();
 
         long? accountLegalEntityId = response?.AccountLegalEntityId;
@@ -128,7 +128,7 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
             employerAccountLink = Url.RouteUrl(RouteNames.EmployerDetailsByRequestId, new { ukprn, response!.RequestId });
         }
 
-        var shutterViewModel = new EmailSearchInviteAlreadySentShutterPageViewModel(email, employerName, employerAccountLink!);
+        var shutterViewModel = new EmailSearchInviteAlreadySentShutterPageViewModel(employerName, employerAccountLink!);
 
         return View(EmailSearchInviteAlreadySentShutterPageViewPath, shutterViewModel);
     }

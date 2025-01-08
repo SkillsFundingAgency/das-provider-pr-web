@@ -1,5 +1,4 @@
-﻿using System.Net;
-using AutoFixture.NUnit3;
+﻿using AutoFixture.NUnit3;
 using FluentAssertions;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +14,7 @@ using SFA.DAS.Provider.PR.Web.Models.AddEmployer;
 using SFA.DAS.Provider.PR.Web.Models.Session;
 using SFA.DAS.Provider.PR_Web.UnitTests.TestHelpers;
 using SFA.DAS.Testing.AutoFixture;
+using System.Net;
 
 namespace SFA.DAS.Provider.PR_Web.UnitTests.Controllers.SearchByEmail;
 public class EmailSearchInviteAlreadySentShutterPageTests
@@ -133,22 +133,23 @@ public class EmailSearchInviteAlreadySentShutterPageTests
         int ukprn,
         int accountLegalEntityId,
         string employerName,
-        GetRequestByUkprnEmailResponse getRequestByUkprnEmailResponse,
+        GetRequestsByRequestIdResponse getRequestsByRequestIdResponse,
         CancellationToken cancellationToken)
     {
-        getRequestByUkprnEmailResponse.EmployerOrganisationName = employerName;
-        getRequestByUkprnEmailResponse.RequestType = RequestType.Permission.ToString();
+        getRequestsByRequestIdResponse.EmployerOrganisationName = employerName;
+        getRequestsByRequestIdResponse.RequestType = RequestType.Permission.ToString();
         var email = "test@test.com";
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel
         {
             Email = email,
+            RequestId = getRequestsByRequestIdResponse.RequestId,
             AccountLegalEntityId = accountLegalEntityId,
             AccountLegalEntityName = employerName
         });
 
-        Response<GetRequestByUkprnEmailResponse> resultResponse = new(null, new(HttpStatusCode.OK), () => getRequestByUkprnEmailResponse);
+        Response<GetRequestsByRequestIdResponse> resultResponse = new(null, new(HttpStatusCode.OK), () => getRequestsByRequestIdResponse);
 
-        outerApiMock.Setup(o => o.GetRequestByUkprnAndEmail(ukprn, Email, cancellationToken)).ReturnsAsync(resultResponse);
+        outerApiMock.Setup(o => o.GetRequestByRequestId(getRequestsByRequestIdResponse.RequestId, cancellationToken)).ReturnsAsync(resultResponse);
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.EmployerDetails, EmployerDetailsLink);
 
@@ -159,7 +160,6 @@ public class EmailSearchInviteAlreadySentShutterPageTests
         EmailSearchInviteAlreadySentShutterPageViewModel? viewModel =
             viewResult.Model as EmailSearchInviteAlreadySentShutterPageViewModel;
         viewModel!.EmployerAccountLink.Should().Be(EmployerDetailsLink);
-        viewModel.Email.Should().Be(Email);
         viewModel.EmployerName.Should().Be(employerName.ToUpper());
     }
 
@@ -173,22 +173,23 @@ public class EmailSearchInviteAlreadySentShutterPageTests
         int ukprn,
         int accountLegalEntityId,
         string employerName,
-        GetRequestByUkprnEmailResponse getRequestByUkprnEmailResponse,
+        GetRequestsByRequestIdResponse getRequestsByRequestIdResponse,
         CancellationToken cancellationToken)
     {
-        getRequestByUkprnEmailResponse.EmployerOrganisationName = employerName;
-        getRequestByUkprnEmailResponse.RequestType = RequestType.AddAccount.ToString();
+        getRequestsByRequestIdResponse.EmployerOrganisationName = employerName;
+        getRequestsByRequestIdResponse.RequestType = RequestType.AddAccount.ToString();
         var email = "test@test.com";
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel
         {
             Email = email,
+            RequestId = getRequestsByRequestIdResponse.RequestId,
             AccountLegalEntityId = accountLegalEntityId,
             AccountLegalEntityName = employerName
         });
 
-        Response<GetRequestByUkprnEmailResponse> resultResponse = new(null, new(HttpStatusCode.OK), () => getRequestByUkprnEmailResponse);
+        Response<GetRequestsByRequestIdResponse> resultResponse = new(null, new(HttpStatusCode.OK), () => getRequestsByRequestIdResponse);
 
-        outerApiMock.Setup(o => o.GetRequestByUkprnAndEmail(ukprn, Email, cancellationToken)).ReturnsAsync(resultResponse);
+        outerApiMock.Setup(o => o.GetRequestByRequestId(getRequestsByRequestIdResponse.RequestId, cancellationToken)).ReturnsAsync(resultResponse);
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.EmployerDetailsByRequestId, EmployerDetailsByRequestIdLink);
 
@@ -199,7 +200,6 @@ public class EmailSearchInviteAlreadySentShutterPageTests
         EmailSearchInviteAlreadySentShutterPageViewModel? viewModel =
             viewResult.Model as EmailSearchInviteAlreadySentShutterPageViewModel;
         viewModel!.EmployerAccountLink.Should().Be(EmployerDetailsByRequestIdLink);
-        viewModel.Email.Should().Be(Email);
         viewModel.EmployerName.Should().Be(employerName.ToUpper());
     }
 
@@ -213,21 +213,22 @@ public class EmailSearchInviteAlreadySentShutterPageTests
       int ukprn,
       int requestId,
       string employerName,
-      GetRequestByUkprnEmailResponse getRequestByUkprnEmailResponse,
+      GetRequestsByRequestIdResponse getRequestsByRequestIdResponse,
       CancellationToken cancellationToken)
     {
-        getRequestByUkprnEmailResponse.EmployerOrganisationName = employerName;
-        getRequestByUkprnEmailResponse.AccountLegalEntityId = null;
+        getRequestsByRequestIdResponse.EmployerOrganisationName = employerName;
+        getRequestsByRequestIdResponse.AccountLegalEntityId = null;
         var email = "test@test.com";
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel
         {
             Email = email,
+            RequestId = getRequestsByRequestIdResponse.RequestId,
             AccountLegalEntityName = employerName
         });
 
-        Response<GetRequestByUkprnEmailResponse> resultResponse = new(null, new(HttpStatusCode.OK), () => getRequestByUkprnEmailResponse);
+        Response<GetRequestsByRequestIdResponse> resultResponse = new(null, new(HttpStatusCode.OK), () => getRequestsByRequestIdResponse);
 
-        outerApiMock.Setup(o => o.GetRequestByUkprnAndEmail(ukprn, Email, cancellationToken)).ReturnsAsync(resultResponse);
+        outerApiMock.Setup(o => o.GetRequestByRequestId(getRequestsByRequestIdResponse.RequestId, cancellationToken)).ReturnsAsync(resultResponse);
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.EmployerDetailsByRequestId, EmployerDetailsByRequestIdLink);
 
@@ -238,7 +239,6 @@ public class EmailSearchInviteAlreadySentShutterPageTests
         EmailSearchInviteAlreadySentShutterPageViewModel? viewModel =
             viewResult.Model as EmailSearchInviteAlreadySentShutterPageViewModel;
         viewModel!.EmployerAccountLink.Should().Be(EmployerDetailsByRequestIdLink);
-        viewModel.Email.Should().Be(Email);
         viewModel.EmployerName.Should().Be(employerName.ToUpper());
     }
 }
