@@ -3,6 +3,7 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Encoding;
+using SFA.DAS.Provider.PR.Application.Constants;
 using SFA.DAS.Provider.PR.Domain.Interfaces;
 using SFA.DAS.Provider.PR.Web.Authorization;
 using SFA.DAS.Provider.PR.Web.Infrastructure;
@@ -93,12 +94,12 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
         if (hasActiveRequest is true)
         {
             var requestResponse = await _outerApiClient.GetRequest(ukprn, sessionModel.Paye, cancellationToken);
-
             var request = requestResponse.GetContent();
+            TempData[TempDataKeys.RequestId] = request.RequestId;
+
             if (request.AccountLegalEntityId != null)
             {
                 sessionModel.AccountLegalEntityId = request.AccountLegalEntityId!.Value;
-                sessionModel.RequestId = request.RequestId;
                 _sessionService.Set(sessionModel);
             }
 

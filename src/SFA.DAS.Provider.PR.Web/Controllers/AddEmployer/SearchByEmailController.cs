@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using SFA.DAS.Encoding;
+using SFA.DAS.Provider.PR.Application.Constants;
 using SFA.DAS.Provider.PR.Domain.Interfaces;
 using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
 using SFA.DAS.Provider.PR.Web.Authorization;
@@ -60,10 +61,11 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
             return View(ViewPath, viewModel);
         }
 
-        var relationshipByEmail = await _outerApiClient.GetRelationshipByEmail(submitModel.Email!, ukprn, cancellationToken);
-
-        var sessionModel = new AddEmployerSessionModel { Email = submitModel.Email!, RequestId = relationshipByEmail.RequestId };
+        var sessionModel = new AddEmployerSessionModel { Email = submitModel.Email! };
         _sessionService.Set(sessionModel);
+
+        var relationshipByEmail = await _outerApiClient.GetRelationshipByEmail(submitModel.Email!, ukprn, cancellationToken);
+        TempData[TempDataKeys.RequestId] = relationshipByEmail.RequestId;
 
         if (relationshipByEmail.HasActiveRequest)
         {
@@ -97,15 +99,14 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
     [Route("emailSearchInviteAlreadySent", Name = RouteNames.EmailSearchInviteAlreadySent)]
     public async Task<IActionResult> EmailSearchInviteAlreadySent([FromRoute] int ukprn, CancellationToken cancellationToken)
     {
-        var sessionModel = _sessionService.Get<AddEmployerSessionModel>();
-        var requestId = sessionModel?.RequestId;
+        var requestId = GetRequestId();
 
-        if (requestId == null)
+        if (string.IsNullOrEmpty(requestId))
         {
             return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
         }
 
-        var requestResponse = await _outerApiClient.GetRequestByRequestId((Guid)requestId, cancellationToken);
+        var requestResponse = await _outerApiClient.GetRequestByRequestId(new Guid(requestId), cancellationToken);
         var response = requestResponse.GetContent();
 
         long? accountLegalEntityId = response?.AccountLegalEntityId;
@@ -198,4 +199,14 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
         return !(response.HasOneEmployerAccount.GetValueOrDefault()
                 && response.HasOneLegalEntity.GetValueOrDefault());
     }
+
+    private string GetRequestId()
+    {
+        if (TempData is null) return string.Empty;
+
+        return TempData.TryGetValue(TempDataKeys.RequestId, out var value) && value is not null
+            ? value.ToString() ?? string.Empty
+            : string.Empty;
+    }
+
 }

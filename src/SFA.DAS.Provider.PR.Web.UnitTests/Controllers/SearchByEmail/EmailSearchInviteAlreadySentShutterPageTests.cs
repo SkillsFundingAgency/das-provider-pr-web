@@ -1,10 +1,13 @@
 ﻿using AutoFixture.NUnit3;
 using FluentAssertions;
 using FluentValidation;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Moq;
 using RestEase;
 using SFA.DAS.Encoding;
+using SFA.DAS.Provider.PR.Application.Constants;
 using SFA.DAS.Provider.PR.Domain.Interfaces;
 using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
 using SFA.DAS.Provider.PR.Web.Controllers.AddEmployer;
@@ -99,21 +102,25 @@ public class EmailSearchInviteAlreadySentShutterPageTests
         [Frozen] Mock<ISessionService> sessionServiceMock,
         [Frozen] Mock<IValidator<SearchByEmailSubmitModel>> validatorMock,
         [Greedy] SearchByEmailController sut,
-        GetRequestByUkprnEmailResponse getRequestByUkprnEmailResponse,
+        GetRequestsByRequestIdResponse getRequestsByRequestIdResponse,
         int ukprn,
         CancellationToken cancellationToken)
     {
-        getRequestByUkprnEmailResponse.EmployerOrganisationName = string.Empty;
+        getRequestsByRequestIdResponse.EmployerOrganisationName = string.Empty;
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel
         {
             Email = Email
         });
 
-        Response<GetRequestByUkprnEmailResponse> resultResponse = new(null, new(HttpStatusCode.OK), () => getRequestByUkprnEmailResponse);
+        Response<GetRequestsByRequestIdResponse> resultResponse = new(null, new(HttpStatusCode.OK), () => getRequestsByRequestIdResponse);
 
-        outerApiMock.Setup(o => o.GetRequestByUkprnAndEmail(ukprn, Email, cancellationToken)).ReturnsAsync(resultResponse);
+        outerApiMock.Setup(o => o.GetRequestByRequestId(getRequestsByRequestIdResponse.RequestId, cancellationToken)).ReturnsAsync(resultResponse);
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, AddEmployerStartLink);
+        sut.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>())
+        {
+            { TempDataKeys.RequestId, getRequestsByRequestIdResponse.RequestId.ToString() }
+        };
 
         var result = await sut.EmailSearchInviteAlreadySent(ukprn, cancellationToken);
 
@@ -142,7 +149,6 @@ public class EmailSearchInviteAlreadySentShutterPageTests
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel
         {
             Email = email,
-            RequestId = getRequestsByRequestIdResponse.RequestId,
             AccountLegalEntityId = accountLegalEntityId,
             AccountLegalEntityName = employerName
         });
@@ -152,6 +158,10 @@ public class EmailSearchInviteAlreadySentShutterPageTests
         outerApiMock.Setup(o => o.GetRequestByRequestId(getRequestsByRequestIdResponse.RequestId, cancellationToken)).ReturnsAsync(resultResponse);
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.EmployerDetails, EmployerDetailsLink);
+        sut.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>())
+        {
+            { TempDataKeys.RequestId, getRequestsByRequestIdResponse.RequestId.ToString() }
+        };
 
         var result = await sut.EmailSearchInviteAlreadySent(ukprn, cancellationToken);
 
@@ -182,7 +192,6 @@ public class EmailSearchInviteAlreadySentShutterPageTests
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel
         {
             Email = email,
-            RequestId = getRequestsByRequestIdResponse.RequestId,
             AccountLegalEntityId = accountLegalEntityId,
             AccountLegalEntityName = employerName
         });
@@ -192,6 +201,10 @@ public class EmailSearchInviteAlreadySentShutterPageTests
         outerApiMock.Setup(o => o.GetRequestByRequestId(getRequestsByRequestIdResponse.RequestId, cancellationToken)).ReturnsAsync(resultResponse);
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.EmployerDetailsByRequestId, EmployerDetailsByRequestIdLink);
+        sut.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>())
+        {
+            { TempDataKeys.RequestId, getRequestsByRequestIdResponse.RequestId.ToString() }
+        };
 
         var result = await sut.EmailSearchInviteAlreadySent(ukprn, cancellationToken);
 
@@ -222,7 +235,6 @@ public class EmailSearchInviteAlreadySentShutterPageTests
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(new AddEmployerSessionModel
         {
             Email = email,
-            RequestId = getRequestsByRequestIdResponse.RequestId,
             AccountLegalEntityName = employerName
         });
 
@@ -231,6 +243,10 @@ public class EmailSearchInviteAlreadySentShutterPageTests
         outerApiMock.Setup(o => o.GetRequestByRequestId(getRequestsByRequestIdResponse.RequestId, cancellationToken)).ReturnsAsync(resultResponse);
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.EmployerDetailsByRequestId, EmployerDetailsByRequestIdLink);
+        sut.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>())
+        {
+            { TempDataKeys.RequestId, getRequestsByRequestIdResponse.RequestId.ToString() }
+        };
 
         var result = await sut.EmailSearchInviteAlreadySent(ukprn, cancellationToken);
 
