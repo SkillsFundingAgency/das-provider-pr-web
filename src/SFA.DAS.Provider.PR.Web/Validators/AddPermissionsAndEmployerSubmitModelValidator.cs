@@ -14,6 +14,11 @@ public class AddPermissionsAndEmployerSubmitModelValidator : AbstractValidator<A
             .Cascade(CascadeMode.Stop)
             .Must(HasAtLeastOnePermission)
             .WithMessage(BothSelectionsAreNoErrorMessage);
+
+        RuleFor(s => s.PermissionToRecruit)
+            .Cascade(CascadeMode.Stop)
+            .Must(HasAtLeastOnePermission)
+            .WithMessage(BothSelectionsAreNoErrorMessage);
     }
 
     private static bool HasAtLeastOnePermission(AddPermissionsAndEmployerSubmitModel model, string? addRecords)

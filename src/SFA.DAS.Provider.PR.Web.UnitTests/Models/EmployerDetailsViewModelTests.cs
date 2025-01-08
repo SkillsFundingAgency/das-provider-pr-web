@@ -4,12 +4,8 @@ using SFA.DAS.Provider.PR.Web.Constants;
 using SFA.DAS.Provider.PR.Web.Models;
 
 namespace SFA.DAS.Provider.PR_Web.UnitTests.Models;
-public class EmployerDetailsModelTests
+public class EmployerDetailsViewModelTests
 {
-    public const string CreateAccountRequestType = "CreateAccount";
-    public const string PermissionRequestType = "Permission";
-    public const string AddAccountRequestType = "AddAccount";
-
     [Test, AutoData]
     public void ModelIsCreatedCorrectly_FromGetProviderRelationshipResponseObject(GetProviderRelationshipResponse response)
     {
@@ -32,28 +28,6 @@ public class EmployerDetailsModelTests
             Assert.That(actual.LastRequestOperations, Is.EqualTo(Array.Empty<Operation>()));
             Assert.That(actual.HasPermissionsRequest, Is.False);
         });
-    }
-
-    [Test, AutoData]
-    public void EmployerDetailsViewModel_LastActionText_ExistingRecruitRelationshipText(GetProviderRelationshipResponse response)
-    {
-        response.LastRequestOperations = Array.Empty<Operation>();
-        response.LastRequestStatus = RequestStatus.Declined;
-        response.LastAction = PermissionAction.RecruitRelationship;
-
-        var actual = (EmployerDetailsViewModel)response;
-        Assert.That(actual.LastActionText, Is.EqualTo(EmployerDetailsViewModel.RelationshipByRecruitText));
-    }
-
-    [Test, AutoData]
-    public void EmployerDetailsViewModel_LastActionText_ExistingApprovalsRelationshipText(GetProviderRelationshipResponse response)
-    {
-        response.LastRequestOperations = Array.Empty<Operation>();
-        response.LastRequestStatus = RequestStatus.Declined;
-        response.LastAction = PermissionAction.ApprovalsRelationship;
-
-        var actual = (EmployerDetailsViewModel)response;
-        Assert.That(actual.LastActionText, Is.EqualTo(EmployerDetailsViewModel.RelationshipByApprovalText));
     }
 
     [Test, AutoData]
@@ -159,43 +133,6 @@ public class EmployerDetailsModelTests
     }
 
     [Test]
-    [InlineAutoData(RequestStatus.Sent, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsViewModel.UpdatePermissionRequestSentText)]
-    [InlineAutoData(RequestStatus.Sent, PermissionAction.AccountAdded, CreateAccountRequestType, EmployerDetailsViewModel.PermissionSetText)]
-    [InlineAutoData(RequestStatus.Sent, PermissionAction.AccountCreated, CreateAccountRequestType, EmployerDetailsViewModel.CreateOrAddAccountRequestAcceptedText)]
-    [InlineAutoData(RequestStatus.Accepted, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsViewModel.PermissionSetText)]
-    [InlineAutoData(RequestStatus.Declined, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsViewModel.UpdatePermissionRequestDeclinedText)]
-    [InlineAutoData(RequestStatus.Expired, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsViewModel.UpdatePermissionRequestExpiredText)]
-    [InlineAutoData(RequestStatus.Accepted, PermissionAction.AccountCreated, CreateAccountRequestType, EmployerDetailsViewModel.CreateOrAddAccountRequestAcceptedText)]
-    [InlineAutoData(RequestStatus.Accepted, PermissionAction.RecruitRelationship, AddAccountRequestType, EmployerDetailsViewModel.RelationshipByRecruitText)]
-    [InlineAutoData(RequestStatus.Accepted, PermissionAction.ApprovalsRelationship, AddAccountRequestType, EmployerDetailsViewModel.RelationshipByApprovalText)]
-    [InlineAutoData(RequestStatus.Accepted, PermissionAction.AccountAdded, AddAccountRequestType, EmployerDetailsViewModel.PermissionSetText)]
-
-    public void LastActionTextIsSetCorrectly_WhenExistingRelationshipExists(RequestStatus status, PermissionAction action, string lastRequestType, string expected,
-        GetProviderRelationshipResponse response)
-    {
-        response.LastRequestStatus = status;
-        response.LastAction = action;
-        response.LastRequestType = lastRequestType;
-
-        var actual = (EmployerDetailsViewModel)response;
-
-        Assert.That(actual.LastActionText, Is.EqualTo(expected));
-    }
-
-    [Test]
-    [InlineAutoData("AddAccount", EmployerDetailsViewModel.PendingAddTrainingProviderAndPermissionsRequestText)]
-    [InlineAutoData("CreateAccount", EmployerDetailsViewModel.PendingCreateAccountInvitationText)]
-    public void LastActionTextIsSetCorrectly_WhenExistingDoesNotRelationshipExist(string lastRequestType, string expected,
-        GetRequestsByRequestIdResponse response)
-    {
-        response.RequestType = lastRequestType;
-
-        var actual = (EmployerDetailsViewModel)response;
-
-        Assert.That(actual.LastActionText, Is.EqualTo(expected));
-    }
-
-    [Test]
     [InlineAutoData(new Operation[] { Operation.CreateCohort }, SetPermissionsText.CohortsPermissionText)]
     [InlineAutoData(new Operation[] { Operation.Recruitment }, SetPermissionsText.RecruitmentPermissionText)]
     [InlineAutoData(new Operation[] { Operation.RecruitmentRequiresReview }, SetPermissionsText.RecruitmentWithReviewPermissionText)]
@@ -206,13 +143,13 @@ public class EmployerDetailsModelTests
 
         var actual = (EmployerDetailsViewModel)response;
 
-        Assert.That(actual.CurrentPermissions.Contains(expected));
+        Assert.That(actual.CurrentPermissions, Does.Contain(expected));
     }
 
     [Test]
-    [InlineAutoData(new Operation[] { }, new Operation[] { Operation.CreateCohort }, false)]
-    [InlineAutoData(new Operation[] { Operation.CreateCohort }, new Operation[] { }, true)]
-    [InlineAutoData(new Operation[] { Operation.CreateCohort }, new Operation[] { Operation.CreateCohort }, true)]
+    [InlineAutoData(new Operation[] { }, new[] { Operation.CreateCohort }, false)]
+    [InlineAutoData(new[] { Operation.CreateCohort }, new Operation[] { }, true)]
+    [InlineAutoData(new[] { Operation.CreateCohort }, new[] { Operation.CreateCohort }, true)]
     public void HasExistingPermissionsSetCorrectly(Operation[] operations, Operation[] lastRequestOperations,
         bool expected, GetProviderRelationshipResponse response)
     {
@@ -240,5 +177,15 @@ public class EmployerDetailsModelTests
         var actual = (EmployerDetailsViewModel)response;
 
         Assert.That(actual.HasPermissionsRequest, Is.EqualTo(expected));
+    }
+
+
+    [TestCase(null, false)]
+    [TestCase("", false)]
+    [TestCase("action text", true)]
+    public void EmployerDetailsViewModel_SetLastActionText_SetShowLastActionText(string? lastActionText, bool expectedShowLastActionText)
+    {
+        var actual = new EmployerDetailsViewModel { LastActionText = lastActionText! };
+        Assert.That(actual.ShowLastActionText, Is.EqualTo(expectedShowLastActionText));
     }
 }

@@ -24,6 +24,28 @@ public sealed class RequestPermissionsSubmitModelValidatorTests
             .WithErrorMessage(RequestPermissionsSubmitModelValidator.MatchesExistingPermissionErrorMessage);
     }
 
+    [TestCase(SetPermissions.AddRecords.Yes, SetPermissions.AddRecords.No, SetPermissions.RecruitApprentices.Yes, SetPermissions.RecruitApprentices.Yes)]
+    [TestCase(SetPermissions.AddRecords.No, SetPermissions.AddRecords.Yes, SetPermissions.RecruitApprentices.Yes, SetPermissions.RecruitApprentices.Yes )]
+    [TestCase(SetPermissions.AddRecords.No, SetPermissions.AddRecords.No, SetPermissions.RecruitApprentices.Yes, SetPermissions.RecruitApprentices.YesWithReview )]
+    [TestCase(SetPermissions.AddRecords.Yes, SetPermissions.AddRecords.Yes, SetPermissions.RecruitApprentices.YesWithReview, SetPermissions.RecruitApprentices.Yes)]
+    [TestCase(SetPermissions.AddRecords.Yes, SetPermissions.AddRecords.Yes, SetPermissions.RecruitApprentices.No, SetPermissions.RecruitApprentices.Yes)]
+    [TestCase(SetPermissions.AddRecords.Yes, SetPermissions.AddRecords.Yes, SetPermissions.RecruitApprentices.YesWithReview, SetPermissions.RecruitApprentices.No)]
+    public void Validate_AnyPermissionChanges_IsValid(string existingCohortPErmission, string newCohortPermission, string existingRecruitPermission, string newRecruitPermission)
+    {
+        var model = new RequestPermissionsSubmitModel()
+        {
+            PermissionToAddCohorts = newCohortPermission,
+            ExistingPermissionToAddCohorts = existingCohortPErmission,
+            PermissionToRecruit = newRecruitPermission,
+            ExistingPermissionToRecruit = existingRecruitPermission
+        };
+
+        var sut = new RequestPermissionsSubmitModelValidator();
+        var result = sut.TestValidate(model);
+
+        result.ShouldNotHaveValidationErrorFor(a => a.PermissionToAddCohorts);
+    }
+
     [Test]
     public void RequestPermissionsSubmitModelValidator_NoSelections_ReturnsInvalid()
     {
@@ -31,7 +53,7 @@ public sealed class RequestPermissionsSubmitModelValidatorTests
         {
             PermissionToAddCohorts = SetPermissions.AddRecords.No,
             PermissionToRecruit = SetPermissions.RecruitApprentices.No,
-            ExistingPermissionToAddCohorts = SetPermissions.AddRecords.No,
+            ExistingPermissionToAddCohorts = SetPermissions.AddRecords.Yes,
             ExistingPermissionToRecruit = SetPermissions.RecruitApprentices.No
         };
         var sut = new RequestPermissionsSubmitModelValidator();

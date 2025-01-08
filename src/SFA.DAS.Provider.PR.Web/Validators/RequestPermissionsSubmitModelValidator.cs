@@ -12,17 +12,25 @@ public class RequestPermissionsSubmitModelValidator : AbstractValidator<RequestP
     public RequestPermissionsSubmitModelValidator()
     {
         RuleFor(s => s.PermissionToAddCohorts)
-            .Must(ChangePermissionsNotChanged)
+            .Cascade(CascadeMode.Stop)
+            .Must(HasUpdatedPermissions)
+            .WithMessage(MatchesExistingPermissionErrorMessage)
+            .Must(AddPermissionsBothNoFalse)
+            .WithMessage(BothSelectionsAreNoErrorMessage);
+
+        RuleFor(s => s.PermissionToRecruit)
+            .Cascade(CascadeMode.Stop)
+            .Must(HasUpdatedPermissions)
             .WithMessage(MatchesExistingPermissionErrorMessage)
             .Must(AddPermissionsBothNoFalse)
             .WithMessage(BothSelectionsAreNoErrorMessage);
     }
 
-    private static bool ChangePermissionsNotChanged(RequestPermissionsSubmitModel viewModel, string? addRecords)
+    private static bool HasUpdatedPermissions(RequestPermissionsSubmitModel viewModel, string? addRecords)
     {
         return 
             !(viewModel.PermissionToAddCohorts == viewModel.ExistingPermissionToAddCohorts && 
-            viewModel.PermissionToRecruit == viewModel.ExistingPermissionToAddCohorts);
+            viewModel.PermissionToRecruit == viewModel.ExistingPermissionToRecruit);
     }
 
     private static bool AddPermissionsBothNoFalse(RequestPermissionsSubmitModel viewModel, string? addRecords)

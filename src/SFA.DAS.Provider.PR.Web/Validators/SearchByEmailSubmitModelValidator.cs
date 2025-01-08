@@ -19,12 +19,7 @@ public class SearchByEmailSubmitModelValidator : AbstractValidator<SearchByEmail
             .WithMessage(NoEmailErrorMessage)
             .Matches(RegularExpressions.EmailRegex)
             .WithMessage(InvalidEmailErrorMessage)
-            .Must(IsDomainValid)
+            .MustAsync(async (email, cancellationToken) => await EmailCheckingService.IsValidDomain(email))
             .WithMessage(InvalidDomainErrorMessage);
-    }
-
-    private static bool IsDomainValid(string email)
-    {
-        return EmailCheckingService.IsValidDomain(email);
     }
 }
