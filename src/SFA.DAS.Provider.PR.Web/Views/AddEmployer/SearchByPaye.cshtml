@@ -36,27 +36,27 @@
             <div esfa-validation-marker-for="@Model.Paye" class="govuk-form-group">
                 <span asp-validation-for="Paye" class="govuk-error-message"></span>
                 <div class="govuk-body" id="paye">
-                    <label class="govuk-label govuk-label--s" for="paye">
+                    <label id="PayeLabel" class="govuk-label govuk-label--s" for="paye">
                         Employer PAYE reference
                     </label>
                     <div id="paye-hint" class="govuk-hint">
                         This is a 3 digit tax office number, a forward slash, and a tax office employer reference, like 123/AB456.
                     </div>
-                    <input asp-for="Paye" class="govuk-input govuk-input--width-20"  name="paye" type="text" spellcheck="false" autocomplete="off" sfa-validationerror-class="form-control-error" maxlength="14">
+                    <input asp-for="Paye" class="govuk-input govuk-input--width-20" aria-labelledby="PayeLabel" role="search" name="paye" type="text" spellcheck="false" autocomplete="off" sfa-validationerror-class="form-control-error" maxlength="14">
                 </div>
             </div>
             
             <div esfa-validation-marker-for="@Model.Aorn" class="govuk-form-group">
                 <span asp-validation-for="Aorn" class="govuk-error-message"></span>
                 <div class="govuk-body" id="aorn">
-                    <label class="govuk-label govuk-label--s" for="aorn">
+                    <label id="AornLabel" class="govuk-label govuk-label--s" for="aorn">
                         Accounts Office reference
                     </label>
                     <div id="aorn-hint" class="govuk-hint">
                         This is 13 characters, like 123PX00123456. The employer can find it on letters from HMRC about PAYE
                         and when they registered as an employer.
                     </div>
-                    <input asp-for="Aorn" class="govuk-input govuk-input--width-20" name="aorn" type="text" spellcheck="false" autocomplete="off" sfa-validationerror-class="form-control-error" maxlength="13">
+                    <input asp-for="Aorn" class="govuk-input govuk-input--width-20" aria-labelledby="AornLabel" role="search" name="aorn" type="text" spellcheck="false" autocomplete="off" sfa-validationerror-class="form-control-error" maxlength="13">
                 </div>
             </div>
 
