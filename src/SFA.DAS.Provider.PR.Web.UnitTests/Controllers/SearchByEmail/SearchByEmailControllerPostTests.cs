@@ -158,7 +158,8 @@ public class SearchByEmailControllerPostTests
             x => x.Email == Email
                  && x.AccountId == getRelationshipByEmailResponse.AccountId
                  && x.AccountLegalEntityId == getRelationshipByEmailResponse.AccountLegalEntityId
-            && x.AccountLegalEntityName == getRelationshipByEmailResponse.AccountLegalEntityName
+                 && x.AccountLegalEntityName == getRelationshipByEmailResponse.AccountLegalEntityName
+                 && x.Paye == getRelationshipByEmailResponse.Paye
             )), Times.AtLeastOnce);
     }
 

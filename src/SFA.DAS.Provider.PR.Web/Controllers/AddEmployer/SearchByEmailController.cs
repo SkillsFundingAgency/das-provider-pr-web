@@ -87,6 +87,7 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
         sessionModel.AccountLegalEntityId = relationshipByEmail.AccountLegalEntityId;
         sessionModel.AccountLegalEntityName = relationshipByEmail.AccountLegalEntityName;
         sessionModel.AccountId = relationshipByEmail.AccountId;
+        sessionModel.Paye = relationshipByEmail.Paye;
 
         _sessionService.Set(sessionModel);
 
