@@ -132,6 +132,7 @@ public class AddPermissionsAndEmployerControllerGetSentControllerTests
     public async Task Get_PostsExpectedAddRequestForSingleOperation(
         string addRecordsOperation,
         string addRecruitmentOperation,
+        string paye,
         [Frozen] Mock<IOuterApiClient> outerApiClientMock,
         [Frozen] Mock<ISessionService> sessionServiceMock,
         [Frozen] Mock<IValidator<AddPermissionsAndEmployerSubmitModel>> validatorMock,
@@ -151,7 +152,8 @@ public class AddPermissionsAndEmployerControllerGetSentControllerTests
             AccountLegalEntityName = accountLegalName,
             AccountId = accountId,
             PermissionToAddCohorts = addRecordsOperation,
-            PermissionToRecruit = addRecruitmentOperation
+            PermissionToRecruit = addRecruitmentOperation,
+            Paye = paye
         };
 
         sessionServiceMock.Setup(s => s.Get<AddEmployerSessionModel>()).Returns(addEmployerSessionModel);
@@ -174,6 +176,7 @@ public class AddPermissionsAndEmployerControllerGetSentControllerTests
             && s.AccountLegalEntityId == accountLegalEntityId
             && s.Ukprn == ukprn
           && s.Operations.First() == expectedOperations.First()
+            && s.Paye == paye
         ), cancellationToken), Times.Once);
     }
 
