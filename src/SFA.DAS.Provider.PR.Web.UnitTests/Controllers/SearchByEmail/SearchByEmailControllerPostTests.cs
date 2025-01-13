@@ -2,7 +2,9 @@
 using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Moq;
 using SFA.DAS.Encoding;
 using SFA.DAS.Provider.PR.Domain.Interfaces;
@@ -51,6 +53,7 @@ public class SearchByEmailControllerPostTests
         validatorMock.Setup(v => v.ValidateAsync(It.IsAny<SearchByEmailSubmitModel>(), It.IsAny<CancellationToken>())).ReturnsAsync(new ValidationResult());
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
+        sut.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
 
         var result = await sut.Index(ukprn, searchByEmailSubmitModel, cancellationToken);
 
@@ -82,6 +85,8 @@ public class SearchByEmailControllerPostTests
 
         validatorMock.Setup(v => v.ValidateAsync(It.IsAny<SearchByEmailSubmitModel>(), It.IsAny<CancellationToken>())).ReturnsAsync(new ValidationResult());
 
+        sut.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
+
         var result = await sut.Index(ukprn, searchByEmailSubmitModel, cancellationToken);
 
         RedirectToRouteResult? redirectToRouteResult = result.As<RedirectToRouteResult>();
@@ -110,6 +115,7 @@ public class SearchByEmailControllerPostTests
 
         var sut = new SearchByEmailController(outerApiClientMock.Object, sessionServiceMock.Object,
             encodingServiceMock.Object, validatorMock.Object);
+        sut.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
 
         await sut.Index(ukprn, searchByEmailSubmitModel, cancellationToken);
 
@@ -140,6 +146,7 @@ public class SearchByEmailControllerPostTests
         validatorMock.Setup(v => v.ValidateAsync(It.IsAny<SearchByEmailSubmitModel>(), It.IsAny<CancellationToken>())).ReturnsAsync(new ValidationResult());
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
+        sut.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
 
         var result = await sut.Index(ukprn, searchByEmailSubmitModel, cancellationToken);
 
@@ -151,7 +158,8 @@ public class SearchByEmailControllerPostTests
             x => x.Email == Email
                  && x.AccountId == getRelationshipByEmailResponse.AccountId
                  && x.AccountLegalEntityId == getRelationshipByEmailResponse.AccountLegalEntityId
-            && x.AccountLegalEntityName == getRelationshipByEmailResponse.AccountLegalEntityName
+                 && x.AccountLegalEntityName == getRelationshipByEmailResponse.AccountLegalEntityName
+                 && x.Paye == getRelationshipByEmailResponse.Paye
             )), Times.AtLeastOnce);
     }
 
@@ -285,6 +293,7 @@ public class SearchByEmailControllerPostTests
         validatorMock.Setup(v => v.ValidateAsync(It.IsAny<SearchByEmailSubmitModel>(), It.IsAny<CancellationToken>())).ReturnsAsync(new ValidationResult());
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
+        sut.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
 
         await sut.Index(ukprn, searchByEmailSubmitModel, cancellationToken);
 
@@ -320,6 +329,7 @@ public class SearchByEmailControllerPostTests
         validatorMock.Setup(v => v.ValidateAsync(It.IsAny<SearchByEmailSubmitModel>(), It.IsAny<CancellationToken>())).ReturnsAsync(new ValidationResult());
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerMultipleAccounts, RedirectToMultipleAccountsShutterPage);
+        sut.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
 
         var result = await sut.Index(ukprn, searchByEmailSubmitModel, cancellationToken);
 
@@ -348,6 +358,7 @@ public class SearchByEmailControllerPostTests
         validatorMock.Setup(v => v.ValidateAsync(It.IsAny<SearchByEmailSubmitModel>(), It.IsAny<CancellationToken>())).ReturnsAsync(new ValidationResult());
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
+        sut.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
 
         var result = await sut.Index(ukprn, searchByEmailSubmitModel, cancellationToken);
 

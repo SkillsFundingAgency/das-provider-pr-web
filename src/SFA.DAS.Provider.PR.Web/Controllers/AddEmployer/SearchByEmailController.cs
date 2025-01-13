@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using SFA.DAS.Encoding;
+using SFA.DAS.Provider.PR.Application.Constants;
 using SFA.DAS.Provider.PR.Domain.Interfaces;
 using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
 using SFA.DAS.Provider.PR.Web.Authorization;
@@ -64,6 +65,7 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
         _sessionService.Set(sessionModel);
 
         var relationshipByEmail = await _outerApiClient.GetRelationshipByEmail(submitModel.Email!, ukprn, cancellationToken);
+        TempData[TempDataKeys.RequestId] = relationshipByEmail.RequestId;
 
         if (relationshipByEmail.HasActiveRequest)
         {
@@ -85,6 +87,7 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
         sessionModel.AccountLegalEntityId = relationshipByEmail.AccountLegalEntityId;
         sessionModel.AccountLegalEntityName = relationshipByEmail.AccountLegalEntityName;
         sessionModel.AccountId = relationshipByEmail.AccountId;
+        sessionModel.Paye = relationshipByEmail.Paye;
 
         _sessionService.Set(sessionModel);
 
@@ -97,15 +100,14 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
     [Route("emailSearchInviteAlreadySent", Name = RouteNames.EmailSearchInviteAlreadySent)]
     public async Task<IActionResult> EmailSearchInviteAlreadySent([FromRoute] int ukprn, CancellationToken cancellationToken)
     {
-        var sessionModel = _sessionService.Get<AddEmployerSessionModel>();
-        var email = sessionModel?.Email;
+        var requestId = GetRequestId();
 
-        if (string.IsNullOrEmpty(email))
+        if (string.IsNullOrEmpty(requestId))
         {
             return RedirectToRoute(RouteNames.AddEmployerStart, new { ukprn });
         }
 
-        var requestResponse = await _outerApiClient.GetRequestByUkprnAndEmail(ukprn, email, cancellationToken);
+        var requestResponse = await _outerApiClient.GetRequestByRequestId(new Guid(requestId), cancellationToken);
         var response = requestResponse.GetContent();
 
         long? accountLegalEntityId = response?.AccountLegalEntityId;
@@ -128,7 +130,7 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
             employerAccountLink = Url.RouteUrl(RouteNames.EmployerDetailsByRequestId, new { ukprn, response!.RequestId });
         }
 
-        var shutterViewModel = new EmailSearchInviteAlreadySentShutterPageViewModel(email, employerName, employerAccountLink!);
+        var shutterViewModel = new EmailSearchInviteAlreadySentShutterPageViewModel(employerName, employerAccountLink!);
 
         return View(EmailSearchInviteAlreadySentShutterPageViewPath, shutterViewModel);
     }
@@ -198,4 +200,14 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
         return !(response.HasOneEmployerAccount.GetValueOrDefault()
                 && response.HasOneLegalEntity.GetValueOrDefault());
     }
+
+    private string GetRequestId()
+    {
+        if (TempData is null) return string.Empty;
+
+        return TempData.TryGetValue(TempDataKeys.RequestId, out var value) && value is not null
+            ? value.ToString() ?? string.Empty
+            : string.Empty;
+    }
+
 }

@@ -2,7 +2,9 @@
 using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Moq;
 using SFA.DAS.Provider.PR.Domain.Interfaces;
 using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
@@ -426,6 +428,7 @@ public class SearchByPayeControllerPostTests
         validatorMock.Setup(v => v.Validate(It.IsAny<SearchByPayeSubmitModel>())).Returns(new ValidationResult());
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
+        sut.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
 
         var result = await sut.Index(ukprn, searchByPayeSubmitModel, cancellationToken);
 
@@ -472,6 +475,7 @@ public class SearchByPayeControllerPostTests
         validatorMock.Setup(v => v.Validate(It.IsAny<SearchByPayeSubmitModel>())).Returns(new ValidationResult());
 
         sut.AddUrlHelperMock().AddUrlForRoute(RouteNames.AddEmployerStart, BackLink);
+        sut.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
 
         await sut.Index(ukprn, searchByPayeSubmitModel, cancellationToken);
 
