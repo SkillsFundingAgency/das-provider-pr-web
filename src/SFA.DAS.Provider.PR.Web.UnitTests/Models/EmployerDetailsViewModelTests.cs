@@ -31,6 +31,28 @@ public class EmployerDetailsViewModelTests
     }
 
     [Test, AutoData]
+    public void EmployerDetailsViewModel_LastActionText_ExistingRecruitRelationshipText(GetProviderRelationshipResponse response)
+    {
+        response.LastRequestOperations = Array.Empty<Operation>();
+        response.LastRequestStatus = RequestStatus.Declined;
+        response.LastAction = PermissionAction.RecruitRelationship;
+
+        var actual = (EmployerDetailsViewModel)response;
+        Assert.That(actual.LastActionText, Is.EqualTo(EmployerDetailsViewModel.RelationshipByRecruitText));
+    }
+
+    [Test, AutoData]
+    public void EmployerDetailsViewModel_LastActionText_ExistingApprovalsRelationshipText(GetProviderRelationshipResponse response)
+    {
+        response.LastRequestOperations = Array.Empty<Operation>();
+        response.LastRequestStatus = RequestStatus.Declined;
+        response.LastAction = PermissionAction.ApprovalsRelationship;
+
+        var actual = (EmployerDetailsViewModel)response;
+        Assert.That(actual.LastActionText, Is.EqualTo(EmployerDetailsViewModel.RelationshipByApprovalText));
+    }
+
+    [Test, AutoData]
     public void EmployerDetailsViewModel_SetLastActionDate_LastRequestTimeHasValue(GetProviderRelationshipResponse response)
     {
         response.LastRequestTime = DateTime.UtcNow;
@@ -130,6 +152,19 @@ public class EmployerDetailsViewModelTests
         var actual = (EmployerDetailsViewModel)response;
 
         Assert.That(actual.LastRequestOperations, Is.EqualTo(response.LastRequestOperations));
+    }
+
+    [Test]
+    [InlineAutoData("AddAccount", EmployerDetailsViewModel.PendingAddTrainingProviderAndPermissionsRequestText)]
+    [InlineAutoData("CreateAccount", EmployerDetailsViewModel.PendingCreateAccountInvitationText)]
+    public void LastActionTextIsSetCorrectly_WhenExistingDoesNotRelationshipExist(string lastRequestType, string expected,
+        GetRequestsByRequestIdResponse response)
+    {
+        response.RequestType = lastRequestType;
+
+        var actual = (EmployerDetailsViewModel)response;
+
+        Assert.That(actual.LastActionText, Is.EqualTo(expected));
     }
 
     [Test]
