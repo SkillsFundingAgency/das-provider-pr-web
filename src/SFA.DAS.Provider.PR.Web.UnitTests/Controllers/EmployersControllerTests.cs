@@ -95,7 +95,7 @@ public class EmployersControllerTests
     }
 
     [Test, AutoData]
-    public async Task Index_NoRelationshipRequest_BuildsEmployerDetailsLink(int ukprn, GetProviderRelationshipsResponse response, GetRequestsByRequestIdResponse responseByRequestData, string employerDetailsLink, ApplicationSettings applicationSettings, ProviderRelationshipModel employer, CancellationToken cancellationToken)
+    public async Task IndexWithUkprn_HasExistingRelationships_BuildsEmployerDetailsLink(int ukprn, GetProviderRelationshipsResponse response, GetRequestsByRequestIdResponse responseByRequestData, string employerDetailsLink, ApplicationSettings applicationSettings, ProviderRelationshipModel employer, CancellationToken cancellationToken)
     {
         Mock<IOuterApiClient> outerApiClientMock = new();
 
@@ -123,18 +123,21 @@ public class EmployersControllerTests
         actual.As<ViewResult>().Model.As<EmployersViewModel>().Employers.First().EmployerDetailsUrl.Should().Be(employerDetailsLink);
     }
 
-    [Test, AutoData]
-    public async Task Index_HasRelationshipRequests_BuildsEmployerDetailsLink(int ukprn, GetProviderRelationshipsResponse response, GetRequestsByRequestIdResponse responseByRequestData, string employerDetailsLink, ApplicationSettings applicationSettings, ProviderRelationshipModel employer, CancellationToken cancellationToken)
+    [Test]
+    [InlineAutoData(RequestType.AddAccount)]
+    [InlineAutoData(RequestType.CreateAccount)]
+    public async Task IndexWithUkprn_HasRelationshipRequests_BuildsEmployerDetailsLink(RequestType requestType, int ukprn, GetProviderRelationshipsResponse response, GetRequestsByRequestIdResponse responseByRequestData, string employerDetailsLink, ApplicationSettings applicationSettings, ProviderRelationshipModel employer, CancellationToken cancellationToken)
     {
         Mock<IOuterApiClient> outerApiClientMock = new();
 
-        employer.RequestId = Guid.NewGuid();
+        employer.RequestId = new Guid();
         response.Employers = new List<ProviderRelationshipModel> { employer };
         response.HasAnyRelationships = true;
 
         outerApiClientMock.Setup(c => c.GetProviderRelationships(ukprn, It.IsAny<Dictionary<string, string>>(), cancellationToken)).ReturnsAsync(response);
 
         Response<GetRequestsByRequestIdResponse> responseByRequest = new(null, new(HttpStatusCode.OK), () => responseByRequestData);
+        responseByRequestData.RequestType = requestType.ToString();
         outerApiClientMock.Setup(c => c.GetRequestByRequestId(It.IsAny<Guid>(), cancellationToken))
             .ReturnsAsync(responseByRequest);
 
@@ -142,11 +145,12 @@ public class EmployersControllerTests
         applicationSettingsMock.Setup(a => a.Value).Returns(applicationSettings);
 
         EmployersController sut = new(outerApiClientMock.Object, applicationSettingsMock.Object);
-        sut.AddDefaultContext().AddUrlHelperMock().AddUrlForRoute(RouteNames.EmployerDetailsByRequestId, employerDetailsLink);
+        sut.AddDefaultContext().AddUrlHelperMock().AddUrlForRoute(RouteNames.EmployerDetails, employerDetailsLink);
         sut.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
 
         var actual = await sut.Index(ukprn, new(), cancellationToken);
 
         actual.As<ViewResult>().Model.As<EmployersViewModel>().Employers.First().EmployerDetailsUrl.Should().Be(employerDetailsLink);
+        outerApiClientMock.Verify(x => x.GetRequestByRequestId((Guid)employer.RequestId, cancellationToken), Times.AtLeast(1));
     }
 }

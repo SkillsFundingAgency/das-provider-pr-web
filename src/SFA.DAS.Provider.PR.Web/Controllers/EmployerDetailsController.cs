@@ -7,7 +7,6 @@ using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
 using SFA.DAS.Provider.PR.Web.Authorization;
 using SFA.DAS.Provider.PR.Web.Infrastructure;
 using SFA.DAS.Provider.PR.Web.Models;
-using SFA.DAS.Provider.PR.Web.Services;
 
 namespace SFA.DAS.Provider.PR.Web.Controllers;
 
@@ -26,7 +25,6 @@ public class EmployerDetailsController(IOuterApiClient _outerApiclient, IEncodin
             await _outerApiclient.GetProviderRelationship(ukprn, accountLegalEntityIdDecoded, cancellationToken);
 
         EmployerDetailsViewModel model = response;
-        model.LastActionText = EmployerDetailsMappingService.MapLastActionText(response);
 
         model.EmployersLink = Url.RouteUrl(RouteNames.Employers, new { ukprn })!;
 
@@ -46,7 +44,6 @@ public class EmployerDetailsController(IOuterApiClient _outerApiclient, IEncodin
         }
 
         EmployerDetailsViewModel model = response.GetContent();
-        model.LastActionText = EmployerDetailsMappingService.MapLastActionText(response.GetContent());
 
         model.AccountLegalEntityPublicHashedId =
             encodingService.Encode(model.AccountLegalEntityId, EncodingType.PublicAccountLegalEntityId);
