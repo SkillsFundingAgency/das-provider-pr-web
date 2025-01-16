@@ -155,30 +155,6 @@ public class EmployerDetailsViewModelTests
     }
 
     [Test]
-    [InlineAutoData(RequestStatus.Sent, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsViewModel.UpdatePermissionRequestSentText)]
-    [InlineAutoData(RequestStatus.Sent, PermissionAction.AccountAdded, CreateAccountRequestType, EmployerDetailsViewModel.PermissionSetText)]
-    [InlineAutoData(RequestStatus.Sent, PermissionAction.AccountCreated, CreateAccountRequestType, EmployerDetailsViewModel.CreateOrAddAccountRequestAcceptedText)]
-    [InlineAutoData(RequestStatus.Accepted, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsViewModel.PermissionSetText)]
-    [InlineAutoData(RequestStatus.Declined, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsViewModel.UpdatePermissionRequestDeclinedText)]
-    [InlineAutoData(RequestStatus.Expired, PermissionAction.PermissionUpdated, PermissionRequestType, EmployerDetailsViewModel.UpdatePermissionRequestExpiredText)]
-    [InlineAutoData(RequestStatus.Accepted, PermissionAction.AccountCreated, CreateAccountRequestType, EmployerDetailsViewModel.CreateOrAddAccountRequestAcceptedText)]
-    [InlineAutoData(RequestStatus.Accepted, PermissionAction.RecruitRelationship, AddAccountRequestType, EmployerDetailsViewModel.RelationshipByRecruitText)]
-    [InlineAutoData(RequestStatus.Accepted, PermissionAction.ApprovalsRelationship, AddAccountRequestType, EmployerDetailsViewModel.RelationshipByApprovalText)]
-    [InlineAutoData(RequestStatus.Accepted, PermissionAction.AccountAdded, AddAccountRequestType, EmployerDetailsViewModel.PermissionSetText)]
-
-    public void LastActionTextIsSetCorrectly_WhenExistingRelationshipExists(RequestStatus status, PermissionAction action, string lastRequestType, string expected,
-        GetProviderRelationshipResponse response)
-    {
-        response.LastRequestStatus = status;
-        response.LastAction = action;
-        response.LastRequestType = lastRequestType;
-
-        var actual = (EmployerDetailsViewModel)response;
-
-        Assert.That(actual.LastActionText, Is.EqualTo(expected));
-    }
-
-    [Test]
     [InlineAutoData("AddAccount", EmployerDetailsViewModel.PendingAddTrainingProviderAndPermissionsRequestText)]
     [InlineAutoData("CreateAccount", EmployerDetailsViewModel.PendingCreateAccountInvitationText)]
     public void LastActionTextIsSetCorrectly_WhenExistingDoesNotRelationshipExist(string lastRequestType, string expected,
