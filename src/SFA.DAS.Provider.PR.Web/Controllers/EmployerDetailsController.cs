@@ -27,9 +27,9 @@ public class EmployerDetailsController(IOuterApiClient _outerApiclient, IEncodin
         var request = requestResponse?.GetContent();
 
         if (request?.RequestId != null &&
-            request?.RequestId != Guid.Empty &&
-            request?.RequestType == RequestType.AddAccount &&
-           (request?.Status == RequestStatus.New || request?.Status == RequestStatus.Sent))
+            request.RequestId != Guid.Empty &&
+            request.RequestType == RequestType.AddAccount &&
+           (request.Status == RequestStatus.New || request.Status == RequestStatus.Sent))
         {
             return RedirectToRoute(RouteNames.EmployerDetailsByRequestId, new { ukprn, request.RequestId });
         }

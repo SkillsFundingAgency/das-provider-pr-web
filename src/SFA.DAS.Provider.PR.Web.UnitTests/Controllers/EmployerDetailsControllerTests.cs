@@ -26,8 +26,8 @@ public class EmployerDetailsControllerTests
 
         Mock<IOuterApiClient> outerApiClientMock = new();
         outerApiClientMock.Setup(x =>
-                x.GetRequestByUkprnAndAccountLegalEntityId(ukprn, accountLegalEntityId, CancellationToken.None))
-            .ReturnsAsync((Response<GetRequestByUkprnAccountLegalEntityIdResponse>)null);
+                x.GetRequestByUkprnAndAccountLegalEntityId(ukprn, accountLegalEntityId, CancellationToken.None))!
+            .ReturnsAsync(new Response<GetRequestByUkprnAccountLegalEntityIdResponse>(null, new(HttpStatusCode.OK), () => ((GetRequestByUkprnAccountLegalEntityIdResponse?)null)!));
 
         outerApiClientMock.Setup(x => x.GetProviderRelationship(ukprn, accountLegalEntityId, CancellationToken.None))
             .ReturnsAsync(response);
@@ -57,8 +57,8 @@ public class EmployerDetailsControllerTests
 
         Mock<IOuterApiClient> outerApiClientMock = new();
         outerApiClientMock.Setup(x =>
-                x.GetRequestByUkprnAndAccountLegalEntityId(ukprn, accountLegalEntityId, CancellationToken.None))
-            .ReturnsAsync((Response<GetRequestByUkprnAccountLegalEntityIdResponse>)null);
+                x.GetRequestByUkprnAndAccountLegalEntityId(ukprn, accountLegalEntityId, CancellationToken.None))!
+            .ReturnsAsync(new Response<GetRequestByUkprnAccountLegalEntityIdResponse>(null, new(HttpStatusCode.OK), () => ((GetRequestByUkprnAccountLegalEntityIdResponse?)null)!));
 
         outerApiClientMock.Setup(x => x.GetProviderRelationship(ukprn, accountLegalEntityId, CancellationToken.None))
             .ReturnsAsync(response);
