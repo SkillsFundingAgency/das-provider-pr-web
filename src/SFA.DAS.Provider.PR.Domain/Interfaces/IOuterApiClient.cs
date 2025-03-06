@@ -40,6 +40,11 @@ public interface IOuterApiClient
     Task<Response<GetRequestByUkprnEmailResponse>> GetRequestByUkprnAndEmail([Query] long ukprn, [Query] string email, CancellationToken cancellationToken);
 
     [AllowAnyStatusCode]
+    [Get("requests")]
+    Task<Response<GetRequestByUkprnAccountLegalEntityIdResponse>> GetRequestByUkprnAndAccountLegalEntityId(
+        [Query] long ukprn, [Query] long accountLegalEntityId, CancellationToken cancellationToken);
+
+    [AllowAnyStatusCode]
     [Get("requests/{requestid}")]
     Task<Response<GetRequestsByRequestIdResponse>> GetRequestByRequestId([Path] Guid requestid, CancellationToken cancellationToken);
 }

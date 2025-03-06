@@ -21,6 +21,19 @@ public class EmployerDetailsController(IOuterApiClient _outerApiclient, IEncodin
     {
         var accountLegalEntityIdDecoded = encodingService.Decode(accountlegalentityid, EncodingType.PublicAccountLegalEntityId);
 
+        var requestResponse =
+            await _outerApiclient.GetRequestByUkprnAndAccountLegalEntityId(ukprn, accountLegalEntityIdDecoded,
+                cancellationToken);
+        var request = requestResponse?.GetContent();
+
+        if (request?.RequestId != null &&
+            request?.RequestId != Guid.Empty &&
+            request?.RequestType == RequestType.AddAccount &&
+           (request?.Status == RequestStatus.New || request?.Status == RequestStatus.Sent))
+        {
+            return RedirectToRoute(RouteNames.EmployerDetailsByRequestId, new { ukprn, request.RequestId });
+        }
+
         GetProviderRelationshipResponse response =
             await _outerApiclient.GetProviderRelationship(ukprn, accountLegalEntityIdDecoded, cancellationToken);
 

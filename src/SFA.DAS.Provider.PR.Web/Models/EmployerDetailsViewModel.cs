@@ -71,6 +71,7 @@ public class EmployerDetailsViewModel
     {
         return new EmployerDetailsViewModel
         {
+            AccountLegalEntityId = (long)response.AccountLegalEntityId!,
             AccountLegalEntityName = response.EmployerOrganisationName!.ToUpper(),
             Ukprn = response.Ukprn,
             LastActionDate = response.RequestedDate.ToString("d MMM yyyy"),
