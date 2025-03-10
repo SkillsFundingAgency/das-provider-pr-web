@@ -83,8 +83,6 @@ public class EmployerDetailsViewModelTests
     [Test, AutoData]
     public void ModelIsCreatedCorrectly_FromGetRequestsByRequestIdResponseObject(GetRequestsByRequestIdResponse response)
     {
-        response.AccountLegalEntityId = null;
-
         var actual = (EmployerDetailsViewModel)response;
 
         Assert.Multiple(() =>
@@ -97,7 +95,7 @@ public class EmployerDetailsViewModelTests
             Assert.That(actual.LastRequestOperations, Is.EqualTo(response.Operations));
             Assert.That(actual.HasPermissionsRequest, Is.True);
             Assert.That(actual.HasExistingPermissions, Is.False);
-            Assert.That(actual.ShowAgreementId, Is.False);
+            Assert.That(actual.ShowAgreementId, Is.True);
         });
     }
 
