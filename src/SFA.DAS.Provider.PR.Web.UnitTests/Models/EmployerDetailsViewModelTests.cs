@@ -100,6 +100,23 @@ public class EmployerDetailsViewModelTests
     }
 
     [Test, AutoData]
+    public void FromGetRequestsByRequestIdResponseOperator_HasAccountLegalEntityId_ShowAgreementIsTrue(GetRequestsByRequestIdResponse response)
+    {
+        var actual = (EmployerDetailsViewModel)response;
+
+        Assert.That(actual.ShowAgreementId, Is.True);
+    }
+
+    [Test, AutoData]
+    public void FromGetRequestsByRequestIdResponseOperator_DoesNotHaveAccountLegalEntityId_ShowAgreementIdIsFalse(GetRequestsByRequestIdResponse response)
+    {
+        response.AccountLegalEntityId = null;
+        var actual = (EmployerDetailsViewModel)response;
+
+        Assert.That(actual.ShowAgreementId, Is.False);
+    }
+
+    [Test, AutoData]
     public void EmployerDetailsViewModel_SetHasExistingPermissions_ApprovalsRelationshipReturnsTrue(GetProviderRelationshipResponse response)
     {
         response.LastAction = PermissionAction.ApprovalsRelationship;
