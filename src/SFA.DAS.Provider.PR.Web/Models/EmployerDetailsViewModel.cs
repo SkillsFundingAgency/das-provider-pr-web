@@ -14,7 +14,7 @@ public class EmployerDetailsViewModel
     public const string RelationshipByRecruitText = "Added you as training provider for new apprentice vacancy";
     public const string RelationshipByApprovalText = "Added you as training provider for new apprentice";
 
-    public long AccountLegalEntityId { get; set; }
+    public long? AccountLegalEntityId { get; set; }
 
     public string AccountLegalEntityPublicHashedId { get; set; } = null!;
 
@@ -71,7 +71,7 @@ public class EmployerDetailsViewModel
     {
         return new EmployerDetailsViewModel
         {
-            AccountLegalEntityId = (long)response.AccountLegalEntityId!,
+            AccountLegalEntityId = response.AccountLegalEntityId,
             AccountLegalEntityName = response.EmployerOrganisationName!.ToUpper(),
             Ukprn = response.Ukprn,
             LastActionDate = response.RequestedDate.ToString("d MMM yyyy"),

@@ -45,8 +45,10 @@ public class EmployerDetailsController(IOuterApiClient _outerApiclient, IEncodin
 
         EmployerDetailsViewModel model = response.GetContent();
 
-        model.AccountLegalEntityPublicHashedId =
-            encodingService.Encode(model.AccountLegalEntityId, EncodingType.PublicAccountLegalEntityId);
+        if (model.AccountLegalEntityId.HasValue)
+        {
+            model.AccountLegalEntityPublicHashedId = encodingService.Encode(model.AccountLegalEntityId.Value, EncodingType.PublicAccountLegalEntityId);
+        }
 
         model.EmployersLink = Url.RouteUrl(RouteNames.Employers, new { ukprn })!;
 
