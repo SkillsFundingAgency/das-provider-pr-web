@@ -62,7 +62,7 @@ public class EmployerDetailsController(IOuterApiClient _outerApiclient, IEncodin
         return View(model);
     }
 
-    private bool IsActivePermissionsRequest(Response<GetRequestsByRequestIdResponse> response)
+    private static bool IsActivePermissionsRequest(Response<GetRequestsByRequestIdResponse> response)
     {
         var responseContent = response.GetContent();
 
