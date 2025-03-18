@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RestEase;
 using SFA.DAS.Encoding;
 using SFA.DAS.Provider.PR.Domain.Interfaces;
 using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
@@ -43,8 +44,7 @@ public class EmployerDetailsController(IOuterApiClient _outerApiclient, IEncodin
             return RedirectToAction("HttpStatusCodeHandler", "Error", new { statusCode = 404 });
         }
 
-        if (string.Equals(response.GetContent().RequestType, RequestType.Permission.ToString(),
-                StringComparison.CurrentCultureIgnoreCase))
+        if (IsActivePermissionsRequest(response))
         {
             return RedirectToRoute(RouteNames.EmployerDetails,
                 new { ukprn, response.GetContent().AccountLegalEntityId });
@@ -60,5 +60,14 @@ public class EmployerDetailsController(IOuterApiClient _outerApiclient, IEncodin
         model.EmployersLink = Url.RouteUrl(RouteNames.Employers, new { ukprn })!;
 
         return View(model);
+    }
+
+    private bool IsActivePermissionsRequest(Response<GetRequestsByRequestIdResponse> response)
+    {
+        var responseContent = response.GetContent();
+
+        return string.Equals(responseContent.RequestType, RequestType.Permission.ToString(), StringComparison.CurrentCultureIgnoreCase) &&
+               (string.Equals(responseContent.Status, RequestStatus.New.ToString(), StringComparison.CurrentCultureIgnoreCase) ||
+                string.Equals(responseContent.Status, RequestStatus.Sent.ToString(), StringComparison.CurrentCultureIgnoreCase));
     }
 }

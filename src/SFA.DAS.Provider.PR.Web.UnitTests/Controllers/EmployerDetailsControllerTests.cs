@@ -116,6 +116,7 @@ public class EmployerDetailsControllerTests
         Guid requestId, GetRequestsByRequestIdResponse responseData)
     {
         responseData.RequestType = RequestType.Permission.ToString();
+        responseData.Status = RequestStatus.Sent.ToString();
         Response<GetRequestsByRequestIdResponse> response = new(null, new(HttpStatusCode.OK), () => responseData);
 
         Mock<IOuterApiClient> outerApiClientMock = new();
