@@ -110,13 +110,14 @@ public class EmployerDetailsControllerTests
         actual.As<ViewResult>().Model.As<EmployerDetailsViewModel>().EmployersLink.Should().Be(employerUrl);
     }
 
-    [Test, AutoData]
+    [Test]
+    [InlineAutoData(RequestType.Permission, RequestStatus.Sent)]
+    [InlineAutoData(RequestType.Permission, RequestStatus.New)]
     public async Task IndexWithUkprnAndRequestId_AndActivePermissionsRequest_RedirectsToAccountLegalEntityIdRoute(
-        int ukprn,
-        Guid requestId, GetRequestsByRequestIdResponse responseData)
+        RequestType requestType, RequestStatus requestStatus, int ukprn, Guid requestId, GetRequestsByRequestIdResponse responseData)
     {
-        responseData.RequestType = RequestType.Permission.ToString();
-        responseData.Status = RequestStatus.Sent.ToString();
+        responseData.RequestType = requestType.ToString();
+        responseData.Status = requestStatus.ToString();
         Response<GetRequestsByRequestIdResponse> response = new(null, new(HttpStatusCode.OK), () => responseData);
 
         Mock<IOuterApiClient> outerApiClientMock = new();
