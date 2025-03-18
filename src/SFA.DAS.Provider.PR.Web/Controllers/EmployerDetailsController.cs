@@ -43,6 +43,13 @@ public class EmployerDetailsController(IOuterApiClient _outerApiclient, IEncodin
             return RedirectToAction("HttpStatusCodeHandler", "Error", new { statusCode = 404 });
         }
 
+        if (string.Equals(response.GetContent().RequestType, RequestType.Permission.ToString(),
+                StringComparison.CurrentCultureIgnoreCase))
+        {
+            return RedirectToRoute(RouteNames.EmployerDetails,
+                new { ukprn, response.GetContent().AccountLegalEntityId });
+        }
+
         EmployerDetailsViewModel model = response.GetContent();
 
         if (model.AccountLegalEntityId.HasValue)
