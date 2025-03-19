@@ -46,8 +46,11 @@ public class EmployerDetailsController(IOuterApiClient _outerApiclient, IEncodin
 
         if (HasActivePermissionsRequest(response))
         {
+            var accountLegalEntityId = encodingService.Encode(response.GetContent().AccountLegalEntityId!.Value,
+                EncodingType.PublicAccountLegalEntityId);
+
             return RedirectToRoute(RouteNames.EmployerDetails,
-                new { ukprn, response.GetContent().AccountLegalEntityId });
+                new { ukprn, accountLegalEntityId });
         }
 
         EmployerDetailsViewModel model = response.GetContent();
