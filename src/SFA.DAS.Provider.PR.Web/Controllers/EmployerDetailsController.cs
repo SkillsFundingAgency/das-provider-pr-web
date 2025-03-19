@@ -44,7 +44,7 @@ public class EmployerDetailsController(IOuterApiClient _outerApiclient, IEncodin
             return RedirectToAction("HttpStatusCodeHandler", "Error", new { statusCode = 404 });
         }
 
-        if (IsActivePermissionsRequest(response))
+        if (HasActivePermissionsRequest(response))
         {
             return RedirectToRoute(RouteNames.EmployerDetails,
                 new { ukprn, response.GetContent().AccountLegalEntityId });
@@ -62,12 +62,12 @@ public class EmployerDetailsController(IOuterApiClient _outerApiclient, IEncodin
         return View(model);
     }
 
-    private static bool IsActivePermissionsRequest(Response<GetRequestsByRequestIdResponse> response)
+    private static bool HasActivePermissionsRequest(Response<GetRequestsByRequestIdResponse> response)
     {
-        var responseContent = response.GetContent();
+        GetRequestsByRequestIdResponse responseContent = response.GetContent();
 
-        return string.Equals(responseContent.RequestType, RequestType.Permission.ToString(), StringComparison.CurrentCultureIgnoreCase) &&
-               (string.Equals(responseContent.Status, RequestStatus.New.ToString(), StringComparison.CurrentCultureIgnoreCase) ||
-                string.Equals(responseContent.Status, RequestStatus.Sent.ToString(), StringComparison.CurrentCultureIgnoreCase));
+        return responseContent.RequestType == RequestType.Permission.ToString() &&
+               (responseContent.Status == RequestStatus.New.ToString() ||
+                responseContent.Status == RequestStatus.Sent.ToString());
     }
 }
