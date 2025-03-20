@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RestEase;
 using SFA.DAS.Encoding;
 using SFA.DAS.Provider.PR.Domain.Interfaces;
 using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
@@ -43,6 +44,15 @@ public class EmployerDetailsController(IOuterApiClient _outerApiclient, IEncodin
             return RedirectToAction("HttpStatusCodeHandler", "Error", new { statusCode = 404 });
         }
 
+        if (HasActivePermissionsRequest(response))
+        {
+            var accountLegalEntityId = encodingService.Encode(response.GetContent().AccountLegalEntityId!.Value,
+                EncodingType.PublicAccountLegalEntityId);
+
+            return RedirectToRoute(RouteNames.EmployerDetails,
+                new { ukprn, accountLegalEntityId });
+        }
+
         EmployerDetailsViewModel model = response.GetContent();
 
         if (model.AccountLegalEntityId.HasValue)
@@ -53,5 +63,14 @@ public class EmployerDetailsController(IOuterApiClient _outerApiclient, IEncodin
         model.EmployersLink = Url.RouteUrl(RouteNames.Employers, new { ukprn })!;
 
         return View(model);
+    }
+
+    private static bool HasActivePermissionsRequest(Response<GetRequestsByRequestIdResponse> response)
+    {
+        GetRequestsByRequestIdResponse responseContent = response.GetContent();
+
+        return responseContent.RequestType == RequestType.Permission.ToString() &&
+               (responseContent.Status == RequestStatus.New.ToString() ||
+                responseContent.Status == RequestStatus.Sent.ToString());
     }
 }
