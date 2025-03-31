@@ -44,9 +44,8 @@ builder.Services
         options.Filters.Add<AutoValidateAntiforgeryTokenAttribute>();
     })
     .AddSessionStateTempDataProvider()
-    .SetDefaultNavigationSection(NavigationSection.Home)
-    .EnableGoogleAnalytics()
-    .SetDfESignInConfiguration(true);
+    .SetDefaultNavigationSection(NavigationSection.Relationships)
+    .EnableGoogleAnalytics();
 
 #if DEBUG
 builder.Services.AddControllersWithViews().AddControllersAsServices().AddRazorRuntimeCompilation();
