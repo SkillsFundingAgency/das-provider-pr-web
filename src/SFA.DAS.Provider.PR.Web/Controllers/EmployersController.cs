@@ -24,7 +24,7 @@ public class EmployersController(IOuterApiClient _outerApiclient, IOptions<Appli
     [HttpGet]
     public async Task<IActionResult> Index([FromRoute] long ukprn, [FromQuery] EmployersSubmitModel submitModel, CancellationToken cancellationToken)
     {
-        if(TempData.ContainsKey(TempDataKeys.PermissionsRequestId))
+        if (TempData.ContainsKey(TempDataKeys.PermissionsRequestId))
         {
             TempData.Remove(TempDataKeys.PermissionsRequestId);
         }
