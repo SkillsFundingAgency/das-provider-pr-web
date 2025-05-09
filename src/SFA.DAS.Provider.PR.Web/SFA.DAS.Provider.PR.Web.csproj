@@ -28,7 +28,7 @@
     <PackageReference Include="SFA.DAS.DfESignIn.Auth" Version="17.1.89" />
     <PackageReference Include="SFA.DAS.Encoding" Version="1.1.76" />
     <PackageReference Include="SFA.DAS.Http" Version="3.2.69" />
-    <PackageReference Include="SFA.DAS.Provider.Shared.UI" Version="2.0.39" />
+    <PackageReference Include="SFA.DAS.Provider.Shared.UI" Version="2.0.48" />
     <PackageReference Include="WebEssentials.AspNetCore.CdnTagHelpers" Version="1.0.21" />
   </ItemGroup>
 
