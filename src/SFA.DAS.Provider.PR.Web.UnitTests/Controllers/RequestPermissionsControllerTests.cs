@@ -23,7 +23,7 @@ public class RequestPermissionsControllerTests
     private Mock<IOuterApiClient> _outerApiClientMock;
     private Mock<IEncodingService> _encodingServiceMock;
     private Mock<IValidator<RequestPermissionsSubmitModel>> _validatorMock;
-    private RequestPermissionsController? sut;
+    private RequestPermissionsController sut = null!;
 
     [SetUp]
     public void Setup()
@@ -60,7 +60,7 @@ public class RequestPermissionsControllerTests
     [TearDown]
     public void TearDown()
     {
-        sut?.Dispose();
+        sut.Dispose();
     }
 
     [Test]
