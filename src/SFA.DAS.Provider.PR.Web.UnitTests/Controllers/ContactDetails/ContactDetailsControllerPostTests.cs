@@ -124,12 +124,12 @@ public class ContactDetailsControllerPostTests
         var viewResult = result.As<ViewResult>();
         Assert.That(viewResult, Is.Not.Null);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             var emailError = viewResult.ViewData.ModelState[nameof(contactDetailsSubmitModel.FirstName)]?.Errors.FirstOrDefault();
             Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'FirstName' field.");
             Assert.That(emailError!.ErrorMessage, Is.EqualTo(ValidationError));
-        });
+        }
     }
 
     [Test, MoqAutoData]
@@ -166,12 +166,12 @@ public class ContactDetailsControllerPostTests
         var viewResult = result.As<ViewResult>();
         Assert.That(viewResult, Is.Not.Null);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             var emailError = viewResult.ViewData.ModelState[nameof(contactDetailsSubmitModel.FirstName)]?.Errors.FirstOrDefault();
             Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'FirstName' field.");
             Assert.That(emailError!.ErrorMessage, Is.EqualTo(ValidationError));
-        });
+        }
     }
 
     [Test, MoqAutoData]
@@ -208,12 +208,12 @@ public class ContactDetailsControllerPostTests
         var viewResult = result.As<ViewResult>();
         Assert.That(viewResult, Is.Not.Null);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             var emailError = viewResult.ViewData.ModelState[nameof(contactDetailsSubmitModel.LastName)]?.Errors.FirstOrDefault();
             Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'LastName' field.");
             Assert.That(emailError!.ErrorMessage, Is.EqualTo(ValidationError));
-        });
+        }
     }
 
     [Test, MoqAutoData]
@@ -250,12 +250,12 @@ public class ContactDetailsControllerPostTests
         var viewResult = result.As<ViewResult>();
         Assert.That(viewResult, Is.Not.Null);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             var emailError = viewResult.ViewData.ModelState[nameof(contactDetailsSubmitModel.LastName)]?.Errors.FirstOrDefault();
             Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'LastName' field.");
             Assert.That(emailError!.ErrorMessage, Is.EqualTo(ValidationError));
-        });
+        }
     }
 
     [Test, MoqAutoData]

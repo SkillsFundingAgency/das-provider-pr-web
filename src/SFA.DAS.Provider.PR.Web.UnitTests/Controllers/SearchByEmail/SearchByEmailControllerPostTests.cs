@@ -228,14 +228,14 @@ public class SearchByEmailControllerPostTests
         var viewModel = viewResult.Model as SearchByEmailModel;
         Assert.That(viewModel, Is.Not.Null);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(viewModel!.Email, Is.Null);
 
             var emailError = viewResult.ViewData.ModelState[nameof(searchByEmailSubmitModel.Email)]?.Errors.FirstOrDefault();
             Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'Email' field.");
             Assert.That(emailError!.ErrorMessage, Is.EqualTo(ValidationError));
-        });
+        }
     }
 
     [Test, MoqAutoData]
@@ -267,14 +267,14 @@ public class SearchByEmailControllerPostTests
         var viewModel = viewResult.Model as SearchByEmailModel;
         Assert.That(viewModel, Is.Not.Null);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(viewModel!.Email, Is.EqualTo(searchByEmailSubmitModel.Email));
 
             var emailError = viewResult.ViewData.ModelState[nameof(searchByEmailSubmitModel.Email)]?.Errors.FirstOrDefault();
             Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'Email' field.");
             Assert.That(emailError!.ErrorMessage, Is.EqualTo(ValidationError));
-        });
+        }
     }
 
     [Test, MoqAutoData]

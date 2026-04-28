@@ -46,7 +46,7 @@ public class AddPermissionsControllerGetTests
         AddPermissionsViewModel? viewModel = viewResult.Model as AddPermissionsViewModel;
 
         sessionServiceMock.Verify(s => s.Get<AddEmployerSessionModel>(), Times.Once);
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(viewResult.ViewName, Is.EqualTo(AddPermissionsController.ViewPath));
             Assert.That(viewModel!.CancelLink, Is.EqualTo(CancelLink));
@@ -54,7 +54,7 @@ public class AddPermissionsControllerGetTests
             Assert.That(viewModel.Ukprn, Is.EqualTo(ukprn));
             Assert.That(viewModel.PermissionToAddCohorts, Is.EqualTo(SetPermissions.AddRecords.Yes));
             Assert.That(viewModel.PermissionToRecruit, Is.EqualTo(SetPermissions.RecruitApprentices.Yes));
-        });
+        }
     }
 
     [Test, MoqAutoData]
@@ -126,11 +126,11 @@ public class AddPermissionsControllerGetTests
         ViewResult? viewResult = result.As<ViewResult>();
         AddPermissionsViewModel? viewModel = viewResult.Model as AddPermissionsViewModel;
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(viewResult.ViewName, Is.EqualTo(AddPermissionsController.ViewPath));
             Assert.That(viewModel!.PermissionToAddCohorts, Is.EqualTo(permissionToAdd));
             Assert.That(viewModel.PermissionToRecruit, Is.EqualTo(permissionToRecruit));
-        });
+        }
     }
 }

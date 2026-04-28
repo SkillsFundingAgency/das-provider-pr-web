@@ -154,14 +154,14 @@ public class SearchByPayeControllerPostTests
         var viewModel = viewResult.Model as SearchByPayeModel;
         Assert.That(viewModel, Is.Not.Null);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(viewModel!.Paye, Is.Null);
 
             var emailError = viewResult.ViewData.ModelState[nameof(searchByPayeSubmitModel.Paye)]?.Errors.FirstOrDefault();
             Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'Paye' field.");
             Assert.That(emailError!.ErrorMessage, Is.EqualTo(ValidationError));
-        });
+        }
     }
 
     [Test, MoqAutoData]
@@ -195,14 +195,14 @@ public class SearchByPayeControllerPostTests
         var viewModel = viewResult.Model as SearchByPayeModel;
         Assert.That(viewModel, Is.Not.Null);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(viewModel!.Paye, Is.EqualTo(searchByPayeSubmitModel.Paye));
 
             var emailError = viewResult.ViewData.ModelState[nameof(searchByPayeSubmitModel.Paye)]?.Errors.FirstOrDefault();
             Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'Paye' field.");
             Assert.That(emailError!.ErrorMessage, Is.EqualTo(ValidationError));
-        });
+        }
     }
 
     [Test, MoqAutoData]
@@ -259,14 +259,14 @@ public class SearchByPayeControllerPostTests
         var viewModel = viewResult.Model as SearchByPayeModel;
         Assert.That(viewModel, Is.Not.Null);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(viewModel!.Aorn, Is.Null);
 
             var emailError = viewResult.ViewData.ModelState[nameof(searchByPayeSubmitModel.Aorn)]?.Errors.FirstOrDefault();
             Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'Aorn' field.");
             Assert.That(emailError!.ErrorMessage, Is.EqualTo(ValidationError));
-        });
+        }
     }
 
     [Test, MoqAutoData]
@@ -300,14 +300,14 @@ public class SearchByPayeControllerPostTests
         var viewModel = viewResult.Model as SearchByPayeModel;
         Assert.That(viewModel, Is.Not.Null);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(viewModel!.Aorn, Is.EqualTo(searchByPayeSubmitModel.Aorn));
 
             var emailError = viewResult.ViewData.ModelState[nameof(searchByPayeSubmitModel.Aorn)]?.Errors.FirstOrDefault();
             Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'Aorn' field.");
             Assert.That(emailError!.ErrorMessage, Is.EqualTo(ValidationError));
-        });
+        }
     }
 
     [Test, MoqAutoData]
@@ -341,14 +341,14 @@ public class SearchByPayeControllerPostTests
         var viewModel = viewResult.Model as SearchByPayeModel;
         Assert.That(viewModel, Is.Not.Null);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(viewModel!.Paye, Is.Null);
 
             var emailError = viewResult.ViewData.ModelState["Paye"]?.Errors.FirstOrDefault();
             Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'Paye' field.");
             Assert.That(emailError!.ErrorMessage, Is.EqualTo("Paye field is invalid"));
-        });
+        }
     }
 
     [Test, MoqAutoData]
@@ -382,14 +382,14 @@ public class SearchByPayeControllerPostTests
         var viewModel = viewResult.Model as SearchByPayeModel;
         Assert.That(viewModel, Is.Not.Null);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(viewModel!.Aorn, Is.Null);
 
             var emailError = viewResult.ViewData.ModelState["Aorn"]?.Errors.FirstOrDefault();
             Assert.That(emailError, Is.Not.Null, "Expected a validation error for the 'Aorn' field.");
             Assert.That(emailError!.ErrorMessage, Is.EqualTo("Aorn field is invalid"));
-        });
+        }
     }
 
     [Test, MoqAutoData]
