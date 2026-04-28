@@ -23,7 +23,7 @@ public class RequestPermissionsControllerTests
     private Mock<IOuterApiClient> _outerApiClientMock;
     private Mock<IEncodingService> _encodingServiceMock;
     private Mock<IValidator<RequestPermissionsSubmitModel>> _validatorMock;
-    private RequestPermissionsController sut;
+    private RequestPermissionsController? sut;
 
     [SetUp]
     public void Setup()
@@ -55,6 +55,12 @@ public class RequestPermissionsControllerTests
         sut.AddDefaultContext().AddUrlHelperMock().AddUrlForRoute(RouteNames.EmployerDetails,"employer-details-url");
 
         sut.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        sut?.Dispose();
     }
 
     [Test]
