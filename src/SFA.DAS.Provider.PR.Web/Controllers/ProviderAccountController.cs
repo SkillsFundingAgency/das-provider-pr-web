@@ -9,7 +9,7 @@ namespace SFA.DAS.Provider.PR.Web.Controllers;
 public class ProviderAccountController : ControllerBase
 {
     [Route("signout", Name = RouteNames.ProviderSignOut)]
-    public IActionResult SignOut()
+    public new IActionResult SignOut()
     {
         return SignOut(
             new Microsoft.AspNetCore.Authentication.AuthenticationProperties
