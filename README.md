@@ -58,7 +58,7 @@ AppSettings.Development.json file
 
 ## Technologies
 
-* .NetCore 8.0
+* .Net 10
 * REDIS
 * NUnit
 * Moq
