@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Encoding;
@@ -23,7 +22,7 @@ public class RequestPermissionsController(IOuterApiClient _outerApiclient, IEnco
     [HttpGet]
     public async Task<IActionResult> Index([FromRoute] int ukprn, [FromRoute] string accountLegalEntityId, CancellationToken cancellationToken)
     {
-        if(!string.IsNullOrWhiteSpace(GetRequestId()))
+        if (!string.IsNullOrWhiteSpace(GetRequestId()))
         {
             return RedirectToRoute(RouteNames.Employers, new { ukprn, HasPendingRequest = true });
         }
@@ -34,7 +33,7 @@ public class RequestPermissionsController(IOuterApiClient _outerApiclient, IEnco
     }
 
     [HttpPost]
-    public async Task<IActionResult> Index([FromRoute] long ukprn, [FromRoute] string accountLegalEntityId, RequestPermissionsSubmitModel requestPermissionsSubmitModel,CancellationToken cancellationToken)
+    public async Task<IActionResult> Index([FromRoute] long ukprn, [FromRoute] string accountLegalEntityId, RequestPermissionsSubmitModel requestPermissionsSubmitModel, CancellationToken cancellationToken)
     {
         var accountLegalEntityIdDecoded = encodingService.Decode(accountLegalEntityId, EncodingType.PublicAccountLegalEntityId);
 
@@ -45,7 +44,7 @@ public class RequestPermissionsController(IOuterApiClient _outerApiclient, IEnco
         requestPermissionsSubmitModel.ExistingPermissionToAddCohorts = existingPermissions.PermissionToAddCohorts!;
 
         if (!IsModelValid(requestPermissionsSubmitModel))
-        { 
+        {
             var model = await CreateRequestPermissionsViewModel(ukprn, accountLegalEntityId, cancellationToken);
             return View(model);
         }
@@ -87,7 +86,7 @@ public class RequestPermissionsController(IOuterApiClient _outerApiclient, IEnco
         var result = _validator.Validate(requestPermissionsSubmitModel);
         if (!result.IsValid)
         {
-            result.AddToModelState(ModelState);
+            ModelState.AddValidationErrors(result.Errors);
             return false;
         }
         return true;
