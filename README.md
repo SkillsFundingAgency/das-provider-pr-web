@@ -18,7 +18,7 @@ This is part of the provider portal. Here provider users can invite new employer
 
 * A clone of this repository
 * A storage emulator like Azurite
-* Visual studio 2022 or higher or similar IDE 
+* Visual studio or similar IDE 
 
 ### Dependencies
 
