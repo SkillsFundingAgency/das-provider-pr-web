@@ -108,11 +108,11 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
         }
 
         var requestResponse = await _outerApiClient.GetRequestByRequestId(new Guid(requestId), cancellationToken);
-        var response = requestResponse.GetContent();
+        GetRequestsByRequestIdResponse response = requestResponse.GetContent();
 
-        long? accountLegalEntityId = response?.AccountLegalEntityId;
+        long? accountLegalEntityId = response.AccountLegalEntityId;
 
-        string? employerName = response?.EmployerOrganisationName?.ToUpper();
+        string? employerName = response.EmployerOrganisationName?.ToUpper();
 
         if (string.IsNullOrEmpty(employerName))
         {
@@ -120,7 +120,7 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
         }
 
         var employerAccountLink = string.Empty;
-        if (accountLegalEntityId != null && response?.RequestType == RequestType.Permission.ToString())
+        if (accountLegalEntityId != null && response.RequestType == RequestType.Permission.ToString())
         {
             var accountLegalEntityIdEncoded = encodingService.Encode(accountLegalEntityId.Value, EncodingType.PublicAccountLegalEntityId);
             employerAccountLink = Url.RouteUrl(RouteNames.EmployerDetails, new { ukprn, accountLegalEntityId = accountLegalEntityIdEncoded })!;
