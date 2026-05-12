@@ -23,7 +23,7 @@ public class RequestPermissionsControllerTests
     private Mock<IOuterApiClient> _outerApiClientMock;
     private Mock<IEncodingService> _encodingServiceMock;
     private Mock<IValidator<RequestPermissionsSubmitModel>> _validatorMock;
-    private RequestPermissionsController sut;
+    private RequestPermissionsController sut = null!;
 
     [SetUp]
     public void Setup()
@@ -57,6 +57,12 @@ public class RequestPermissionsControllerTests
         sut.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        sut.Dispose();
+    }
+
     [Test]
     public async Task RequestPermissionsController_Index_RedirectsIfRequestIdExists()
     {
@@ -66,19 +72,18 @@ public class RequestPermissionsControllerTests
 
         var redirectResult = (RedirectToRouteResult)result;
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(result, Is.InstanceOf<RedirectToRouteResult>());
             Assert.That(redirectResult.RouteName, Is.EqualTo(RouteNames.Employers));
             Assert.That((bool)redirectResult?.RouteValues!["HasPendingRequest"]!, Is.True);
-        });
+        }
     }
 
     [Test]
     public async Task RequestPermissionsController_Index_ReturnsViewWithViewModel()
     {
         sut.TempData.Remove(TempDataKeys.PermissionsRequestId);
-        var viewModel = new RequestPermissionsViewModel();
 
         _encodingServiceMock.Setup(x => 
             x.Decode(
@@ -89,19 +94,19 @@ public class RequestPermissionsControllerTests
 
         var result = await sut.Index(12345, "accountLegalEntityId", CancellationToken.None);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(result, Is.InstanceOf<ViewResult>());
             var viewResult = (ViewResult)result;
             Assert.That(viewResult.Model, Is.InstanceOf<RequestPermissionsViewModel>());
 
-            var viewModel = ((RequestPermissionsViewModel)viewResult.Model!)!;
-            Assert.That(viewModel.AccountLegalEntityName, Is.EqualTo("ACCOUNTLEGALENTITYNAME"));
-            Assert.That(viewModel.ExistingPermissionToAddCohorts, Is.EqualTo(nameof(SetPermissions.AddRecords.Yes)));
-            Assert.That(viewModel.ExistingPermissionToRecruit, Is.EqualTo(nameof(SetPermissions.RecruitApprentices.Yes)));
-            Assert.That(viewModel.PermissionToAddCohorts, Is.EqualTo(nameof(SetPermissions.AddRecords.Yes)));
-            Assert.That(viewModel.PermissionToRecruit, Is.EqualTo(nameof(SetPermissions.RecruitApprentices.Yes)));
-        });
+            var model = ((RequestPermissionsViewModel)viewResult.Model!)!;
+            Assert.That(model.AccountLegalEntityName, Is.EqualTo("ACCOUNTLEGALENTITYNAME"));
+            Assert.That(model.ExistingPermissionToAddCohorts, Is.EqualTo(nameof(SetPermissions.AddRecords.Yes)));
+            Assert.That(model.ExistingPermissionToRecruit, Is.EqualTo(nameof(SetPermissions.RecruitApprentices.Yes)));
+            Assert.That(model.PermissionToAddCohorts, Is.EqualTo(nameof(SetPermissions.AddRecords.Yes)));
+            Assert.That(model.PermissionToRecruit, Is.EqualTo(nameof(SetPermissions.RecruitApprentices.Yes)));
+        }
     }
 
     [Test]
@@ -172,7 +177,7 @@ public class RequestPermissionsControllerTests
 
         var result = await sut.Index(12345, "accountLegalEntityId", submitModel, CancellationToken.None);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(sut.TempData.ContainsKey(TempDataKeys.AccountLegalEntityName), Is.True);
             Assert.That(sut.TempData[TempDataKeys.AccountLegalEntityName], Is.EqualTo("ACCOUNTLEGALENTITYNAME"));
@@ -181,6 +186,6 @@ public class RequestPermissionsControllerTests
             Assert.That(result, Is.InstanceOf<RedirectToRouteResult>());
             var redirectResult = (RedirectToRouteResult)result;
             Assert.That(redirectResult.RouteName, Is.EqualTo(RouteNames.RequestPermissionsConfirmation));
-        });
+        }
     }
 }

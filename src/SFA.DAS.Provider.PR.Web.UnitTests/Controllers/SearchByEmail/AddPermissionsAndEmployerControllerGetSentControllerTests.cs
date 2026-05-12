@@ -1,4 +1,4 @@
-﻿using AutoFixture.NUnit3;
+﻿using AutoFixture.NUnit4;
 using FluentAssertions;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
@@ -57,14 +57,14 @@ public class AddPermissionsAndEmployerControllerGetSentControllerTests
 
         sessionServiceMock.Verify(s => s.Get<AddEmployerSessionModel>(), Times.Once);
         sessionServiceMock.Verify(s => s.Delete<AddEmployerSessionModel>(), Times.Once);
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(viewResult.ViewName, Is.EqualTo(AddPermissionsAndEmployerController.ViewPathSent));
             Assert.That(viewModel!.ViewEmployersLink, Is.EqualTo(HomeLink));
             Assert.That(viewModel.Email, Is.EqualTo(email));
             Assert.That(viewModel.LegalName, Is.EqualTo(accountLegalName));
             Assert.That(viewModel.Ukprn, Is.EqualTo(ukprn));
-        });
+        }
     }
 
     [Test]

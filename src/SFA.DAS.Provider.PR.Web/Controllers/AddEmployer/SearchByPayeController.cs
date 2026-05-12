@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
-using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Encoding;
 using SFA.DAS.Provider.PR.Application.Constants;
 using SFA.DAS.Provider.PR.Domain.Interfaces;
 using SFA.DAS.Provider.PR.Web.Authorization;
+using SFA.DAS.Provider.PR.Web.Extensions;
 using SFA.DAS.Provider.PR.Web.Infrastructure;
 using SFA.DAS.Provider.PR.Web.Infrastructure.Services;
 using SFA.DAS.Provider.PR.Web.Models.AddEmployer;
@@ -70,7 +70,7 @@ public class SearchByPayeController(IOuterApiClient _outerApiClient, ISessionSer
             viewModel.Email = submitModel.Email;
             viewModel.Paye = submitModel.Paye;
             viewModel.Aorn = submitModel.Aorn;
-            result.AddToModelState(ModelState);
+            ModelState.AddValidationErrors(result.Errors);
             return View(ViewPath, viewModel);
         }
         var sessionModel = _sessionService.Get<AddEmployerSessionModel>();

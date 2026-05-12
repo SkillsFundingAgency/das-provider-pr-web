@@ -1,4 +1,4 @@
-﻿using AutoFixture.NUnit3;
+﻿using AutoFixture.NUnit4;
 using FluentAssertions;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
@@ -42,7 +42,7 @@ public class AddPermissionsAndEmployerControllerGetTests
         AddPermissionsAndEmployerViewModel? viewModel = viewResult.Model as AddPermissionsAndEmployerViewModel;
 
         sessionServiceMock.Verify(s => s.Get<AddEmployerSessionModel>(), Times.Once);
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(viewResult.ViewName, Is.EqualTo(AddPermissionsAndEmployerController.ViewPath));
             Assert.That(viewModel!.CancelLink, Is.EqualTo(CancelLink));
@@ -51,7 +51,7 @@ public class AddPermissionsAndEmployerControllerGetTests
             Assert.That(viewModel.Ukprn, Is.EqualTo(ukprn));
             Assert.That(viewModel.PermissionToAddCohorts, Is.EqualTo(SetPermissions.AddRecords.Yes));
             Assert.That(viewModel.PermissionToRecruit, Is.EqualTo(SetPermissions.RecruitApprentices.Yes));
-        });
+        }
     }
 
     [Test, MoqAutoData]
@@ -137,11 +137,11 @@ public class AddPermissionsAndEmployerControllerGetTests
         ViewResult? viewResult = result.As<ViewResult>();
         AddPermissionsAndEmployerViewModel? viewModel = viewResult.Model as AddPermissionsAndEmployerViewModel;
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(viewResult.ViewName, Is.EqualTo(AddPermissionsAndEmployerController.ViewPath));
             Assert.That(viewModel!.PermissionToAddCohorts, Is.EqualTo(permissionToAdd));
             Assert.That(viewModel.PermissionToRecruit, Is.EqualTo(permissionToRecruit));
-        });
+        }
     }
 }

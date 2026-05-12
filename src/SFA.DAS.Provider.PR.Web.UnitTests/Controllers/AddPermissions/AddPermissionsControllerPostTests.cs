@@ -1,4 +1,4 @@
-﻿using AutoFixture.NUnit3;
+﻿using AutoFixture.NUnit4;
 using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
@@ -89,12 +89,12 @@ public class AddPermissionsControllerPostTests
         AddPermissionsViewModel? viewModel = viewResult.Model as AddPermissionsViewModel;
 
         sessionServiceMock.Verify(s => s.Get<AddEmployerSessionModel>(), Times.Once);
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(viewResult.ViewName, Is.EqualTo(AddPermissionsController.ViewPath));
             Assert.That(viewModel!.CancelLink, Is.EqualTo(CancelLink));
             Assert.That(viewModel.Email, Is.EqualTo(sessionModel.Email));
             Assert.That(viewModel.Ukprn, Is.EqualTo(ukprn));
-        });
+        }
     }
 }

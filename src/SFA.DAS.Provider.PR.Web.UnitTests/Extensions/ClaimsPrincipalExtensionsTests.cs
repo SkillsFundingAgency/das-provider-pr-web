@@ -1,5 +1,5 @@
 ﻿using System.Security.Claims;
-using AutoFixture.NUnit3;
+using AutoFixture.NUnit4;
 using FluentAssertions;
 using SFA.DAS.Provider.PR.Web.Authorization;
 using SFA.DAS.Provider.PR.Web.Extensions;

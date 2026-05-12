@@ -1,4 +1,4 @@
-﻿using AutoFixture.NUnit3;
+﻿using AutoFixture.NUnit4;
 using FluentAssertions;
 using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
 using SFA.DAS.Provider.PR.Web.Constants;
@@ -110,11 +110,11 @@ public class OperationsMappingServiceDescriptionsToOperationsTests
         var operations = new List<Operation>();
         var result = OperationsMappingService.MapOperationsToDescriptions(operations);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(result.PermissionToAddCohorts, Is.EqualTo(SetPermissions.AddRecords.No));
             Assert.That(result.PermissionToRecruit, Is.EqualTo(SetPermissions.RecruitApprentices.No));
-        });
+        }
     }
 
     [Test]
@@ -123,11 +123,11 @@ public class OperationsMappingServiceDescriptionsToOperationsTests
         var operations = new List<Operation> { Operation.CreateCohort };
         var result = OperationsMappingService.MapOperationsToDescriptions(operations);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(result.PermissionToAddCohorts, Is.EqualTo(SetPermissions.AddRecords.Yes));
             Assert.That(result.PermissionToRecruit, Is.EqualTo(SetPermissions.RecruitApprentices.No));
-        });
+        }
     }
 
     [Test]
@@ -136,11 +136,11 @@ public class OperationsMappingServiceDescriptionsToOperationsTests
         var operations = new List<Operation> { Operation.Recruitment };
         var result = OperationsMappingService.MapOperationsToDescriptions(operations);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(result.PermissionToAddCohorts, Is.EqualTo(SetPermissions.AddRecords.No));
             Assert.That(result.PermissionToRecruit, Is.EqualTo(SetPermissions.RecruitApprentices.Yes));
-        });
+        }
     }
 
     [Test]
@@ -149,11 +149,11 @@ public class OperationsMappingServiceDescriptionsToOperationsTests
         var operations = new List<Operation> { Operation.RecruitmentRequiresReview };
         var result = OperationsMappingService.MapOperationsToDescriptions(operations);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(result.PermissionToAddCohorts, Is.EqualTo(SetPermissions.AddRecords.No));
             Assert.That(result.PermissionToRecruit, Is.EqualTo(SetPermissions.RecruitApprentices.YesWithReview));
-        });
+        }
     }
 
     [Test]
@@ -162,10 +162,10 @@ public class OperationsMappingServiceDescriptionsToOperationsTests
         var operations = new List<Operation> { Operation.CreateCohort, Operation.Recruitment, Operation.RecruitmentRequiresReview };
         var result = OperationsMappingService.MapOperationsToDescriptions(operations);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(result.PermissionToAddCohorts, Is.EqualTo(SetPermissions.AddRecords.Yes));
             Assert.That(result.PermissionToRecruit, Is.EqualTo(SetPermissions.RecruitApprentices.Yes));
-        });
+        }
     }
 }

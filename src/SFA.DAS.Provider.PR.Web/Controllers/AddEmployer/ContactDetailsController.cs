@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
-using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SFA.DAS.Provider.PR.Web.Authorization;
+using SFA.DAS.Provider.PR.Web.Extensions;
 using SFA.DAS.Provider.PR.Web.Infrastructure;
 using SFA.DAS.Provider.PR.Web.Infrastructure.Services;
 using SFA.DAS.Provider.PR.Web.Models.AddEmployer;
@@ -58,7 +58,7 @@ public class ContactDetailsController(ISessionService _sessionService, IValidato
         if (!result.IsValid)
         {
             var viewModel = GetViewModel(ukprn, sessionModel);
-            result.AddToModelState(ModelState);
+            ModelState.AddValidationErrors(result.Errors);
             return View(ViewPath, viewModel);
         }
 

@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
@@ -8,6 +7,7 @@ using SFA.DAS.Provider.PR.Application.Constants;
 using SFA.DAS.Provider.PR.Domain.Interfaces;
 using SFA.DAS.Provider.PR.Domain.OuterApi.Responses;
 using SFA.DAS.Provider.PR.Web.Authorization;
+using SFA.DAS.Provider.PR.Web.Extensions;
 using SFA.DAS.Provider.PR.Web.Infrastructure;
 using SFA.DAS.Provider.PR.Web.Infrastructure.Services;
 using SFA.DAS.Provider.PR.Web.Models.AddEmployer;
@@ -57,7 +57,7 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
         {
             var viewModel = GetViewModel(ukprn);
             viewModel.Email = submitModel.Email;
-            result.AddToModelState(ModelState);
+            ModelState.AddValidationErrors(result.Errors);
             return View(ViewPath, viewModel);
         }
 
@@ -108,11 +108,11 @@ public class SearchByEmailController(IOuterApiClient _outerApiClient, ISessionSe
         }
 
         var requestResponse = await _outerApiClient.GetRequestByRequestId(new Guid(requestId), cancellationToken);
-        var response = requestResponse.GetContent();
+        GetRequestsByRequestIdResponse response = requestResponse.GetContent();
 
-        long? accountLegalEntityId = response?.AccountLegalEntityId;
+        long? accountLegalEntityId = response.AccountLegalEntityId;
 
-        string? employerName = response?.EmployerOrganisationName?.ToUpper();
+        string? employerName = response.EmployerOrganisationName?.ToUpper();
 
         if (string.IsNullOrEmpty(employerName))
         {
