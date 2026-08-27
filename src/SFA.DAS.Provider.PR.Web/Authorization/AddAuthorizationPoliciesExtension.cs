@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Authorization;
-using SFA.DAS.Authorization.DependencyResolution.Microsoft;
 
 namespace SFA.DAS.Provider.PR.Web.Authorization;
 
